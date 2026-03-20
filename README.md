@@ -6,8 +6,8 @@
 | ------------- | ------------------------------------ |
 | **Author**    | Mohd Zamin Quadri                    |
 | **Programme** | M.Sc. Mathematics in Science and Engineering |
-| **Supervisor**| Prof. Dr. Rolf Moeckel               |
-| **Advisor**   | Dr. Ana Moreno                        |
+| **Supervisor**| Prof. Dr. Stephan Günnemann           |
+| **Advisor**   | Dominik Fuchsgruber, Elena Natterer, M.Sc. |
 | **Date**      | April 2026                            |
 
 ---
@@ -52,7 +52,7 @@ All methods are applied post-hoc to existing trained models. No retraining is re
 
 | Metric | Trial 7 | Trial 8 |
 | ------ | ------- | ------- |
-| MC Dropout Spearman rho | 0.469 | 0.482 |
+| MC Dropout Spearman rho | 0.444 | 0.482 |
 | Conformal 90% coverage  | 89.98% | 90.02% |
 | Conformal 95% coverage  | 95.03% | 95.01% |
 

@@ -164,7 +164,9 @@ def main():
         ax.set_facecolor(BG)
 
         # Main curve
-        ax.plot(x, y, "-o", color=color, lw=2.2, ms=6, zorder=4, label=f"MC σ abstention")
+        ax.plot(
+            x, y, "-o", color=color, lw=2.2, ms=6, zorder=4, label=f"MC σ abstention"
+        )
 
         # Baseline MC (100% retained)
         ax.axhline(
@@ -212,7 +214,9 @@ def main():
         ax.legend(fontsize=7.5, framealpha=0.85, loc="upper left")
         ax.grid(True, color=P_LGRAY, lw=0.5, alpha=0.7)
 
-    fig.text(0.5, -0.02, FOOTNOTE, ha="center", fontsize=7.5, color=P_MGRAY, style="italic")
+    fig.text(
+        0.5, -0.02, FOOTNOTE, ha="center", fontsize=7.5, color=P_MGRAY, style="italic"
+    )
     fig.subplots_adjust(left=0.08, right=0.97, top=0.89, bottom=0.14, wspace=0.30)
 
     for ext in ("pdf", "png"):
@@ -221,12 +225,10 @@ def main():
         print(f"  Saved: {out}")
     plt.close(fig)
 
-
     # -- Markdown report 2A --──────────────────────────────────────────────────────
     def _get(col, pct):
         row = sel_df[sel_df["retained_pct"] == pct]
         return float(row[col].values[0]) if not row.empty else float("nan")
-
 
     mae_90 = _get("MAE", 90)
     rmse_90 = _get("RMSE", 90)
@@ -316,7 +318,6 @@ def main():
     (OUT_MD / "UQ_SELECTIVE_PREDICTION_T8.md").write_text(md_sel, encoding="utf-8")
     print(f"  Saved: {OUT_MD / 'UQ_SELECTIVE_PREDICTION_T8.md'}")
 
-
     # ═══════════════════════════════════════════════════════════════════════════════
     # PART 2B — Uncertainty as Error Detector (AUROC / AUPRC)
     # ═══════════════════════════════════════════════════════════════════════════════
@@ -324,6 +325,17 @@ def main():
 
     sigma = df["pred_mc_std"].values.astype(np.float64)
     errors = df["abs_error_det"].values.astype(np.float64)
+
+    # Subsample for curve plotting (memory-safe); scalar metrics use full data
+    MAX_CURVE = 300_000
+    if len(sigma) > MAX_CURVE:
+        rng = np.random.RandomState(42)
+        idx_sub = rng.choice(len(sigma), MAX_CURVE, replace=False)
+        sigma_curve = sigma[idx_sub]
+        errors_curve = errors[idx_sub]
+    else:
+        sigma_curve = sigma
+        errors_curve = errors
 
     p90_cutoff = float(np.percentile(errors, 90))
     p80_cutoff = float(np.percentile(errors, 80))
@@ -338,13 +350,16 @@ def main():
     pr_data = {}
 
     for name, cutoff in thresholds.items():
-        labels = (errors >= cutoff).astype(int)
-        n_pos = int(labels.sum())
-        pct_pos = n_pos / len(labels) * 100
-        auroc = float(roc_auc_score(labels, sigma))
-        auprc = float(average_precision_score(labels, sigma))
-        fpr, tpr, _ = roc_curve(labels, sigma)
-        prec, rec, _ = precision_recall_curve(labels, sigma)
+        # Scalar metrics on FULL data (exact values)
+        labels_full = (errors >= cutoff).astype(int)
+        n_pos = int(labels_full.sum())
+        pct_pos = n_pos / len(labels_full) * 100
+        auroc = float(roc_auc_score(labels_full, sigma))
+        auprc = float(average_precision_score(labels_full, sigma))
+        # Curves on SUBSAMPLE (memory-safe, for plotting only)
+        labels_sub = (errors_curve >= cutoff).astype(int)
+        fpr, tpr, _ = roc_curve(labels_sub, sigma_curve)
+        prec, rec, _ = precision_recall_curve(labels_sub, sigma_curve)
         roc_data[name] = (fpr, tpr, auroc)
         pr_data[name] = (prec, rec, auprc, pct_pos / 100)
         rows_det.append(
@@ -385,7 +400,13 @@ def main():
     ax = axes[0]
     ax.set_facecolor(BG)
     ax.plot(
-        [0, 1], [0, 1], "--", color=P_MGRAY, lw=1.2, label="Random (AUROC=0.50)", zorder=2
+        [0, 1],
+        [0, 1],
+        "--",
+        color=P_MGRAY,
+        lw=1.2,
+        label="Random (AUROC=0.50)",
+        zorder=2,
     )
     for name, (fpr, tpr, auroc) in roc_data.items():
         ax.plot(
@@ -438,7 +459,9 @@ def main():
     ax.legend(fontsize=8, framealpha=0.85, loc="upper right")
     ax.grid(True, color=P_LGRAY, lw=0.5, alpha=0.7)
 
-    fig.text(0.5, -0.02, FOOTNOTE, ha="center", fontsize=7.5, color=P_MGRAY, style="italic")
+    fig.text(
+        0.5, -0.02, FOOTNOTE, ha="center", fontsize=7.5, color=P_MGRAY, style="italic"
+    )
     fig.subplots_adjust(left=0.08, right=0.97, top=0.89, bottom=0.14, wspace=0.30)
 
     for ext in ("pdf", "png"):
@@ -446,7 +469,6 @@ def main():
         fig.savefig(out, dpi=300, bbox_inches="tight", facecolor=BG)
         print(f"  Saved: {out}")
     plt.close(fig)
-
 
     # -- Markdown report 2B --──────────────────────────────────────────────────────
     r10 = det_df[det_df["threshold"] == "top10"].iloc[0]
