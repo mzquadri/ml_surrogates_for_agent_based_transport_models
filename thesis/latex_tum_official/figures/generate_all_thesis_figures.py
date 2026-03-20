@@ -172,7 +172,7 @@ def fig2_uq_ranking():
         "Exp A\nCombined",
         "Exp B\nMulti-Ens.",
     ]
-    rho = [0.4263, 0.4186, 0.4437, 0.4820, 0.1600, 0.1035, 0.1601, 0.1167]
+    rho = [0.4263, 0.4186, 0.4460, 0.4820, 0.1600, 0.1035, 0.1601, 0.1167]
     colors = ([P_BLUE] * 4) + ([P_AMBER] * 4)
 
     fig, ax = plt.subplots(figsize=(11, 5.2))
