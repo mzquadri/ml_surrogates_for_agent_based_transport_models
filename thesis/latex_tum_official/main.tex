@@ -78,28 +78,6 @@
 
 \appendix{}
 
-\chapter{Code Repository}
-\label{appendix:code}
-
-The source code, trained model weights, pre-computed predictions, and figure generation scripts accompanying this thesis are publicly available at:
-
-\begin{center}
-\url{https://github.com/mzquadri/ml_surrogates_for_agent_based_transport_models}
-\end{center}
-
-\noindent The repository contains:
-\begin{itemize}
-    \item \textbf{GNN model implementations} -- all architectures evaluated in this thesis, including the PointNet + Transformer + GAT hybrid (\texttt{scripts/gnn/models/})
-    \item \textbf{Training pipeline} -- scripts for training and hyperparameter configuration (\texttt{scripts/training/})
-    \item \textbf{Uncertainty quantification analyses} -- MC Dropout, conformal prediction, calibration audit, and selective prediction scripts (\texttt{scripts/evaluation/})
-    \item \textbf{Data preprocessing} -- MATSim simulation output to PyTorch Geometric graph conversion (\texttt{scripts/data\_preprocessing/})
-    \item \textbf{Trained model weights and predictions} -- all eight trials with deterministic and MC Dropout predictions (\texttt{data/TR-C\_Benchmarks/})
-    \item \textbf{Thesis figures} -- generation scripts and PDF/PNG outputs (\texttt{thesis/.../figures/})
-    \item \textbf{Environment specifications} -- Conda environment files for reproducibility (\texttt{environment-minimal.yml})
-\end{itemize}
-
-\noindent Detailed instructions for environment setup, reproduction of results, and figure generation are provided in the repository's \texttt{README\_SUBMISSION.md}.
-
 \microtypesetup{protrusion=false}
 
 \addchap{Abbreviations}
