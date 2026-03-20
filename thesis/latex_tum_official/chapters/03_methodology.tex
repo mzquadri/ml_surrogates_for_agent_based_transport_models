@@ -22,8 +22,8 @@ Each node $i$ is characterized by five input features:
 \midrule
 \texttt{VOL\_BASE\_CASE} & vehicles/hour & Traffic volume in baseline scenario \\
 \texttt{CAPACITY\_BASE\_CASE} & vehicles/hour & Road segment capacity \\
-\texttt{CAPACITY\_REDUCTION} & fraction & Policy-induced capacity change (0--1) \\
-\texttt{FREESPEED} & km/h & Free-flow speed limit \\
+\texttt{CAPACITY\_REDUCTION} & vehicles/hour & Policy-induced capacity reduction (absolute, $\leq 0$) \\
+\texttt{FREESPEED} & m/s & Free-flow speed limit \\
 \texttt{LENGTH} & meters & Road segment length \\
 \bottomrule
 \end{tabular}
