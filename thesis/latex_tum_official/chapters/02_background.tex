@@ -1,0 +1,156 @@
+% !TEX root = ../main.tex
+
+\chapter{Background and Related Work}\label{chapter:background}
+
+This chapter sets out the theoretical background for the work that follows. Section~\ref{sec:abm} covers agent-based transport models and the MATSim simulation framework. Section~\ref{sec:gnn} introduces graph neural networks and their application to traffic prediction. Section~\ref{sec:uq} reviews uncertainty quantification in deep learning, with particular attention to Monte Carlo Dropout, deep ensembles, and conformal prediction. Section~\ref{sec:related} situates this work within the existing literature on ML surrogates and uncertainty quantification for graph-based predictions.
+
+\section{Agent-Based Transport Models}\label{sec:abm}
+
+Agent-based models (ABMs) simulate complex systems by modelling individual entities and their interactions~\cite{bonabeau2002agent, railsback2019agent}. Rather than describing aggregate traffic flow with differential equations, they let emergent patterns arise from the decisions of many autonomous agents. In transport applications, agents typically represent travellers who decide on routes, departure times, and travel modes. The resulting macroscopic traffic patterns emerge from---and can only be understood through---the collective effect of these individual choices.
+
+\begin{definition}[Agent-Based Model]
+An agent-based model consists of a set of autonomous agents $\mathcal{A} = \{a_1, a_2, \ldots, a_N\}$, an environment $\mathcal{E}$ in which agents operate, and a set of rules $\mathcal{R}$ governing agent behavior and interactions. Each agent $a_i$ maintains an internal state $s_i$ and makes decisions based on local observations and objectives.
+\end{definition}
+
+\subsection{MATSim Framework}
+
+The Multi-Agent Transport Simulation (MATSim) framework~\cite{horni2016matsim} is a widely-used open-source platform for large-scale transport simulations. Each synthetic agent has a daily activity plan specifying where they need to go and when; the simulation handles activity scheduling and location choice, mode selection across car, public transit, cycling, and walking, route choice based on experienced travel times, and dynamic traffic assignment through queue-based network loading. A typical run iterates through multiple synthetic ``days,'' with agents learning from experience and gradually revising their plans. This evolutionary process converges toward a user equilibrium where no agent can unilaterally improve their travel time~\cite{horni2016matsim}.
+
+\subsection{Computational Challenges}
+
+While MATSim provides high-fidelity traffic predictions, the computational cost is substantial. Simulating the Paris metropolitan region---our study area---requires more than eight hours per scenario on modern hardware, significant memory for agent state tracking, and multiple iterations to reach equilibrium. These constraints motivate the development of surrogate models that can approximate MATSim outputs at a fraction of the computational cost.
+
+\section{Graph Neural Networks}\label{sec:gnn}
+
+Graph Neural Networks (GNNs) extend deep learning to graph-structured data, making them natural candidates for traffic network analysis~\cite{scarselli2009graph, kipf2017semi, wu2020comprehensive}. The formal definition of graphs and the message passing framework underlying modern GNNs are introduced below.
+
+\begin{definition}[Graph]
+A graph is a tuple $\mathcal{G} = (\mathcal{V}, \mathcal{E}, \mathbf{X}, \mathbf{E})$ defined by a nonempty finite set of nodes $\mathcal{V}$, a set of edges $\mathcal{E} \subseteq \mathcal{V} \times \mathcal{V}$, node features $\mathbf{X} \in \mathbb{R}^{|\mathcal{V}| \times d_n}$, and edge features $\mathbf{E} \in \mathbb{R}^{|\mathcal{E}| \times d_e}$.
+\end{definition}
+
+The neighbourhood of a node $v$, denoted $\mathcal{N}(v)$, is the set of all nodes connected to $v$ by an edge: $\mathcal{N}(v) = \{u \in \mathcal{V} \mid (u, v) \in \mathcal{E}\}$.
+
+\subsection{Message Passing Framework}
+
+Modern GNNs follow the message passing paradigm~\cite{gilmer2017neural}, where node representations are iteratively updated through neighbourhood aggregation:
+
+\begin{definition}[Message Passing Neural Network]
+Given initial node representations $\mathbf{h}_v^{(0)} = \mathbf{x}_v$, a message passing neural network updates node representations over $K$ layers through the following operations:
+\begin{align}
+    \mathbf{m}_v^{(k)} &= \text{\textsc{Aggregate}}^{(k)}\left(\left\{\mathbf{h}_u^{(k-1)} : u \in \mathcal{N}(v)\right\}\right) \label{eq:aggregate}\\
+    \mathbf{h}_v^{(k)} &= \text{\textsc{Update}}^{(k)}\left(\mathbf{h}_v^{(k-1)}, \mathbf{m}_v^{(k)}\right) \label{eq:update}
+\end{align}
+where $\mathbf{h}_v^{(k)}$ denotes the representation of node $v$ at layer $k$, \textsc{Aggregate} is a permutation-invariant function, and \textsc{Update} combines the aggregated neighbourhood information with the node's previous representation.
+\end{definition}
+
+\subsection{Graph Attention Networks}
+
+Graph Attention Networks (GATs)~\cite{velickovic2018graph} introduce attention mechanisms to weight neighbor contributions dynamically:
+
+\begin{equation}
+    \alpha_{ij} = \frac{\exp\left(\text{LeakyReLU}\left(\mathbf{a}^T[\mathbf{W}\mathbf{h}_i \| \mathbf{W}\mathbf{h}_j]\right)\right)}{\sum_{k \in \mathcal{N}(i)} \exp\left(\text{LeakyReLU}\left(\mathbf{a}^T[\mathbf{W}\mathbf{h}_i \| \mathbf{W}\mathbf{h}_k]\right)\right)}
+\end{equation}
+
+where $\alpha_{ij}$ represents the attention coefficient between nodes $i$ and $j$, $\mathbf{W}$ is a learnable weight matrix, and $\mathbf{a}$ is the attention vector. This attention mechanism enables the model to learn which neighbors are most relevant for each prediction.
+
+\subsection{GNNs for Traffic Prediction}
+
+Recent work has demonstrated strong GNN performance on traffic prediction tasks~\cite{li2018diffusion, yu2018spatio, zhao2020tgcn, jiang2022graph}. The dominant approach combines spatial message-passing over the road graph with temporal sequence modelling using recurrent or attention-based layers. Li~et~al.~\cite{li2018diffusion} introduced diffusion-based graph convolutions to capture directional traffic flow, while Yu~et~al.~\cite{yu2018spatio} combined graph convolutions with gated recurrent units for short-term speed forecasting. Subsequent work extended these ideas to multi-hop attention and multi-scale spatial representations~\cite{jiang2022graph}. A common thread is the treatment of intersections as graph nodes, with edges representing road links between them.
+
+An important representational choice, adopted in this thesis following~\textcite{natterer2025ml}, is to represent road segments---rather than intersections---as graph nodes. This \emph{line graph} transformation assigns each road link its own node, enabling the model to predict link-level traffic changes directly. A consequence is that each node must carry the geometric coordinates of its corresponding road segment; in the PointNetTransfGAT architecture, this is handled by providing the 2D start and end positions of each segment as auxiliary positional inputs to the PointNetConv layers, as described in Chapter~\ref{chapter:methodology}.
+
+\section{Uncertainty Quantification in Deep Learning}\label{sec:uq}
+
+Uncertainty quantification (UQ) enables models to express confidence in their predictions~\cite{abdar2021review, gawlikowski2023survey}. Understanding uncertainty is critical for deploying machine learning models in decision support applications where reliability matters.
+
+\begin{definition}[Aleatoric Uncertainty]
+Aleatoric uncertainty, also known as data uncertainty, arises from inherent randomness in the observations. This uncertainty is irreducible and cannot be eliminated by collecting more data. In traffic prediction, day-to-day variation in travel demand represents aleatoric uncertainty.
+\end{definition}
+
+\begin{definition}[Epistemic Uncertainty]
+Epistemic uncertainty, also known as model uncertainty, arises from limited training data or model capacity. This uncertainty is reducible and decreases as more data becomes available. Epistemic uncertainty is the primary focus of this thesis.
+\end{definition}
+
+\subsection{Bayesian Neural Networks}
+
+Bayesian neural networks (BNNs) place distributions over network weights rather than point estimates~\cite{mackay1992practical, neal1996bayesian}. For a network with weights $\mathbf{w}$, we seek the posterior distribution:
+
+\begin{equation}
+    p(\mathbf{w}|\mathcal{D}) = \frac{p(\mathcal{D}|\mathbf{w})p(\mathbf{w})}{p(\mathcal{D})}
+\end{equation}
+
+where $\mathcal{D}$ denotes the training data, $p(\mathcal{D}|\mathbf{w})$ is the likelihood, and $p(\mathbf{w})$ is the prior over weights. Exact posterior inference is intractable for neural networks due to the high dimensionality of the weight space, motivating the development of approximate inference methods.
+
+\subsection{Monte Carlo Dropout}
+
+Gal and Ghahramani~\cite{gal2016dropout} established a theoretical connection between dropout and approximate Bayesian inference. By keeping dropout active at test time and performing $T$ forward passes, we obtain samples from an approximate posterior distribution:
+
+\begin{definition}[MC Dropout Uncertainty Estimation]
+For an input $\mathbf{x}$, MC Dropout performs $T$ stochastic forward passes with dropout enabled:
+\begin{equation}
+    \hat{y}_t = f_{\hat{\mathbf{w}}_t}(\mathbf{x}), \quad t = 1, \ldots, T
+\end{equation}
+where $\hat{\mathbf{w}}_t$ represents the weights after applying dropout mask $t$. The predictive mean and variance are estimated as:
+\begin{align}
+    \mathbb{E}[y] &\approx \frac{1}{T}\sum_{t=1}^{T}\hat{y}_t \\
+    \text{Var}[y] &\approx \frac{1}{T}\sum_{t=1}^{T}(\hat{y}_t - \mathbb{E}[y])^2
+\end{align}
+\end{definition}
+
+MC Dropout is particularly attractive for practical applications because it requires no architectural modifications---only keeping dropout active during inference. This makes it straightforward to add uncertainty quantification to existing trained models. In our experiments (Chapter~\ref{chapter:methodology}), we use $S = 30$ stochastic forward passes (denoted $S$ to distinguish from the general $T$ above).
+
+\subsection{Deep Ensembles}
+
+Deep ensembles~\cite{lakshminarayanan2017simple} take an alternative approach by training $M$ networks independently with different random initializations:
+
+\begin{definition}[Deep Ensemble Uncertainty Estimation]
+Given $M$ independently trained networks with weights $\{\mathbf{w}_1, \ldots, \mathbf{w}_M\}$, the ensemble prediction and uncertainty are:
+\begin{align}
+    \mathbb{E}[y] &= \frac{1}{M}\sum_{m=1}^{M}f_{\mathbf{w}_m}(\mathbf{x}) \\
+    \text{Var}[y] &= \frac{1}{M}\sum_{m=1}^{M}\left(f_{\mathbf{w}_m}(\mathbf{x}) - \mathbb{E}[y]\right)^2
+\end{align}
+\end{definition}
+
+Ensembles often provide well-calibrated uncertainty estimates but require training and maintaining multiple models, increasing computational cost by a factor of $M$. This trade-off between uncertainty quality and computational efficiency is a central consideration in our experimental evaluation.
+
+\subsection{Conformal Prediction}
+
+Conformal prediction~\cite{angelopoulos2023conformal, vovk2005algorithmic} is a distribution-free framework for constructing prediction intervals with guaranteed finite-sample coverage. Unlike Bayesian methods, conformal prediction requires no assumptions about the form of the model's predictive distribution---only \emph{exchangeability} of the data.
+
+\begin{definition}[Split Conformal Prediction]
+Given a pre-trained model $f$, a calibration set $\mathcal{D}_\text{cal} = \{(x_i, y_i)\}_{i=1}^n$, and a desired coverage level $1 - \alpha$, split conformal prediction proceeds as follows:
+\begin{enumerate}
+    \item Compute nonconformity scores $s_i = |y_i - f(x_i)|$ for each calibration point.
+    \item Set the quantile threshold $q = \text{Quantile}\!\left(s_1, \ldots, s_n;\, \frac{\lceil (n+1)(1-\alpha) \rceil}{n}\right)$.
+    \item For a new test point $x_\text{new}$, construct the prediction interval $\mathcal{C}(x_\text{new}) = [f(x_\text{new}) - q,\; f(x_\text{new}) + q]$.
+\end{enumerate}
+\end{definition}
+
+The key property is a finite-sample marginal coverage guarantee: for any new test point drawn exchangeably from the same distribution,
+\begin{equation}
+    \Pr\!\left(y_\text{new} \in \mathcal{C}(x_\text{new})\right) \geq 1 - \alpha.
+\end{equation}
+
+This guarantee is \emph{model-agnostic} and holds regardless of whether the underlying model's uncertainty estimates are well-calibrated. The trade-off is that conformal intervals are fixed-width (not adaptive to individual inputs), so the coverage guarantee is marginal rather than conditional on each input.
+
+In our experiments (Section~\ref{sec:conformal_results}), we apply split conformal prediction to Trial~8 using the absolute residual as the nonconformity score, with a 50/50 calibration--evaluation split of the 100 test graphs.
+
+\subsection{Evaluating Uncertainty Quality}
+
+High-quality uncertainty estimates should correlate with actual prediction errors: the model should express higher uncertainty when it is more likely to be wrong. Three metrics are used to assess this in our experiments. The \textbf{Spearman rank correlation} ($\rho$) measures the monotonic relationship between predicted uncertainty and absolute prediction error; values range from $-1$ to $+1$, with positive values indicating that higher uncertainty corresponds to higher error. \textbf{Calibration curves} assess whether $p$\% prediction intervals actually contain $p$\% of true values, with well-calibrated models tracking the diagonal. Finally, the \textbf{negative log-likelihood (NLL)} is a proper scoring rule that jointly evaluates prediction accuracy and calibration in a single quantity.
+
+\section{Related Work}\label{sec:related}
+
+\subsection{Machine Learning Surrogates for Transport Models}
+
+Machine learning surrogates for transport simulations have received increasing attention in recent years~\cite{natterer2025ml}. Historically, surrogate approaches in the transport domain relied on statistical emulation or shallow regression models trained to reproduce aggregate outputs of expensive simulation runs. Willard et al.~\cite{willard2022integrating} provide a broad review of physics-informed machine learning methods used as surrogates across scientific domains, highlighting the tension between data efficiency and physical consistency---a tension that persists when replacing agent-based simulations with learned approximations. More recently, graph-based representations have proven particularly effective for transport surrogates because they preserve the network topology essential for capturing traffic propagation effects~\cite{natterer2025ml}.
+
+The PointNetTransfGAT architecture~\cite{natterer2025ml} combines ideas from PointNet, transformers, and graph attention networks to achieve strong performance on traffic prediction from policy scenarios. This architecture forms the foundation for the uncertainty quantification experiments in this thesis.
+
+\subsection{Uncertainty Quantification for Traffic Prediction}
+
+Uncertainty quantification in traffic prediction remains relatively underexplored. Wang et al.~\cite{wang2023uncertainty} apply probabilistic graph neural networks to spatiotemporal travel demand forecasting — a temporal task in which the model ingests a sequence of observed demand snapshots and predicts future values. This differs fundamentally from the setting studied here: predicting the \emph{change} in link-level traffic volume induced by a transport policy scenario is a static, cross-sectional regression problem with no temporal component. The distributional challenges and appropriate UQ methods therefore differ substantially. To our knowledge, the combination of GNN-based surrogates with distribution-free coverage guarantees via conformal prediction has not been previously explored in the transport literature, and this work addresses that gap.
+
+\subsection{Uncertainty Quantification for GNNs}
+
+Recent work has extended UQ methods to GNNs~\cite{zhang2019bayesian, hasanzadeh2020bayesian}, though primarily for node classification tasks rather than regression. Bayesian GNNs~\cite{zhang2019bayesian} place prior distributions over graph convolutional weights and perform approximate posterior inference, while DropEdge-style approaches~\cite{hasanzadeh2020bayesian} use stochastic edge dropout as a form of variational inference over graph structure. Key findings suggest that graph structure can both help (by providing regularization through neighbourhood aggregation) and hurt (by propagating uncertainty through connected nodes) prediction confidence. The node-level regression setting studied here — where each node represents a road segment and the prediction target is a continuous traffic flow change — introduces different distributional challenges than the categorical outputs most commonly studied in this literature. The interplay between graph structure and uncertainty quantification in regression settings therefore remains an open research question that this thesis helps to address.

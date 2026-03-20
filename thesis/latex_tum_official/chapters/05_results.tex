@@ -1,0 +1,595 @@
+% !TEX root = ../main.tex
+
+\chapter{Results}\label{chapter:results}
+
+This chapter reports results from the eight training trials and the subsequent uncertainty quantification experiments. All metric values are sourced directly from JSON evaluation files produced during model training and testing, and all experiments use \textbf{1,000 of 10,000 available MATSim scenarios (10\% subset)}.
+
+\section{Model Training Results}
+
+We evaluate model performance using standard regression metrics: coefficient of determination ($R^2$), Mean Absolute Error (MAE), and Root Mean Square Error (RMSE)~\cite{chai2014root, nagelkerke1991note}.
+
+\subsection{Performance Summary}
+
+Table~\ref{tab:trial_results} summarizes test-set performance across all 8 training trials. Trials~1--6 are evaluated on 50 test graphs (1,581,750 nodes); Trials~7--8 on 100 test graphs (3,163,500 nodes). Trial~1 uses a \texttt{Linear(64$\to$1)} final layer; Trials~2--8 use \texttt{GATConv(64$\to$1)}.
+
+\begin{table}[htbp]
+\centering
+\caption[Test-set performance across all 8 training trials]{Test-set performance across all 8 training trials. Sources: \texttt{test\_evaluation\_\allowbreak{}complete.json} (T2--T8) and \texttt{test\_results.json} (T1, T4). Note the architectural difference between T1 and T2--T8, and the split difference between T1--T6 and T7--T8.}
+\label{tab:trial_results}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{lccccccc}
+\toprule
+\textbf{Trial} & \textbf{Final Layer} & \textbf{Split} & \textbf{Test Graphs} & \textbf{Test $R^2$} & \textbf{MAE (veh/h)} & \textbf{RMSE (veh/h)} & \textbf{Pearson $r$} \\
+\midrule
+T1 & Linear & 80/15/5 & 50 & 0.7860 & 2.97 & 5.40 & 0.888 \\
+T2 & GATConv & 80/15/5 & 50 & 0.5117 & 4.33 & 8.15 & 0.719 \\
+T3 & GATConv & 80/15/5 & 50 & 0.2246 & 5.99 & 10.27 & 0.639 \\
+T4 & GATConv & 80/15/5 & 50 & 0.2426 & 6.08 & 10.15 & 0.634 \\
+T5 & GATConv & 80/15/5 & 50 & 0.5553 & 4.24 & 7.78 & 0.747 \\
+T6 & GATConv & 80/15/5 & 50 & 0.5223 & 4.32 & 8.06 & 0.726 \\
+T7 & GATConv & 80/10/10 & 100 & 0.5471 & 4.06 & 7.53 & 0.741 \\
+\textbf{T8} & \textbf{GATConv} & \textbf{80/10/10} & \textbf{100} & \textbf{0.5957} & \textbf{3.96} & \textbf{7.12} & \textbf{0.773} \\
+\bottomrule
+\end{tabular}%
+}
+\vspace{2pt}
+\begin{minipage}{\linewidth}
+\footnotesize For reference, \textcite{natterer2025ml} report an overall $R^2 = 0.91$ on the full 10,000-scenario dataset; direct comparison is not valid due to the 10$\times$ difference in training data scale (1,000 vs 10,000 scenarios).
+\end{minipage}
+\end{table}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{figures/fig1_trial_comparison.pdf}
+\caption[Test-set performance across Trials~2--8]{Test-set performance across Trials~2--8 (T1 excluded; different architecture). $R^2$, MAE, and RMSE are shown left to right. T8 achieves the best result among comparable trials ($R^2 = 0.5957$, MAE $= 3.96$ veh/h). Based on 1,000 scenarios (10\% subset); T1--T6 on 50 test graphs, T7--T8 on 100.}
+\label{fig:trial_comparison}
+\end{figure}
+
+\subsection{Discussion of Trial Results}
+
+Trial~1 achieves the highest $R^2 = 0.7860$ and lowest MAE $= 2.97$ veh/h among all trials. However, Trial~1 uses a structurally different \texttt{Linear} final layer and zero dropout, making it architecturally incompatible with Trials~2--8 (\texttt{GATConv} final layer, non-zero dropout). This difference has two consequences: first, direct performance comparison between T1 and T2--T8 conflates the effect of the output layer type with other hyperparameter differences; second, MC Dropout UQ is \emph{undefined} for Trial~1 because zero dropout means all stochastic forward passes produce identical outputs, yielding zero variance. Trial~1 is therefore excluded from all UQ experiments as a principled architectural constraint, not as an arbitrary choice.
+
+Among Trials~2--8 (comparable architecture with \texttt{GATConv} output and non-zero dropout), Trial~8 achieves the best test performance: $R^2 = 0.5957$, MAE $= 3.96$ veh/h, RMSE $= 7.12$ veh/h. Trials~3--4 (weighted loss) show markedly lower $R^2$ (0.22--0.24), indicating that weighted MSE loss did not improve generalization on this dataset.
+
+\subsection{Best Model Selection}
+
+Trial~1 achieves the highest absolute scores ($R^2 = 0.7860$, MAE $= 2.97$ veh/h), demonstrating that the underlying feature representations learned by the PointNetTransfGAT backbone are effective. However, Trial~1 is structurally incompatible with MC Dropout uncertainty quantification: its zero effective dropout rate means stochastic forward passes produce no variance, making uncertainty estimation impossible. The exclusion of Trial~1 from UQ experiments is therefore a necessary methodological constraint---MC Dropout requires non-zero dropout by definition~\cite{gal2016dropout}. Among the comparable trials (T2--T8, all using \texttt{GATConv} output with non-zero dropout), Trial~8 is the strongest performer ($R^2 = 0.5957$, MAE $= 3.96$ veh/h) and is therefore used for all UQ experiments. Trial~1's higher accuracy serves as a useful reference point, indicating headroom that future architectural refinements (e.g., combining a linear output head with a separate uncertainty mechanism) might recover.
+
+\section{MC Dropout Uncertainty Quality}
+
+\subsection{Spearman Correlation Results}
+
+Table~\ref{tab:mc_dropout_rho} shows Spearman~$\rho$ between MC Dropout uncertainty and absolute prediction error for Trials~5--8 ($S = 30$ MC samples). A higher $\rho$ indicates that the model's uncertainty estimates better predict where errors occur.
+
+\begin{table}[htbp]
+\centering
+\caption[MC Dropout uncertainty-error correlation (Spearman~$\rho$)]{Spearman~$\rho$ between MC Dropout uncertainty and absolute prediction error, $S = 30$ forward passes. T8 achieves the strongest correlation ($\rho = 0.4820$).}
+\label{tab:mc_dropout_rho}
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Trial} & \textbf{Dropout} & \textbf{Test Graphs} & \textbf{Test Nodes} & \textbf{Spearman $\rho$} \\
+\midrule
+T5 & 0.3 & 50 & 1,581,750 & 0.4263 \\
+T6 & 0.3 & 50 & 1,581,750 & 0.4186 \\
+T7 & 0.3 & 100 & 3,163,500 & 0.4437 \\
+\textbf{T8} & \textbf{0.2} & \textbf{100} & \textbf{3,163,500} & \textbf{0.4820} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Trial~8 achieves the highest Spearman~$\rho = 0.4820$, meaning its uncertainty estimates have the strongest rank-correlation with actual prediction errors. However, Trial~8 differs from Trials~5--6 in both dropout rate (0.2 vs 0.3) and data split (80/10/10 vs 80/15/5), and from Trial~7 in dropout rate and learning rate ($5\times10^{-4}$ vs $6\times10^{-4}$); batch size is identical (8) across all four. The $\rho$ improvement therefore cannot be attributed solely to the reduced dropout rate.
+
+\subsection{T8 MC Dropout Uncertainty Statistics}
+
+For Trial~8 ($S = 30$, 100 test graphs, 3,163,500 nodes), MC Dropout produces a mean uncertainty of $\bar{\sigma} = 1.369$ veh/h with a standard deviation of 1.383 veh/h; values range from 0.042 to 44.29 veh/h. The MC mean $R^2$ is 0.5857 and the MC mean MAE is 3.948 veh/h---both virtually identical to the deterministic figures, confirming that enabling dropout at inference does not degrade accuracy. Total MC inference time was 228.25 minutes. Source: \texttt{mc\_dropout\_full\_metrics\_model8\_mc30\_100graphs.json}.
+
+\subsection{Prediction Quality: Deterministic vs MC Dropout Inference}
+
+Figure~\ref{fig:with_without_uq} compares deterministic inference (single forward pass, dropout disabled) against MC Dropout inference (mean of $S = 30$ stochastic passes) for T8. The negligible accuracy difference ($\Delta R^2 = -0.010$, $\Delta\text{MAE} = -0.01$ veh/h) confirms that enabling MC Dropout incurs virtually no cost in predictive performance, while providing informative per-node uncertainty estimates ($\rho = 0.4820$).
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{figures/fig6_with_without_uq.pdf}
+\caption[Deterministic vs MC Dropout inference, T8]{Point prediction accuracy under deterministic and MC Dropout ($S = 30$) inference for T8. Enabling dropout incurs negligible accuracy cost ($\Delta R^2 = -0.010$, $\Delta\text{MAE} = -0.01$ veh/h) while providing uncertainty estimates with Spearman~$\rho = 0.4820$. Based on 100 test graphs.}
+\label{fig:with_without_uq}
+\end{figure}
+
+\section{Ensemble Experiments}
+
+\subsection{Important Caveat: Evaluation Subset Distribution Mismatch}
+\label{sec:ensemble_caveat}
+
+The ensemble experiments (Experiment~A and Experiment~B) exhibit near-zero $R^2$ values ($\approx 0.003$ and $-0.002$ respectively). Investigation reveals that this is an artifact of the evaluation subset used for ensemble scoring: the subset of scenarios available at the intersection of all ensemble members' test splits follows a different distribution from the individual models' training data. Crucially, \textbf{this does not indicate that ensembling is ineffective in general}---the same T8 model achieves $R^2 = 0.5957$ in its own standalone evaluation on the correctly matched test split. The near-zero $R^2$ therefore reflects a confound in the evaluation protocol, not a failure of ensemble-based uncertainty estimation.
+
+Spearman~$\rho$ values from ensemble experiments should be interpreted accordingly: they measure ranking quality \emph{within the mismatched subset only}, and likely underestimate the ranking quality that ensemble methods would achieve under a controlled evaluation with matched train/test distributions. Under fair evaluation conditions, ensemble-based uncertainty estimates may well complement or outperform MC Dropout; the present results cannot adjudicate this question.
+
+\subsection{Experiment A: MC Dropout vs Ensemble Variance}
+
+Table~\ref{tab:exp_a_results} presents uncertainty-error correlations from Experiment~A (MC Dropout with $S = 30$ vs variance across 5 independently seeded T8 training runs). Source: \texttt{experiment\_a\_results.json}.
+
+\begin{table}[htbp]
+\centering
+\caption[Experiment A: MC Dropout vs ensemble variance (Spearman~$\rho$)]{Experiment A: uncertainty-error correlations under data distribution mismatch ($R^2 \approx 0.003$; see Section~\ref{sec:ensemble_caveat}). MC Dropout outperforms ensemble variance within this subset.}
+\label{tab:exp_a_results}
+\begin{tabular}{lcc}
+\toprule
+\textbf{UQ Method} & \textbf{Spearman $\rho$} & \textbf{Mean $\sigma$} \\
+\midrule
+MC Dropout ($S=30$) & 0.1600 & 0.130 \\
+Ensemble Variance (5 runs) & 0.1035 & 0.021 \\
+Combined & 0.1601 & 0.132 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Within the confounded evaluation subset, MC Dropout ($\rho = 0.1600$) outperforms ensemble variance ($\rho = 0.1035$) by 55\%. Combined uncertainty provides negligible additional benefit over MC Dropout alone. However, these $\rho$ values are clearly suppressed by the distribution mismatch (cf.\ $\rho = 0.4820$ for T8 standalone); the relative ranking of methods within this subset should not be generalised without a controlled comparison.
+
+\textbf{Comparison note:} The ensemble experiment MC Dropout result ($\rho = 0.1600$) is \emph{not} the same as the standalone T8 MC Dropout result ($\rho = 0.4820$). The standalone evaluation uses the full 100-graph test split with matched train/test distributions; the ensemble experiment uses a different, distribution-mismatched subset. The difference in $\rho$ (0.16 vs 0.48) is attributable to the evaluation confound, not to a difference in the MC Dropout method itself.
+
+\subsection{Experiment B: Multi-Model Ensemble}
+
+\begin{table}[htbp]
+\centering
+\caption[Experiment B: Multi-model ensemble uncertainty quality]{Experiment B: multi-model ensemble uncertainty quality (T2, T5--T8). $R^2 \approx -0.002$ due to evaluation distribution mismatch; see Section~\ref{sec:ensemble_caveat}.}
+\label{tab:exp_b_uq}
+\begin{tabular}{lc}
+\toprule
+\textbf{Metric} & \textbf{Value} \\
+\midrule
+Spearman $\rho$ & 0.1167 \\
+$R^2$ of ensemble predictions & $\approx -0.002$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Multi-model ensemble disagreement ($\rho = 0.1167$) provides a weaker UQ signal than MC Dropout in this evaluation subset. As with Experiment~A, the near-zero $R^2$ is an artifact of the distribution-mismatched evaluation protocol (Section~\ref{sec:ensemble_caveat}), not evidence that multi-model ensembles are inherently poor uncertainty estimators. A fair comparison would require all models to share a common, properly matched test split.
+
+\section{UQ Method Comparison}
+
+Figure~\ref{fig:uq_ranking} summarizes all uncertainty quality results across methods. The standalone T8 MC Dropout evaluation ($\rho = 0.4820$, 100 graphs, 3,163,500 nodes) represents the most reliable and comprehensive measurement.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{figures/fig2_uq_ranking.pdf}
+\caption[Spearman~$\rho$ across all UQ methods]{Spearman~$\rho$ (uncertainty vs absolute error) for all evaluated UQ methods. Blue bars show standalone MC Dropout results on the full test set; orange bars show ensemble experiment results on a mismatched evaluation subset ($R^2 \approx 0$). T8 standalone ($\rho = 0.4820$) is the most reliable measurement.}
+\label{fig:uq_ranking}
+\end{figure}
+
+\section{Conformal Prediction Results}
+\label{sec:conformal_results}
+
+We apply split conformal prediction to T8 using 50 calibration + 50 evaluation graphs (1,581,750 nodes each). The nonconformity score is the absolute residual $|y - \hat{y}|$.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{figures/fig14_conformal_workflow.pdf}
+\caption[Conformal prediction workflow for T8]{Split conformal prediction workflow for T8. The 100 test graphs are divided into 50 calibration and 50 evaluation graphs. Residuals on the calibration set determine the quantile $q$ at the desired nominal level (90\% or 95\%). Prediction intervals $\hat{y} \pm q$ are then applied to the evaluation set, achieving empirical coverage of 90.02\% and 95.01\% respectively---confirming the marginal coverage guarantee.}
+\label{fig:conformal_workflow}
+\end{figure}
+
+\begin{table}[htbp]
+\centering
+\caption[Conformal prediction results for T8]{Conformal prediction intervals and empirical coverage for T8 (50 calibration + 50 evaluation graphs). Coverage is guaranteed to meet or exceed the nominal level on average.}
+\label{tab:conformal}
+\begin{tabular}{lccc}
+\toprule
+\textbf{Level} & \textbf{Quantile $q$} & \textbf{Achieved Coverage} & \textbf{Interval Width} \\
+\midrule
+90\% & 9.92 veh/h & 90.02\% & $\pm$9.92 veh/h \\
+95\% & 14.68 veh/h & 95.01\% & $\pm$14.68 veh/h \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{figures/fig3_conformal_coverage.pdf}
+\caption[Conformal prediction coverage and interval widths (T8)]{Nominal vs achieved coverage (left) and interval half-widths (right) for T8 split conformal prediction. Both levels meet their nominal targets within 0.02 percentage points. Evaluation: 50 graphs, 1,581,750 nodes.}
+\label{fig:conformal_coverage}
+\end{figure}
+
+Conformal prediction provides \emph{coverage-guaranteed} intervals: on average, at least 90\% (or 95\%) of true values fall within the predicted interval. The intervals are fixed-width (not uncertainty-adaptive), so $\pm$14.68 veh/h is required to achieve 95\% marginal coverage across all nodes.
+
+\subsection{Conditional Coverage by Uncertainty Level}
+\label{sec:conformal_conditional}
+
+Standard conformal prediction guarantees \emph{marginal} coverage---averaged over the entire test distribution---but Barber~et~al.~\cite{barber2021limits} prove that distribution-free \emph{conditional} coverage (i.e., coverage conditioned on specific input features or uncertainty levels) is impossible without additional assumptions. This is a fundamental theoretical result, not a limitation specific to our model: \emph{any} distribution-free conformal method applied to heterogeneous data will exhibit conditional coverage variation. In practice, fixed-width conformal intervals inevitably over-cover easy-to-predict subpopulations and under-cover difficult ones.
+
+We evaluate this theoretically expected behaviour by stratifying the evaluation nodes into 10 deciles based on MC Dropout $\sigma$ (D1 = lowest uncertainty, D10 = highest) and computing coverage within each decile using the global conformal quantile.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{figures/t8_conformal_conditional.pdf}
+\caption[T8 conditional conformal coverage by uncertainty decile]{Conditional coverage by MC Dropout uncertainty decile for T8. Left: standard global conformal intervals over-cover low-uncertainty nodes (D1: 98.6\% at 90\% nominal) and under-cover high-uncertainty nodes (D10: 62.9\%). Right: adaptive conformal prediction, which normalises residuals by $\sigma$ before computing the quantile, substantially reduces this disparity. Based on 1,000 of 10,000 available MATSim scenarios (10\% subset).}
+\label{fig:conformal_conditional}
+\end{figure}
+
+Standard conformal intervals exhibit the conditional coverage variation predicted by theory: at the 90\% nominal level, coverage ranges from 98.6\% (D1) to 62.9\% (D10). This is the expected consequence of applying fixed-width intervals to a heterogeneous prediction task---the interval is unnecessarily wide for well-predicted nodes and too narrow for difficult ones. \textbf{Adaptive conformal prediction}, which uses $|y - \hat{y}|/\sigma$ as the nonconformity score instead of $|y - \hat{y}|$, provides a principled solution: by normalising residuals by the MC Dropout uncertainty, it produces node-specific interval widths that are wider where the model is less certain and narrower where it is confident. This reduces the conditional coverage disparity to a narrow range: coverage ranges from 90.0\% to 96.2\% across deciles at the 90\% level, while preserving the marginal coverage guarantee. The adaptive conformal quantile ($q_{90}^\text{adapt} = 7.58$) is close to the empirical $k_{90}$ from the calibration audit, confirming internal consistency between the MC Dropout ranking and the conformal calibration.
+
+\subsection{MC Dropout as a Ranking Signal vs Calibrated Distribution}
+
+Although MC Dropout uncertainty $\sigma$ correlates meaningfully with errors ($\rho = 0.4820$), the raw $\sigma$ values are \textbf{not} calibrated standard deviations---a well-documented property of approximate Bayesian inference methods~\cite{gal2016dropout, laves2020well}. Table~\ref{tab:k95} shows the scaling factor required to achieve 95\% coverage using $\pm k \sigma$ intervals.
+
+\begin{table}[htbp]
+\centering
+\caption[Scaling factor $k_{95}$ for 95\% coverage: Gaussian vs T8 MC Dropout]{Factor $k$ required for $\pm k\sigma$ to achieve 95\% coverage. Source: \texttt{trial8\_uq\_diagnostics.json} (\texttt{k95} field). For a calibrated Gaussian, $k = 1.96$; T8 MC Dropout requires $k = 11.34$, reflecting the well-known miscalibration of approximate Bayesian uncertainty estimates.}
+\label{tab:k95}
+\begin{tabular}{lcc}
+\toprule
+\textbf{Model} & \textbf{$k_{95}$} & \textbf{Achieved 95\% Coverage with $\pm 1.96\sigma$} \\
+\midrule
+Ideal Gaussian & 1.96 & 95\% \\
+T8 MC Dropout & 11.34 & $\approx$55.6\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.7\textwidth]{figures/fig7_calibration.pdf}
+\caption[Scaling factor $k_{95}$ for 95\% coverage: Gaussian vs T8]{Scaling factor $k_{95}$ required for $\pm k\sigma$ intervals to achieve 95\% coverage. A well-calibrated Gaussian requires $k = 1.96$; T8 MC Dropout requires $k = 11.34$. This gap is characteristic of approximate Bayesian methods and motivates the post-hoc calibration and conformal prediction approaches developed in subsequent sections.}
+\label{fig:k95_calibration}
+\end{figure}
+
+The $k_{95} = 11.34$ result quantifies a known theoretical limitation of MC Dropout: the variational posterior that dropout approximates is typically too concentrated, producing uncertainty estimates that are informative in \emph{rank order} but underestimated in \emph{absolute magnitude}~\cite{gal2016dropout}. This does not diminish the practical value of MC Dropout for selective prediction ($-$41.6\% MAE at 50\% retention) or error detection (AUROC = 0.76); it means that the raw $\sigma$ is most effective as a \emph{ranking signal} for identifying which predictions are more or less reliable, rather than as a calibrated probability distribution. Sections~\ref{sec:coverage_calibration}--\ref{sec:temperature_scaling} and the conformal prediction results in Section~\ref{sec:conformal_results} demonstrate how this limitation is addressed through post-hoc calibration and distribution-free coverage guarantees.
+
+\section{Coverage Calibration Analysis}
+\label{sec:coverage_calibration}
+
+The $k_{95} = 11.34$ result established in the previous section reflects the well-documented miscalibration of approximate Bayesian uncertainty at a single nominal level. Examining all four standard nominal coverage levels---50\%, 80\%, 90\%, and 95\%---reveals the full extent of this calibration gap and provides a direct comparison against conformal prediction, which achieves exact coverage by construction.
+
+\begin{table}[htbp]
+\centering
+\caption[MC Dropout vs conformal prediction coverage across all nominal levels]{MC Dropout $\pm k\sigma$ intervals vs split conformal prediction across all nominal coverage levels. $k$ values are standard Gaussian quantiles ($k_{50}=0.674$, $k_{80}=1.282$, $k_{90}=1.645$, $k_{95}=1.960$). Evaluation: 50 graphs (1,581,750 nodes). Source: \texttt{uq\_comparison\_model8.json}.}
+\label{tab:coverage_calibration}
+\begin{tabular}{ccccccc}
+\toprule
+\multirow{2}{*}{\textbf{Nominal}} & \multicolumn{3}{c}{\textbf{MC Dropout $\pm k\sigma$}} & \multicolumn{2}{c}{\textbf{Conformal Prediction}} \\
+\cmidrule(lr){2-4} \cmidrule(lr){5-6}
+ & $k$ & \textbf{PICP} & \textbf{Avg width (veh/h)} & \textbf{PICP} & \textbf{MPIW (veh/h)} \\
+\midrule
+50\% & 0.674 & 23.3\% & 1.833 & 50.0\% & 3.710 \\
+80\% & 1.282 & 40.1\% & 3.503 & 80.0\% & 11.809 \\
+90\% & 1.645 & 48.6\% & 4.501 & 90.0\% & 19.839 \\
+95\% & 1.960 & 54.8\% & 5.363 & 95.0\% & 29.353 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The pattern is consistent across all levels: MC Dropout intervals fall well short of their nominal coverage. At the 50\% level, $\pm 0.674\sigma$ achieves only 23.3\% coverage---less than half the target. The gap does not close at higher nominal levels; the 95\% interval achieves only 54.8\% coverage. This systematic under-coverage reflects the fact that MC Dropout $\sigma$ values are too small in absolute terms, with a mean of $\bar{\sigma} = 1.369$~veh/h across the 3,163,500-node evaluation. Conformal prediction, by construction, achieves exact nominal coverage at every level through the empirical calibration quantile. The cost is much wider fixed intervals: 29.35~veh/h at 95\% vs 5.36~veh/h for the uncalibrated MC Dropout interval. These two methods are therefore complementary rather than competing: MC Dropout provides adaptive, node-specific uncertainty scores useful for ranking and selective filtering, while conformal prediction provides marginal coverage guarantees at the cost of interval adaptivity.
+
+\section{Selective Prediction}
+\label{sec:selective_prediction}
+
+By filtering predictions to retain only those with the lowest uncertainty, prediction quality improves markedly. Table~\ref{tab:selective_t8} summarises the MAE at each retention threshold. Retaining the 50\% most confident predictions reduces MAE from 3.94~veh/h to 2.31~veh/h---a \textbf{41.6\% reduction}---while retaining only the 90\% most certain nodes yields an 18.5\% improvement. Source: \texttt{trial8\_uq\_ablation\_results.csv} (3,163,500 nodes, 100 test graphs).
+
+\begin{table}[htbp]
+\centering
+\caption[T8 selective prediction: MAE vs retention threshold]{T8 selective prediction results. MAE is reported for each retention fraction, computed on 3,163,500 node predictions. Source: \texttt{trial8\_uq\_ablation\_results.csv}.}
+\label{tab:selective_t8}
+\begin{tabular}{ccc}
+\toprule
+\textbf{Retained fraction} & \textbf{MAE (veh/h)} & \textbf{MAE reduction} \\
+\midrule
+100\% & 3.94 & --- \\
+90\% & 3.22 & $-$18.5\% \\
+50\% & 2.31 & $-$41.6\% \\
+25\% & 1.77 & $-$55.0\% \\
+10\% & 1.03 & $-$74.0\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.8\textwidth]{figures/t8_selective_prediction_curve.pdf}
+\caption[T8 selective prediction curve: MAE vs retention fraction]{MAE as a function of the fraction of predictions retained (sorted by ascending MC Dropout uncertainty, $S=30$) for T8. Retaining the 50\% most certain predictions reduces MAE by 41.6\% (3.94 $\to$ 2.31~veh/h). Based on 1,000 of 10,000 available MATSim scenarios (10\% subset).}
+\label{fig:selective_prediction_t8}
+\end{figure}
+
+\section{Calibration Audit: Conformal vs MC Dropout Intervals}
+\label{sec:calibration_audit}
+
+The conformal prediction results in Section~\ref{sec:conformal_results} used a fixed 50/50 calibration/evaluation split. To decouple the conformal coverage analysis from the selective prediction evaluation, we re-run the calibration audit using a 20/80 split (first 20\% of data as calibration, 80\% as evaluation), matching the methodology applied consistently to both T8 and T7.
+
+\begin{table}[htbp]
+\centering
+\caption[T8 calibration audit: raw MC Dropout vs conformal coverage (20/80 split)]{T8 calibration audit across all nominal coverage levels (20/80 split, 2,530,800 evaluation nodes). $k_\text{emp}$ is the empirical scaling factor required for raw MC Dropout to hit nominal coverage. Global and adaptive conformal prediction achieve near-exact coverage at every level. Source: \texttt{trial8\_uq\_ablation\_results.csv}.}
+\label{tab:calibration_audit_t8}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{ccccccc}
+\toprule
+\textbf{Nominal} & \textbf{Raw MC cov.} & $k_\text{emp}$ & $q_\text{global}$ & \textbf{Global cov.} & $q_\text{adapt}$ & \textbf{Adapt cov.} \\
+\midrule
+50\%  & 23.8\% & 1.679  & 1.874   & 50.4\% & 1.690   & 50.2\% \\
+70\%  & 34.2\% & 3.020  & 3.954   & 70.4\% & 3.038   & 70.2\% \\
+80\%  & 40.7\% & 4.443  & 5.970   & 80.3\% & 4.474   & 80.2\% \\
+90\%  & 49.3\% & 7.558  & 9.993   & 90.2\% & 7.582   & 90.1\% \\
+95\%  & 55.6\% & 11.34  & 14.771  & 95.1\% & 11.357  & 95.0\% \\
+\bottomrule
+\end{tabular}%
+}
+\vspace{2pt}
+\begin{minipage}{\linewidth}
+\footnotesize Results based on 1,000 of 10,000 available MATSim scenarios (10\% subset).
+\end{minipage}
+\end{table}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{figures/t8_calibration_curve.pdf}
+\caption[T8 calibration curve: nominal vs achieved coverage across methods]{Nominal vs achieved coverage for T8 across all coverage levels (20/80 split). Raw MC Dropout severely undercovers at every level (e.g., 55.6\% achieved at 95\% nominal). Global and adaptive conformal prediction both achieve near-exact nominal coverage. Based on 1,000 of 10,000 available MATSim scenarios (10\% subset).}
+\label{fig:calibration_curve_t8}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{figures/t8_interval_width_comparison.pdf}
+\caption[T8 interval width comparison: raw MC vs conformal at each coverage level]{Interval half-widths for T8 at each nominal coverage level (20/80 split). Conformal intervals are wider than raw MC intervals because they are calibrated to actually achieve the nominal coverage. Based on 1,000 of 10,000 available MATSim scenarios (10\% subset).}
+\label{fig:interval_width_t8}
+\end{figure}
+
+\section{Reliability Diagram and Calibration Curve}
+\label{sec:reliability_diagram}
+
+The coverage calibration analysis in the previous section examines calibration at a few discrete nominal levels. A \emph{reliability diagram}~\cite{kuleshov2018accurate, naeini2015obtaining} provides a more comprehensive view by sweeping across all nominal coverage levels from 10\% to 95\%. For each nominal level~$p$, we compute the Gaussian quantile $z_p = \Phi^{-1}((1+p)/2)$ and measure the fraction of nodes where $|y - \hat{y}_\text{MC}| \leq z_p \cdot \sigma_\text{MC}$.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{figures/t8_reliability_diagram.pdf}
+\caption[T8 reliability diagram: expected vs observed Gaussian coverage]{Left: reliability diagram for T8 MC Dropout ($S=30$, 100 graphs, 3,163,500 nodes). The diagonal represents perfect calibration; the model consistently undercovers. Right: coverage gap in percentage points at each nominal level. ECE = 0.265. Based on 1,000 of 10,000 available MATSim scenarios (10\% subset).}
+\label{fig:reliability_diagram}
+\end{figure}
+
+The Expected Calibration Error (ECE), defined as the mean absolute difference between nominal and observed coverage across all levels, is $\text{ECE} = 0.265$ (computed over all 100 test graphs; the 20-graph calibration subset used for temperature scaling in Section~\ref{sec:temperature_scaling} yields a comparable ECE of 0.269). This level of miscalibration is consistent with the $k_{95} = 11.34$ finding and is characteristic of MC Dropout as an approximate Bayesian method: the variational posterior underestimates uncertainty in absolute terms at every nominal level. Importantly, this miscalibration does not invalidate the uncertainty \emph{ranking}---Spearman~$\rho = 0.4820$ and the selective prediction results (Section~\ref{sec:selective_prediction}) demonstrate that the ranking signal remains highly useful despite the absolute miscalibration. The following section addresses this calibration gap through post-hoc temperature scaling.
+
+\subsection{Post-Hoc Temperature Scaling}
+\label{sec:temperature_scaling}
+
+Temperature scaling~\cite{guo2017calibration, laves2020well} is a post-hoc recalibration method that scales all uncertainty estimates by a single learned parameter $T$: $\sigma_\text{scaled} = \sigma_\text{raw} \cdot T$. We optimise $T$ on a calibration set (first 20 test graphs, 632,700 nodes) by minimising the Kuleshov ECE, and evaluate on the remaining 80 test graphs (2,530,800 nodes).
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{figures/t8_temperature_scaling.pdf}
+\caption[T8 temperature scaling: reliability diagram before and after calibration]{Temperature scaling calibration for T8. Top: reliability diagrams before (left, ECE = 0.269) and after (right, ECE = 0.048) scaling with $T = 2.70$. Bottom left: overlay comparison. Bottom right: coverage gap reduction at each nominal level. Evaluation on 80 held-out graphs (2,530,800 nodes). Based on 1,000 of 10,000 available MATSim scenarios (10\% subset).}
+\label{fig:temperature_scaling}
+\end{figure}
+
+The optimal temperature is $T = 2.70$, indicating that raw MC Dropout standard deviations need to be scaled by a factor of approximately 2.7 to approach calibration. This reduces the ECE from 0.269 to 0.048---an \textbf{82\% improvement}---on the held-out evaluation set. However, residual miscalibration persists, particularly at high nominal levels: the scaled 95\% interval achieves only 83.3\% coverage instead of 95\%. The effective $k_{95}$ after scaling is $z_{0.975} \times T = 1.96 \times 2.70 = 5.30$, which is closer to but still below the empirical $k_{95} = 11.34$. This residual gap reflects the non-Gaussian shape of the residual distribution: temperature scaling assumes the errors are proportional to a Gaussian scaled by $\sigma$, but the empirical distribution has heavier tails than any single-parameter Gaussian rescaling can capture.
+
+Temperature scaling therefore provides a meaningful but incomplete improvement. For applications requiring trustworthy coverage, conformal prediction remains necessary.
+
+\subsection{Error Detection via AUROC}\label{sec:error_detection}
+
+MC Dropout uncertainty can be evaluated as a binary classifier for large prediction errors. We define two thresholds: the top-10\% of absolute errors ($> 9.93$~veh/h) and the top-20\% ($> 6.01$~veh/h), and measure whether MC Dropout $\sigma$ can discriminate between high-error and low-error predictions.
+
+\begin{table}[htbp]
+\centering
+\caption[T8 error detection: AUROC and AUPRC for MC Dropout uncertainty]{T8 error detection results. AUROC and AUPRC measure the ability of MC Dropout $\sigma$ to identify high-error predictions. Both clearly exceed the random baseline. Source: \texttt{trial8\_uq\_ablation\_results.csv}.}
+\label{tab:error_detection_t8}
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Threshold} & \textbf{Cutoff (veh/h)} & \textbf{AUROC} & \textbf{AUPRC} & \textbf{Random AUPRC} \\
+\midrule
+Top-10\% errors & 9.93 & 0.7585 & 0.3148 & 0.100 \\
+Top-20\% errors & 6.01 & 0.7401 & 0.4547 & 0.200 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{figures/t8_error_detection_auroc.pdf}
+\caption[T8 error detection ROC curves for MC Dropout uncertainty]{ROC curves for T8 MC Dropout uncertainty as an error detector at the top-10\% and top-20\% error thresholds. AUROC values of 0.76 and 0.74 are well above the 0.5 random baseline. Based on 1,000 of 10,000 available MATSim scenarios (10\% subset).}
+\label{fig:error_detection_t8}
+\end{figure}
+
+\section{Cross-Trial Robustness: Trial~7 Validation}
+\label{sec:t7_crosscheck}
+
+To assess whether the UQ findings for T8 are specific to the best-performing trial or reflect a general property of the PointNetTransfGAT architecture with MC Dropout, we replicate the selective prediction and calibration audit analyses on Trial~7. Trial~7 uses the same architecture (\texttt{GATConv(64$\to$1)} final layer, 80/10/10 split, 100 test graphs) but differs in dropout rate (0.3 vs 0.2) and learning rate ($6\times10^{-4}$ vs $5\times10^{-4}$). Both analyses use the same 20/80 methodology applied to T8.
+
+\subsection{T7 Selective Prediction}
+
+Table~\ref{tab:selective_t7} shows that Trial~7 reproduces the same uncertainty-ranking behaviour as Trial~8: higher uncertainty reliably identifies less accurate predictions, and filtering by uncertainty progressively reduces MAE at all retention thresholds.
+
+\begin{table}[htbp]
+\centering
+\caption[T7 selective prediction: MAE vs retention threshold]{T7 selective prediction results (20/80 split, 2,530,800 evaluation nodes). Source: \texttt{mc\_dropout\_full\_100graphs\_mc30.npz} + \texttt{deterministic\_full\_100graphs.npz}.}
+\label{tab:selective_t7}
+\begin{tabular}{ccc}
+\toprule
+\textbf{Retained fraction} & \textbf{MAE (veh/h)} & \textbf{MAE reduction} \\
+\midrule
+100\% & 4.07 & --- \\
+90\% & 3.32 & $-$18.6\% \\
+50\% & 2.51 & $-$38.3\% \\
+25\% & 1.99 & $-$51.1\% \\
+10\% & 1.23 & $-$69.8\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Trial~7 shows the same uncertainty-ranking behavior as Trial~8. Retaining the 90\% least uncertain predictions reduces MAE from 4.07 to 3.32~veh/h ($-$18.6\%), while retaining only 50\% reduces MAE to 2.51~veh/h ($-$38.3\%). This confirms that MC Dropout uncertainty carries practical value for screening unreliable predictions beyond the single best model.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.8\textwidth]{figures/t7_selective_prediction_curve.pdf}
+\caption[T7 selective prediction curve: MAE vs retention fraction]{MAE as a function of retained fraction for Trial~7 (sorted by ascending MC Dropout uncertainty). The same monotone improvement pattern as T8 is reproduced. Based on 1,000 of 10,000 available MATSim scenarios (10\% subset).}
+\label{fig:selective_prediction_t7}
+\end{figure}
+
+\subsection{T7 Calibration Audit}
+
+Table~\ref{tab:calibration_audit_t7} replicates the calibration audit for T7. The same qualitative pattern holds: raw MC Gaussian intervals severely undercover at every nominal level, while conformal prediction achieves near-exact target coverage.
+
+\begin{table}[htbp]
+\centering
+\caption[T7 calibration audit: raw MC Dropout vs conformal coverage (20/80 split)]{T7 calibration audit across all nominal coverage levels (20/80 split). Source: \texttt{mc\_dropout\_full\_100graphs\_mc30.npz} + \texttt{deterministic\_full\_100graphs.npz}.}
+\label{tab:calibration_audit_t7}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{ccccccc}
+\toprule
+\textbf{Nominal} & \textbf{Raw MC cov.} & $k_\text{emp}$ & $q_\text{global}$ & \textbf{Global cov.} & $q_\text{adapt}$ & \textbf{Adapt cov.} \\
+\midrule
+50\%  & 18.0\% & 2.041  & 1.802   & 50.4\% & 2.048   & 50.2\% \\
+70\%  & 26.8\% & 3.759  & 3.919   & 70.4\% & 3.787   & 70.2\% \\
+80\%  & 32.8\% & 5.846  & 6.067   & 80.4\% & 5.898   & 80.2\% \\
+90\%  & 41.5\% & 10.453 & 10.388  & 90.2\% & 10.491  & 90.1\% \\
+95\%  & 48.4\% & 16.15  & 15.648  & 95.1\% & 16.196  & 95.0\% \\
+\bottomrule
+\end{tabular}%
+}
+\vspace{2pt}
+\begin{minipage}{\linewidth}
+\footnotesize Results based on 1,000 of 10,000 available MATSim scenarios (10\% subset).
+\end{minipage}
+\end{table}
+
+The calibration analysis on Trial~7 confirms the same pattern observed for Trial~8: raw MC Gaussian intervals severely undercover at all nominal levels, whereas both global and adaptive conformal prediction achieve near-exact target coverage. At the 95\% level, Trial~7 requires an empirical scaling factor of $k_{95} = 16.15$, compared with $k_{95} = 11.34$ for Trial~8, indicating even heavier-tailed residual behaviour---consistent with T7's higher dropout rate.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{figures/t7_calibration_curve.pdf}
+\caption[T7 calibration curve: nominal vs achieved coverage across methods]{Nominal vs achieved coverage for T7 across all coverage levels (20/80 split). Raw MC Dropout severely undercovers at every level. Global and adaptive conformal prediction both achieve near-exact nominal coverage. Based on 1,000 of 10,000 available MATSim scenarios (10\% subset).}
+\label{fig:calibration_curve_t7}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{figures/t7_interval_width_comparison.pdf}
+\caption[T7 interval width comparison: raw MC vs conformal at each coverage level]{Interval half-widths for T7 at each nominal coverage level (20/80 split). T7 requires wider conformal intervals than T8 at high nominal levels, consistent with its larger $k_{95} = 16.15$. Based on 1,000 of 10,000 available MATSim scenarios (10\% subset).}
+\label{fig:interval_width_t7}
+\end{figure}
+
+\subsection{T7 vs T8 Summary}
+
+Table~\ref{tab:t7_t8_comparison} summarises the key UQ metrics side-by-side.
+
+\begin{table}[htbp]
+\centering
+\caption[T7 vs T8 UQ comparison]{Key UQ metrics for Trial~7 and Trial~8 (both 80/10/10 split, 100 test graphs). T8 is superior in absolute accuracy and uncertainty quality, but both trials confirm the same qualitative UQ conclusions.}
+\label{tab:t7_t8_comparison}
+\begin{tabular}{lcc}
+\toprule
+\textbf{Metric} & \textbf{T7} & \textbf{T8} \\
+\midrule
+MC Mean MAE (veh/h) & 4.07 & 3.94 \\
+Spearman $\rho$ & 0.4437 & 0.4820 \\
+MAE at 50\% retention (veh/h) & 2.51 & 2.31 \\
+MAE reduction at 50\% & $-$38.3\% & $-$41.6\% \\
+Raw MC cov.\ @ 90\% nominal & 41.5\% & 49.3\% \\
+$k_{95}$ (empirical) & 16.15 & 11.34 \\
+Global conformal cov.\ @ 90\% & 90.2\% & 90.2\% \\
+\bottomrule
+\end{tabular}
+\vspace{2pt}
+\begin{minipage}{\linewidth}
+\footnotesize Results based on 1,000 of 10,000 available MATSim scenarios (10\% subset). MC Mean MAE values reflect MC Dropout mean predictions, not deterministic test MAE (cf.\ Table~\ref{tab:trial_results}); T8 evaluated on the full 100-graph test set (3,163,500 nodes), T7 on a 20/80 split (2,530,800 evaluation nodes).
+\end{minipage}
+\end{table}
+
+Although Trial~8 remains superior in absolute predictive accuracy and uncertainty ranking, Trial~7 reproduces the same qualitative conclusions: MC Dropout is useful for ranking prediction reliability, but conformal calibration is necessary for trustworthy interval coverage. The main UQ findings are not specific to T8.
+
+\subsection{T7 Error Detection: AUROC Analysis}
+\label{sec:t7_auroc}
+
+To complete the cross-trial validation, we compute the same AUROC error-detection metrics from Section~\ref{sec:error_detection} for Trial~7.
+
+\begin{table}[htbp]
+\centering
+\caption[T7 vs T8 error detection comparison]{Error detection (AUROC) and UQ quality metrics for Trial~7 vs Trial~8 (both 100 test graphs, $S=30$). T8 achieves higher AUROC at both thresholds, consistent with its stronger $\rho$.}
+\label{tab:t7_t8_auroc}
+\begin{tabular}{lcc}
+\toprule
+\textbf{Metric} & \textbf{T7} & \textbf{T8} \\
+\midrule
+Spearman $\rho$ & 0.446 & 0.482 \\
+AUROC (top-10\% errors) & 0.742 & 0.759 \\
+AUROC (top-20\% errors) & 0.715 & 0.740 \\
+AUPRC (top-10\% errors) & 0.321 & 0.315 \\
+$k_{95}$ (empirical) & 16.15 & 11.34 \\
+Raw 95\% Gaussian cov. & 48.4\% & 55.6\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{figures/t7_vs_t8_uq_comparison.pdf}
+\caption[T7 vs T8 uncertainty quality comparison]{Comprehensive UQ comparison between Trial~7 and Trial~8 across error detection (AUROC), key metrics ($\rho$, $k_{95}$, MAE), and selective prediction. T8 outperforms on most metrics, but T7 confirms the same qualitative patterns. Based on 1,000 of 10,000 available MATSim scenarios (10\% subset).}
+\label{fig:t7_vs_t8_comparison}
+\end{figure}
+
+Trial~7's AUROC values (0.742 and 0.715 for top-10\% and top-20\% errors respectively) are slightly below T8's (0.759 and 0.740) but still well above the 0.5 random baseline. This confirms that MC Dropout uncertainty functions as a useful error detector across both model configurations.
+
+\section{Per-Graph Uncertainty Variation}
+\label{sec:per_graph_variation}
+
+The aggregate statistics reported above (e.g., $\rho = 0.4820$ over 3,163,500 nodes) mask potential variation across individual test graphs. Each of the 100 test graphs represents a distinct MATSim scenario with 31,635 road-segment nodes. Figure~\ref{fig:per_graph_variation} shows the distribution of per-graph Spearman~$\rho$, MAE, and their relationship.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{figures/t8_per_graph_variation.pdf}
+\caption[T8 per-graph uncertainty variation across 100 test graphs]{Per-graph UQ variation for T8 across 100 test graphs. Top left: histogram of per-graph Spearman~$\rho$ (mean = 0.464, std = 0.023). Top right: histogram of per-graph MAE. Bottom left: scatter of $\rho$ vs MAE coloured by mean $\sigma$. Bottom right: sorted per-graph $\rho$ showing low variation across scenarios. Based on 1,000 of 10,000 available MATSim scenarios (10\% subset).}
+\label{fig:per_graph_variation}
+\end{figure}
+
+Spearman~$\rho$ is consistent across scenarios: mean $= 0.464$, standard deviation $= 0.023$, range $[0.41, 0.51]$. No graph achieves $\rho < 0.4$, confirming that the uncertainty-ranking quality is not driven by a few outlier scenarios but is a robust property of the model. Per-graph MAE is more variable (mean $= 3.95$ veh/h, std $= 0.81$, range $[2.42, 6.07]$), reflecting genuine difficulty variation across traffic scenarios. The per-graph raw Gaussian coverage at the 95\% nominal level averages 54.8\% with a standard deviation of only 0.8\%, cross-validating the aggregate figure of 55.6\% (full 100-graph evaluation) and confirming that the miscalibration is consistent across scenarios.
+
+\section{Feature Correlation with Prediction Error}
+
+Figure~\ref{fig:feature_correlation} shows Spearman correlations between input features and absolute prediction error for T8. Source: \texttt{feature\_analysis\_report.txt} (T8 \texttt{feature\_analysis\_plots/}).
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{figures/fig5_feature_correlation.pdf}
+\caption[Spearman correlation: input features vs absolute prediction error (T8)]{Spearman correlation between input features and absolute prediction error (T8, 100 test graphs, 3,163,500 nodes). Baseline traffic volume ($\rho = +0.332$) and road capacity ($\rho = +0.262$) are the strongest positive predictors; capacity reduction is negative ($\rho = -0.229$). Source: \texttt{feature\_analysis\_report.txt}.}
+\label{fig:feature_correlation}
+\end{figure}
+
+The correlations reveal a coherent pattern. \textbf{Baseline traffic volume} ($\rho = +0.332$) is the strongest predictor of error: high-traffic roads are harder to predict accurately. \textbf{Road capacity} ($\rho = +0.262$) follows, with major high-capacity roads also showing greater error. Conversely, \textbf{capacity reduction} ($\rho = -0.229$) is negatively correlated, indicating that segments subject to stronger policy interventions are actually predicted more accurately---likely because capacity reduction is a direct and unambiguous signal in the input. \textbf{Free-flow speed} ($\rho = +0.211$) shows a modest positive effect, while \textbf{segment length} ($\rho = -0.070$) has minimal influence.
+
+\subsection{Stratified Uncertainty Quality by Feature Bins}
+\label{sec:stratified_uq}
+
+To understand how uncertainty quality varies across the input feature space, we stratify the 3,163,500 test nodes by quartiles of each input feature and evaluate Spearman~$\rho$, MAE, mean~$\sigma$, and conformal coverage within each bin.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{figures/t8_stratified_uq.pdf}
+\caption[T8 stratified UQ by input feature quartiles]{Uncertainty quality stratified by input feature quartiles for T8. Each row shows a different feature. Within each row, panels show Spearman~$\rho$, MAE, mean~$\sigma$, and conformal 90\% coverage by quartile. Low-volume/low-capacity bins exhibit excellent ranking ($\rho = 0.74$--$0.81$) and low MAE ($1.0$--$1.4$ veh/h); high-value bins show degraded ranking ($\rho = 0.26$--$0.41$) but appropriately elevated uncertainty. Based on 1,000 of 10,000 available MATSim scenarios (10\% subset).}
+\label{fig:stratified_uq}
+\end{figure}
+
+The stratification reveals a clear and consistent pattern across features. Nodes with low baseline traffic volume and low road capacity are predicted with high accuracy (MAE $\approx 1.0$--$1.4$ veh/h) and show excellent uncertainty ranking ($\rho \approx 0.74$--$0.81$). For these easy-to-predict segments, MC Dropout confidently assigns low $\sigma$. At the other extreme, high-volume and high-capacity road segments exhibit much higher MAE ($4.5$--$8.0$ veh/h) and degraded ranking quality ($\rho \approx 0.26$--$0.41$), but the model does assign correspondingly higher mean~$\sigma$ to these bins. Segment length is the most homogeneous feature---uncertainty quality varies little across its quartiles---consistent with its weak correlation with prediction error ($\rho = -0.070$).
+
+\section{Summary}
+
+\begin{table}[htbp]
+\centering
+\caption[Summary of key results for T8 (best model)]{Summary of key results for T8 (best model, GATConv final layer, dropout=0.2, 80/10/10 split).}
+\label{tab:summary}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{lll}
+\toprule
+\textbf{Metric} & \textbf{Value} & \textbf{Source / Section} \\
+\midrule
+Test $R^2$ & 0.5957 & \texttt{test\_evaluation\_complete.json} \\
+Test MAE & 3.96 veh/h & \texttt{test\_evaluation\_complete.json} \\
+Test RMSE & 7.12 veh/h & \texttt{test\_evaluation\_complete.json} \\
+MC Dropout $\rho$ ($S=30$, 100 graphs) & 0.4820 & \texttt{mc\_dropout\_full\_metrics\_...json} \\
+Reliability ECE (raw) & 0.265 & Section~\ref{sec:reliability_diagram} \\
+ECE after temp.\ scaling ($T = 2.70$) & 0.048 ($-$82\%) & Section~\ref{sec:temperature_scaling} \\
+Conformal 90\% half-width & $\pm$9.92 veh/h & \texttt{conformal\_standard.json} \\
+Conformal 95\% half-width & $\pm$14.68 veh/h & \texttt{conformal\_standard.json} \\
+$k_{95}$ (scaling for 95\% cov.) & 11.34 & \texttt{trial8\_uq\_diagnostics.json} \\
+MAE reduction (50\% selective) & 41.6\% & \texttt{trial8\_uq\_ablation\_results.csv} \\
+AUROC (top-10\% errors) & 0.759 & Section~\ref{sec:error_detection} \\
+Per-graph $\rho$ stability & $0.464 \pm 0.023$ & Section~\ref{sec:per_graph_variation} \\
+\bottomrule
+\end{tabular}%
+}
+\end{table}
+
+Trial~8 provides both strong predictive accuracy among comparable trials ($R^2 = 0.5957$) and the best uncertainty-error ranking quality ($\rho = 0.4820$). Conformal prediction delivers coverage-guaranteed intervals, while selective prediction demonstrates that uncertainty-guided filtering markedly improves effective accuracy. Post-hoc temperature scaling reduces calibration error by 82\% but cannot fully close the gap to nominal coverage, leaving conformal prediction as the method of choice for trustworthy intervals. Per-graph analysis confirms that these findings are stable across all 100 test scenarios, and cross-trial validation on T7 demonstrates that the conclusions generalise beyond the single best model.

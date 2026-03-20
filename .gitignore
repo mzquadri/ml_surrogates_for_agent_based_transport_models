@@ -1,0 +1,36 @@
+# ── Large files / directories (must not be pushed) ──
+data/
+logs/
+_archive/
+submission.zip
+zia80432
+
+# ── IDE / tooling ──
+.vscode/wandb.env
+**/.ipynb_checkpoints/
+**/__pycache__/
+
+# ── Experiment tracking ──
+**/wandb/
+
+# ── Evaluation outputs ──
+scripts/evaluation/results/
+
+# ── Windows reserved filenames ──
+**/NUL
+
+# ── LaTeX build artifacts ──
+thesis/latex_tum_official/*.aux
+thesis/latex_tum_official/*.bbl
+thesis/latex_tum_official/*.bcf
+thesis/latex_tum_official/*.blg
+thesis/latex_tum_official/*.log
+thesis/latex_tum_official/*.lof
+thesis/latex_tum_official/*.lot
+thesis/latex_tum_official/*.loa
+thesis/latex_tum_official/*.out
+thesis/latex_tum_official/*.run.xml
+thesis/latex_tum_official/*.toc
+thesis/latex_tum_official/*.synctex.gz
+thesis/latex_tum_official/*.fls
+thesis/latex_tum_official/*.fdb_latexmk

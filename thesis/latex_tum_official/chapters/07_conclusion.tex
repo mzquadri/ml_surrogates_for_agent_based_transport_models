@@ -1,0 +1,59 @@
+% !TEX root = ../main.tex
+
+\chapter{Conclusion}\label{chapter:conclusion}
+
+This thesis investigated uncertainty quantification methods for Graph Neural Network surrogates of agent-based transport models. Working with 1,000 of 10,000 available MATSim scenarios (10\% subset) on a Paris road network dataset, we compared MC Dropout, ensemble variance, and conformal prediction as uncertainty quantification approaches.
+
+\section{Summary of Findings}
+
+\subsection{Primary Results}
+
+\begin{enumerate}
+    \item \textbf{Trial~8 achieves the best predictive performance among comparable trials:} $R^2 = 0.5957$, MAE $= 3.96$ veh/h, RMSE $= 7.12$ veh/h (test set, 3,163,500 predictions, 80/10/10 split). Trial~8 uses the \texttt{GATConv(64$\to$1)} final layer and dropout $= 0.2$.
+
+    \item \textbf{MC Dropout provides effective uncertainty ranking:} Trial~8 MC Dropout ($S = 30$, 100 test graphs) achieves Spearman~$\rho = 0.4820$ between predicted uncertainty and absolute prediction error. This confirms that high uncertainty reliably predicts where the model makes larger errors.
+
+    \item \textbf{Selective prediction substantially reduces effective error:} Filtering to the 50\% most confident predictions reduces MAE by 41.6\% (from 3.94 to $\approx$2.31~veh/h, MC Dropout mean). This demonstrates practical value: for decisions where reliability is critical, uncertainty-guided filtering provides meaningful accuracy improvements.
+
+    \item \textbf{Conformal prediction achieves guaranteed coverage:} Split conformal prediction on T8 (50/50 calibration--evaluation split, 50 graphs each) delivers 90.02\% coverage at $\pm$9.92~veh/h and 95.01\% at $\pm$14.68~veh/h, confirming that coverage-guaranteed intervals are achievable for traffic prediction. A separate calibration audit using a larger 20/80 split corroborates these results (90.2\% at $\pm$9.99~veh/h; 95.1\% at $\pm$14.77~veh/h; 2,530,800 evaluation nodes), demonstrating robustness to the choice of calibration set size.
+
+    \item \textbf{MC Dropout uncertainty is not a calibrated standard deviation:} The factor $k_{95} = 11.34$ required to achieve 95\% coverage via $\pm k\sigma$ intervals (vs $k = 1.96$ for a calibrated Gaussian) confirms that raw MC Dropout uncertainty should be used as a ranking signal only, not as a probability distribution.
+
+    \item \textbf{Ensemble experiments suffer from evaluation mismatch:} Ensemble-based uncertainty estimates achieve $\rho = 0.1035$--$0.1601$ in our experiments, but this evaluation exhibits a data distribution mismatch ($R^2 \approx 0$). Within that context, MC Dropout still outperforms ensemble variance by 55\%. Re-evaluation under controlled conditions is necessary for definitive comparison.
+
+    \item \textbf{UQ findings are robust across trials:} Replication of selective prediction and calibration audit on Trial~7 ($\rho = 0.4437$, dropout $= 0.3$) confirms the same qualitative conclusions: MC Dropout provides useful uncertainty ranking, raw $\sigma$ values are not calibrated, and conformal prediction restores near-exact coverage. The main findings are not specific to a single model configuration (Section~\ref{sec:t7_crosscheck}).
+\end{enumerate}
+
+\subsection{Practical Recommendations}
+
+For practitioners deploying GNN-based traffic surrogates, MC Dropout with $S = 30$ samples and dropout $= 0.2$ provides the best uncertainty ranking found in this work. Uncertainty estimates should be used for selective prediction---retaining the 50\% most confident predictions reduces MAE by roughly 42\%---and conformal prediction should be applied when formal coverage guarantees are contractually or operationally required. Raw MC Dropout $\sigma$ should not be interpreted as a calibrated standard deviation, and identical-architecture ensembles are likely to provide weaker UQ signals than single-model MC Dropout at higher computational cost. The cross-trial replication on T7 confirms that these recommendations are not specific to a single hyperparameter configuration.
+
+\section{Contributions}
+
+The primary contributions of this thesis are:
+
+\begin{enumerate}
+    \item \textbf{Systematic UQ evaluation for GNN traffic surrogates:} First comprehensive comparison of MC Dropout, ensemble variance, and conformal prediction for node-level traffic volume change prediction at scale (3.16 million predictions per evaluation).
+
+    \item \textbf{Empirical evidence for MC Dropout effectiveness:} Demonstrated $\rho = 0.4820$ uncertainty-error correlation for T8 MC Dropout. T8 (dropout $= 0.2$, 80/10/10 split) achieves higher $\rho$ than T5--T7 ($\rho$: 0.4186--0.4437, dropout $= 0.3$). Note that T8 differs from T5--T6 in both dropout rate and data split, and from T7 in dropout rate and learning rate; batch size is identical (8) across all four trials, so the $\rho$ improvement cannot be attributed solely to the reduced dropout rate.
+
+    \item \textbf{Conformal prediction coverage verification:} Confirmed that split conformal prediction achieves nominal coverage guarantees on large-scale traffic prediction (1.58M-node evaluation sets).
+
+    \item \textbf{Selective prediction utility:} Quantified that uncertainty-guided filtering achieves 41.6\% MAE reduction at 50\% retention, providing concrete operational guidance.
+
+    \item \textbf{Identification of ensemble evaluation limitations:} Documented the data distribution mismatch in ensemble experiments, providing a cautionary finding for future GNN ensemble research.
+\end{enumerate}
+
+\section{Broader Impact}
+
+This work contributes to the broader goal of trustworthy AI in urban planning. As cities increasingly rely on machine learning for policy decisions, understanding model limitations becomes critical. Uncertainty quantification provides a mechanism for expressing model confidence, enabling more informed decision-making.
+
+Our findings demonstrate that effective UQ is achievable with minimal architectural changes (MC Dropout, dropout $= 0.2$) and manageable computational overhead, and that formal coverage guarantees are attainable through conformal prediction. This accessibility may encourage wider adoption of uncertainty-aware prediction systems in transport planning and related domains.
+
+\section{Future Work}
+
+Several directions emerge naturally from this investigation. The most direct extension is training on the \textbf{full 10,000-scenario dataset} to assess whether model accuracy and uncertainty quality scale proportionally with training data. On the architectural side, \textbf{diverse ensembles} combining GNN variants with different inductive biases (GAT, GraphSAGE, GCN) may provide the complementary uncertainty signals that identical-architecture ensembles failed to deliver here. Within the UQ methods themselves, \textbf{conformal risk control}~\cite{angelopoulos2023conformal} offers a path to tighter, adaptive coverage guarantees beyond the fixed-width intervals produced by standard split conformal prediction. \textbf{Post-hoc calibration} of MC Dropout uncertainty---through isotonic regression or temperature scaling---could reduce $k_{95}$ from 11.34 toward 1.96, allowing $\sigma$ to serve as a genuine probability estimate rather than a ranking signal. Finally, \textbf{multi-city validation} across different network topologies and traffic regimes, combined with explicit \textbf{epistemic--aleatoric decomposition}, would strengthen confidence in the generalizability of these findings.
+
+\section{Closing Remarks}
+
+Deploying machine learning surrogates responsibly in urban planning requires more than accurate predictions---it requires systematic quantification of where those predictions may fail. Uncertainty quantification provides that quantification in a form that is operationally useful: MC Dropout gives planners a per-prediction confidence score, conformal prediction gives them a coverage guarantee, and selective prediction lets them trade breadth of coverage for depth of accuracy. The experiments here, conducted on a 10\% data subset under realistic resource constraints, show that all three are achievable with the PointNetTransfGAT architecture at no meaningful cost to predictive accuracy. The practical case for uncertainty-aware surrogate deployment in transport planning is, on this evidence, well supported.

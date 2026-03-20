@@ -1,0 +1,209 @@
+% !TEX root = ../main.tex
+
+\chapter{Methodology}\label{chapter:methodology}
+
+This chapter describes the GNN architecture adopted for traffic prediction, the three uncertainty quantification methods evaluated in this thesis, and the metrics used to assess both predictive accuracy and uncertainty quality.
+
+\section{Problem Formulation}
+
+We formulate traffic prediction as a node-level regression task on a directed graph. Given a road network $G = (V, E)$ where nodes represent road segments and edges represent connectivity, we aim to predict the change in traffic volume $\Delta v_i$ for each node $i$ after a policy intervention.
+
+\subsection{Input Features}
+
+Each node $i$ is characterized by five input features:
+
+\begin{table}[htbp]
+\centering
+\caption[Input features for each road segment (node)]{Input features for each road segment (node).}
+\label{tab:features}
+\begin{tabular}{llp{7cm}}
+\toprule
+\textbf{Feature} & \textbf{Unit} & \textbf{Description} \\
+\midrule
+\texttt{VOL\_BASE\_CASE} & vehicles/hour & Traffic volume in baseline scenario \\
+\texttt{CAPACITY\_BASE\_CASE} & vehicles/hour & Road segment capacity \\
+\texttt{CAPACITY\_REDUCTION} & fraction & Policy-induced capacity change (0--1) \\
+\texttt{FREESPEED} & km/h & Free-flow speed limit \\
+\texttt{LENGTH} & meters & Road segment length \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{figures/fig3_feature_distributions.pdf}
+\caption[Distribution of input features across the training set]{Distribution of the five input features across 200 training graphs (6,327,000 node observations). Dashed vertical lines mark the median. \texttt{VOL\_BASE\_CASE} and \texttt{CAPACITY\_BASE\_CASE} are right-skewed, reflecting the heavy-tailed nature of urban traffic volumes; \texttt{FREESPEED} is concentrated at a few discrete speed-limit values; \texttt{LENGTH} spans several orders of magnitude. \emph{Results based on 1,000 of 10,000 available MATSim scenarios (10\% subset).}}
+\label{fig:feature_distributions}
+\end{figure}
+
+\subsection{Target Variable}
+
+The target variable is:
+\begin{equation}
+    \Delta v_i = v_i^{\text{policy}} - v_i^{\text{baseline}}
+\end{equation}
+representing the change in traffic volume on segment $i$ after the policy intervention is applied.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{figures/fig10_node_vs_graph.pdf}
+\caption[Node-level vs graph-level GNN prediction with MC Dropout uncertainty]{Node-level predictions ($\Delta v$ per node, with per-node MC Dropout $\sigma$) and graph-level evaluation (MAE per scenario with uncertainty error bars). T8: 100 test graphs $\times$ 31,635 nodes $=$ 3,163,500 total predictions. Source: \texttt{mc\_dropout\_full\_metrics\_model8\_mc30\_100graphs.json}.}
+\label{fig:node_vs_graph}
+\end{figure}
+
+\section{Model Architecture}
+
+We use the PointNetTransfGAT architecture developed by Natterer~et~al.~\cite{natterer2025ml}, which combines ideas from PointNet~\cite{qi2017pointnet}, graph transformers~\cite{shi2021masked}, and graph attention networks~\cite{velickovic2018graph} into a single end-to-end model for node-level regression on road networks.
+
+\textbf{Note on architectural variants:} Trial~1 uses a \texttt{Linear(64$\to$1)} final prediction layer, while Trials~2--8 use a \texttt{GATConv(64$\to$1)} final layer. This difference makes Trial~1 results not directly comparable with Trials~2--8, and Trial~1 is excluded from MC Dropout UQ experiments (effective dropout $= 0.0$).
+
+\subsection{Geometric Representation}
+
+A key design choice in the architecture is how it encodes the physical geometry of road segments. Each node carries two 2D positional coordinates: the start point of its corresponding road segment, $\mathbf{pos}[:,0,:] \in \mathbb{R}^{N \times 2}$, and its end point, $\mathbf{pos}[:,1,:] \in \mathbb{R}^{N \times 2}$. The two PointNetConv layers~\cite{qi2017pointnet} exploit these coordinates by computing, for each node $i$ and neighbour $j$, the relative displacement $\mathbf{pos}_j - \mathbf{pos}_i$ as part of the local MLP input. This means the first PointNetConv uses the start-point geometry of each segment relative to its neighbours, while the second uses the end-point geometry. The effect is that the model learns not only the graph-topological neighbourhood of each segment but also the spatial proximity of where segments begin and end in the 2D plane---an inductive bias well-suited to the geometry of real road networks.
+
+\subsection{Layer-by-Layer Architecture}
+
+Table~\ref{tab:architecture} details the complete forward pass through the network. All dimensions and layer specifications are verified directly from \texttt{scripts/gnn/models/\allowbreak{}point\_net\_transf\_gat.py}.
+
+\begin{table}[htbp]
+\centering
+\caption[PointNetTransfGAT layer progression]{PointNetTransfGAT layer progression. Input: node features $\mathbf{x} \in \mathbb{R}^{N \times 5}$, positional coordinates $\mathbf{pos} \in \mathbb{R}^{N \times 3 \times 2}$ (start, end, and midpoint coordinates; only start and end are used in the forward pass). All dimensions verified from \texttt{point\_net\_transf\_gat.py}.}
+\label{tab:architecture}
+\begin{tabular}{clp{5.2cm}cc}
+\toprule
+\textbf{Stage} & \textbf{Layer} & \textbf{Operation} & \textbf{In dim} & \textbf{Out dim} \\
+\midrule
+1 & PointNetConv-1 & Local MLP: $7 \to 256$ (feat+pos\_start); global MLP: $256 \to 512 \to 512$ & 5 & 512 \\
+2 & PointNetConv-2 & Local MLP: $514 \to 256$ (feat+pos\_end); global MLP: $256 \to 512 \to 128$ & 512 & 128 \\
+3 & TransformerConv-1 & 4 attention heads, $64$ dims/head & 128 & 256 \\
+4 & TransformerConv-2 & 4 attention heads, $128$ dims/head & 256 & 512 \\
+5 & GATConv & 1 head & 512 & 64 \\
+6a & GATConv (final) & 1 head; \textbf{Trials~2--8} & 64 & 1 \\
+6b & Linear (final) & Point projection; \textbf{Trial~1 only} & 64 & 1 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+In Stage~1, the local MLP receives a $7$-dimensional input: the 5 node features concatenated with the 2D start-position displacement $(\mathbf{pos}_j - \mathbf{pos}_i)[:,0,:]$. In Stage~2, the local MLP receives $514$ dimensions: the 512-dimensional embedding from Stage~1 concatenated with the 2D end-position displacement. The TransformerConv layers~\cite{shi2021masked} apply multi-head attention over the graph edges; the GATConv layers~\cite{velickovic2018graph} aggregate neighbourhood information with learned attention weights.
+
+\textbf{Dropout placement:} Dropout is applied within the local and global MLPs of both PointNetConv layers, and between the TransformerConv layers. All dropout calls are gated by the \texttt{use\_dropout} flag (default: \texttt{False}); the flag must be set to \texttt{True} at inference time to activate MC Dropout uncertainty estimation. The architecture also includes a \texttt{predict\_mode\_stats} branch (a TransformerEncoder-based mode predictor) that was implemented in code but was not activated in any of the eight training trials reported in this thesis.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{figures/fig8_architecture.pdf}
+\caption[PointNetTransfGAT architecture: data flow diagram]{PointNetTransfGAT architecture. Two PointNetConv layers encode start- and end-point geometry (512 and 128 channels); two TransformerConv layers capture long-range attention (256 and 512 channels, 4 heads each); two GATConv layers produce the final embedding and scalar prediction (64 then 1 channel). Trial~1 replaces the final \texttt{GATConv(64$\to$1)} with \texttt{Linear(64$\to$1)}. Verified from \texttt{point\_net\_transf\_gat.py}.}
+\label{fig:architecture}
+\end{figure}
+
+% The following figure is retained for supplementary illustration of the end-to-end data flow.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{figures/pointnet_data_flow.pdf}
+\caption[End-to-end data flow: road network to traffic prediction with uncertainty]{End-to-end data flow from road network to traffic prediction with uncertainty. The Paris road network (31,635 nodes) is encoded as a feature matrix ($N \times 5$) with positional coordinates, processed through the GNN, and produces per-node $\Delta v$ predictions with MC Dropout uncertainty $\sigma$. T8 achieves Spearman~$\rho = 0.4820$ (100 test graphs, $S = 30$).}
+\label{fig:data_flow}
+\end{figure}
+
+\subsection{Hyperparameter Summary}
+
+\begin{table}[htbp]
+\centering
+\caption[PointNetTransfGAT hyperparameters by trial group]{Key hyperparameters of the PointNetTransfGAT model, grouped by trial. Full per-trial configurations are given in Table~\ref{tab:trials}.}
+\label{tab:hyperparams}
+\begin{tabular}{lll}
+\toprule
+\textbf{Parameter} & \textbf{Value / Range} & \textbf{Trials} \\
+\midrule
+Hidden channels (PointNet local, GAT) & 64 & All \\
+Hidden channels (TransformerConv) & 256 / 512 & All \\
+TransformerConv attention heads & 4 (both layers) & All \\
+GATConv attention heads & 1 & All \\
+Dropout rate & 0.2 & T8 \\
+ & 0.3 & T5--T7 \\
+ & 0.0 & T1, T3 \\
+Learning rate & $3\times10^{-4}$ to $10^{-3}$ & varies \\
+Batch size & 8 & T5--T8 \\
+ & 16 & T2--T4 \\
+ & 32 & T1 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Uncertainty Quantification Methods}
+
+Three UQ approaches are implemented and compared in this thesis.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{figures/fig12_trial_progression.pdf}
+\caption[Trial progression T1$\rightarrow$T8: architecture changes and performance]{Trial progression from T1 to T8. Top panel shows $R^2$ per trial; bottom panel shows MAE. The key architectural changes per trial are annotated below the bars. T8 (orange) achieves the best combination of predictive accuracy and uncertainty quality among MC Dropout-enabled trials. Verified from \texttt{test\_evaluation\_complete.json}.}
+\label{fig:trial_progression}
+\end{figure}
+
+\subsection{Method 1: MC Dropout}
+
+MC Dropout~\cite{gal2016dropout, gal2016thesis} enables uncertainty estimation by keeping dropout active during inference:
+
+\begin{algorithm}[htbp]
+\caption[MC Dropout uncertainty estimation]{MC Dropout uncertainty estimation. Given a trained model with dropout layers, $S$ stochastic forward passes yield a predictive mean and standard deviation per node.}
+\label{alg:mc_dropout}
+\begin{algorithmic}
+\STATE \textbf{Input:} Input features $\mathbf{x}$, trained model $f$, number of samples $S$
+\STATE \textbf{Output:} Mean prediction $\mu$, uncertainty $\sigma$
+\FOR{$s = 1$ to $S$}
+    \STATE $\hat{y}_s \leftarrow f(\mathbf{x})$ with dropout enabled
+\ENDFOR
+\STATE $\mu \leftarrow \frac{1}{S}\sum_s \hat{y}_s$
+\STATE $\sigma \leftarrow \sqrt{\frac{1}{S}\sum_s (\hat{y}_s - \mu)^2}$
+\RETURN $\mu$, $\sigma$
+\end{algorithmic}
+\end{algorithm}
+
+We use $S = 30$ MC samples, balancing computational cost against estimate stability.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{figures/fig13_mc_dropout_inference.pdf}
+\caption[MC Dropout inference: S=30 stochastic forward passes]{MC Dropout inference procedure for T8. A single road network graph is passed through the GNN with dropout active for $S = 30$ stochastic forward passes, yielding 30 prediction vectors $\hat{y}_1, \ldots, \hat{y}_{30}$. Their per-node mean ($\hat{y}$) and standard deviation ($\sigma$) form the final prediction with uncertainty. Spearman rank correlation between $\sigma$ and $|y - \hat{y}|$ reaches $\rho = 0.4820$ for T8.}
+\label{fig:mc_dropout_inference}
+\end{figure}
+
+\subsection{Method 2: Deep Ensembles}
+
+Ensemble variance measures disagreement across independent training runs of the same model:
+
+\begin{equation}
+    \sigma_{\text{ens}} = \sqrt{\frac{1}{M}\sum_{m=1}^{M}(f_m(\mathbf{x}) - \bar{f}(\mathbf{x}))^2}
+\end{equation}
+
+where $M = 5$ is the number of independently trained models.
+
+\subsection{Method 3: Combined Uncertainty}
+
+We combine MC Dropout and ensemble uncertainty:
+\begin{equation}
+    \sigma_{\text{combined}} = \sqrt{\sigma_{\text{MC}}^2 + \sigma_{\text{ens}}^2}
+\end{equation}
+
+\section{Evaluation Metrics}
+
+\subsection{Prediction Quality}
+
+Prediction accuracy is evaluated using three standard regression metrics. The \textbf{coefficient of determination} ($R^2$) measures the proportion of variance in the target explained by the model:
+\begin{equation}
+    R^2 = 1 - \frac{\sum_i (y_i - \hat{y}_i)^2}{\sum_i (y_i - \bar{y})^2}
+\end{equation}
+The \textbf{mean absolute error} (MAE) gives the average magnitude of prediction errors in the original units (vehicles per hour):
+\begin{equation}
+    \text{MAE} = \frac{1}{n}\sum_i |y_i - \hat{y}_i|
+\end{equation}
+The \textbf{root mean square error} (RMSE) penalises large deviations more heavily and is reported for comparability with prior work:
+\begin{equation}
+    \text{RMSE} = \sqrt{\frac{1}{n}\sum_i (y_i - \hat{y}_i)^2}
+\end{equation}
+
+\subsection{Uncertainty Quality}
+
+Uncertainty quality is assessed with three complementary measures. The \textbf{Spearman rank correlation} ($\rho$) captures the monotonic relationship between the predicted uncertainty $\sigma_i$ and the absolute error $|y_i - \hat{y}_i|$; higher values indicate that uncertainty tracks error more faithfully, and $\rho > 0$ is the minimum bar for a useful uncertainty estimate. The \textbf{Pearson correlation} ($r$) provides a linear analogue that is more sensitive to outliers, offering a cross-check on the rank-based result. Finally, the \textbf{$p$-value} of each correlation test is reported to confirm that the observed association is statistically distinguishable from zero.
+
+A well-calibrated uncertainty estimate should correlate positively with prediction error ($\rho > 0$): where uncertainty is high, actual errors should tend to be larger.
