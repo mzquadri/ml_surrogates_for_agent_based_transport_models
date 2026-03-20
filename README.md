@@ -28,7 +28,7 @@ This thesis develops a post-hoc uncertainty quantification framework for a GNN s
 | -------- | ------- | ------- |
 | Deterministic MAE / RMSE | 3.96 / 7.12 veh/h | -- |
 | R^2 | 0.5957 | -- |
-| MC Dropout Spearman rho | 0.482 | 0.444 |
+| MC Dropout Spearman rho | 0.482 | 0.446 |
 | Conformal 90% / 95% coverage | 90.02% / 95.01% | 89.98% / 95.03% |
 | ECE (before / after temp. scaling) | 0.269 / 0.048 | -- |
 | Selective prediction MAE reduction @80% | 16% | -- |

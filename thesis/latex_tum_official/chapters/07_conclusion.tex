@@ -21,7 +21,7 @@ This thesis investigated uncertainty quantification methods for Graph Neural Net
 
     \item \textbf{Ensemble experiments suffer from evaluation mismatch:} Ensemble-based uncertainty estimates achieve $\rho = 0.1035$--$0.1601$ in our experiments, but this evaluation exhibits a data distribution mismatch ($R^2 \approx 0$). Within that context, MC Dropout still outperforms ensemble variance by 55\%. Re-evaluation under controlled conditions is necessary for definitive comparison.
 
-    \item \textbf{UQ findings are robust across trials:} Replication of selective prediction and calibration audit on Trial~7 ($\rho = 0.4437$, dropout $= 0.3$) confirms the same qualitative conclusions: MC Dropout provides useful uncertainty ranking, raw $\sigma$ values are not calibrated, and conformal prediction restores near-exact coverage. The main findings are not specific to a single model configuration (Section~\ref{sec:t7_crosscheck}).
+    \item \textbf{UQ findings are robust across trials:} Replication of selective prediction and calibration audit on Trial~7 ($\rho = 0.4460$, dropout $= 0.3$) confirms the same qualitative conclusions: MC Dropout provides useful uncertainty ranking, raw $\sigma$ values are not calibrated, and conformal prediction restores near-exact coverage. The main findings are not specific to a single model configuration (Section~\ref{sec:t7_crosscheck}).
 \end{enumerate}
 
 \subsection{Practical Recommendations}
@@ -35,7 +35,7 @@ The primary contributions of this thesis are:
 \begin{enumerate}
     \item \textbf{Systematic UQ evaluation for GNN traffic surrogates:} First comprehensive comparison of MC Dropout, ensemble variance, and conformal prediction for node-level traffic volume change prediction at scale (3.16 million predictions per evaluation).
 
-    \item \textbf{Empirical evidence for MC Dropout effectiveness:} Demonstrated $\rho = 0.4820$ uncertainty-error correlation for T8 MC Dropout. T8 (dropout $= 0.2$, 80/10/10 split) achieves higher $\rho$ than T5--T7 ($\rho$: 0.4186--0.4437, dropout $= 0.3$). Note that T8 differs from T5--T6 in both dropout rate and data split, and from T7 in dropout rate and learning rate; batch size is identical (8) across all four trials, so the $\rho$ improvement cannot be attributed solely to the reduced dropout rate.
+    \item \textbf{Empirical evidence for MC Dropout effectiveness:} Demonstrated $\rho = 0.4820$ uncertainty-error correlation for T8 MC Dropout. T8 (dropout $= 0.2$, 80/10/10 split) achieves higher $\rho$ than T5--T7 ($\rho$: 0.4186--0.4460, dropout $= 0.3$). Note that T8 differs from T5--T6 in both dropout rate and data split, and from T7 in dropout rate and learning rate; batch size is identical (8) across all four trials, so the $\rho$ improvement cannot be attributed solely to the reduced dropout rate.
 
     \item \textbf{Conformal prediction coverage verification:} Confirmed that split conformal prediction achieves nominal coverage guarantees on large-scale traffic prediction (1.58M-node evaluation sets).
 

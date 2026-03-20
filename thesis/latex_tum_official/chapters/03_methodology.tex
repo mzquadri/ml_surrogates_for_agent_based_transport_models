@@ -185,6 +185,61 @@ We combine MC Dropout and ensemble uncertainty:
     \sigma_{\text{combined}} = \sqrt{\sigma_{\text{MC}}^2 + \sigma_{\text{ens}}^2}
 \end{equation}
 
+\subsection{Method 4: Split Conformal Prediction}
+
+Split conformal prediction~\cite{vovk2005algorithmic, angelopoulos2023conformal} provides distribution-free prediction intervals with finite-sample coverage guarantees:
+
+\begin{algorithm}[htbp]
+\caption[Split conformal prediction]{Split conformal prediction. A calibration set is used to compute a coverage-valid quantile; the evaluation set receives prediction intervals with guaranteed marginal coverage.}
+\label{alg:conformal}
+\begin{algorithmic}
+\STATE \textbf{Input:} Calibration set $\mathcal{D}_\text{cal} = \{(\mathbf{x}_i, y_i)\}_{i=1}^n$, trained model $f$, coverage level $1 - \alpha$
+\STATE \textbf{Output:} Prediction interval $C(\mathbf{x}_\text{new})$ for new inputs
+\FOR{$i = 1$ to $n$}
+    \STATE $s_i \leftarrow |y_i - f(\mathbf{x}_i)|$ \COMMENT{nonconformity score}
+\ENDFOR
+\STATE $q \leftarrow \text{Quantile}\left(s_1, \ldots, s_n;\; \lceil(n+1)(1-\alpha)\rceil / n\right)$
+\RETURN $C(\mathbf{x}_\text{new}) = \left[f(\mathbf{x}_\text{new}) - q,\; f(\mathbf{x}_\text{new}) + q\right]$
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{Method 5: Selective Prediction}
+
+Selective prediction uses MC Dropout uncertainty to filter out unreliable predictions, retaining only those the model is most confident about:
+
+\begin{algorithm}[htbp]
+\caption[Selective prediction via uncertainty filtering]{Selective prediction. Predictions are ranked by MC Dropout uncertainty and only the most confident fraction is retained.}
+\label{alg:selective}
+\begin{algorithmic}
+\STATE \textbf{Input:} Predictions $\hat{y}_1, \ldots, \hat{y}_n$, uncertainties $\sigma_1, \ldots, \sigma_n$, retention fraction $\tau \in (0, 1]$
+\STATE \textbf{Output:} Filtered predictions, MAE on retained set
+\STATE Sort predictions by ascending $\sigma$
+\STATE Retain top-$\tau$ fraction (i.e., the $\lfloor \tau \cdot n \rfloor$ predictions with lowest $\sigma$)
+\STATE Compute $\text{MAE}_\tau = \frac{1}{|\mathcal{R}|}\sum_{i \in \mathcal{R}} |y_i - \hat{y}_i|$ on retained set $\mathcal{R}$
+\RETURN filtered predictions, $\text{MAE}_\tau$
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{Method 6: Post-Hoc Temperature Scaling}
+
+Temperature scaling~\cite{guo2017calibration, laves2020well} is a post-hoc recalibration method that learns a single scalar $T$ to rescale uncertainty estimates toward calibration:
+
+\begin{algorithm}[htbp]
+\caption[Post-hoc temperature scaling for uncertainty calibration]{Post-hoc temperature scaling. A single temperature parameter $T$ is optimised on a calibration set to minimise the Expected Calibration Error (ECE).}
+\label{alg:temperature}
+\begin{algorithmic}
+\STATE \textbf{Input:} Calibration set $(y_\text{cal}, \hat{y}_\text{cal}, \sigma_\text{cal})$, evaluation set, candidate temperatures $\mathcal{T}$
+\STATE \textbf{Output:} Optimal $T^*$, scaled uncertainties $\sigma_\text{scaled}$
+\FOR{each $T \in \mathcal{T}$}
+    \STATE $\sigma_\text{scaled} \leftarrow \sigma_\text{raw} \times T$
+    \STATE Compute Kuleshov ECE on calibration set using $\sigma_\text{scaled}$
+\ENDFOR
+\STATE $T^* \leftarrow \arg\min_{T \in \mathcal{T}} \text{ECE}(T)$
+\STATE Apply $\sigma_\text{scaled} \leftarrow \sigma_\text{raw} \times T^*$ to evaluation set
+\RETURN $T^*$, $\sigma_\text{scaled}$
+\end{algorithmic}
+\end{algorithm}
+
 \section{Evaluation Metrics}
 
 \subsection{Prediction Quality}
