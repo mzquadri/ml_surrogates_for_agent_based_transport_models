@@ -1,4 +1,4 @@
-# ── Large files / directories (must not be pushed) ──
+# ── Large files / directories (not pushed to remote) ──
 data/
 logs/
 _archive/
@@ -6,7 +6,7 @@ submission.zip
 zia80432
 
 # ── IDE / tooling ──
-.vscode/wandb.env
+.vscode/
 **/.ipynb_checkpoints/
 **/__pycache__/
 
@@ -34,3 +34,10 @@ thesis/latex_tum_official/*.toc
 thesis/latex_tum_official/*.synctex.gz
 thesis/latex_tum_official/*.fls
 thesis/latex_tum_official/*.fdb_latexmk
+thesis/latex_tum_official/*.xmpi
+thesis/latex_tum_official/*.fmt
+thesis/latex_tum_official/build/
+
+# ── OS files ──
+.DS_Store
+Thumbs.db
