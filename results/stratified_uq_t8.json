@@ -1,0 +1,281 @@
+{
+  "analysis": "stratified_uq_by_features",
+  "description": "UQ quality stratified by input feature quartiles",
+  "n_nodes_total": 3163500,
+  "conformal_calibration": {
+    "n_cal_graphs": 20,
+    "q90": 9.996552085876464,
+    "q95": 14.773152923583972
+  },
+  "features": {
+    "VOL": {
+      "feature": "VOL_BASE_CASE",
+      "short_name": "VOL",
+      "quartile_boundaries": [
+        -0.3728647828102112,
+        -0.2973150312900543,
+        -0.04314536601305008
+      ],
+      "quartiles": {
+        "Q1 (low)": {
+          "label": "Q1 (low)",
+          "n_nodes": 792600,
+          "feature_range": [
+            -0.3747929632663727,
+            -0.3730400800704956
+          ],
+          "spearman_rho": 0.7434276806860755,
+          "p_value": 0.0,
+          "mae_veh_h": 1.3976146179553448,
+          "mean_sigma_veh_h": 0.9740793773064913,
+          "conformal_coverage_90": 0.983996971990916,
+          "conformal_coverage_95": 0.9915808730759526
+        },
+        "Q2": {
+          "label": "Q2",
+          "n_nodes": 772700,
+          "feature_range": [
+            -0.3728647828102112,
+            -0.29749032855033875
+          ],
+          "spearman_rho": 0.36925149023098,
+          "p_value": 0.0,
+          "mae_veh_h": 2.1514944629019994,
+          "mean_sigma_veh_h": 1.159200387162102,
+          "conformal_coverage_90": 0.9760851559466804,
+          "conformal_coverage_95": 0.989933997670506
+        },
+        "Q3": {
+          "label": "Q3",
+          "n_nodes": 803800,
+          "feature_range": [
+            -0.2973150312900543,
+            -0.043320655822753906
+          ],
+          "spearman_rho": 0.20692054014875394,
+          "p_value": 0.0,
+          "mae_veh_h": 4.205897983115358,
+          "mean_sigma_veh_h": 1.2811099729896274,
+          "conformal_coverage_90": 0.9157489425230156,
+          "conformal_coverage_95": 0.9672070166708137
+        },
+        "Q4 (high)": {
+          "label": "Q4 (high)",
+          "n_nodes": 794400,
+          "feature_range": [
+            -0.04314536601305008,
+            11.375207901000977
+          ],
+          "spearman_rho": 0.26442817431911425,
+          "p_value": 0.0,
+          "mae_veh_h": 7.97732461212865,
+          "mean_sigma_veh_h": 2.0548416872207014,
+          "conformal_coverage_90": 0.7315634441087613,
+          "conformal_coverage_95": 0.855039023162135
+        }
+      }
+    },
+    "CAP": {
+      "feature": "CAPACITY_BASE_CASE",
+      "short_name": "CAP",
+      "quartile_boundaries": [
+        -0.4341444969177246,
+        -0.4341444969177246,
+        0.13527140021324158
+      ],
+      "quartiles": {
+        "Q1 (low)": {
+          "label": "Q1 (low)",
+          "n_nodes": 413900,
+          "feature_range": [
+            -0.8137550950050354,
+            -0.5764984488487244
+          ],
+          "spearman_rho": 0.8101173162569767,
+          "p_value": 0.0,
+          "mae_veh_h": 1.024669508859137,
+          "mean_sigma_veh_h": 0.7732802030089168,
+          "conformal_coverage_90": 0.9909422565837158,
+          "conformal_coverage_95": 0.996040106305871
+        },
+        "Q3": {
+          "label": "Q3",
+          "n_nodes": 1918400,
+          "feature_range": [
+            -0.4341444969177246,
+            -0.022899681702256203
+          ],
+          "spearman_rho": 0.3325458649009288,
+          "p_value": 0.0,
+          "mae_veh_h": 3.356888294363141,
+          "mean_sigma_veh_h": 1.2554077647307,
+          "conformal_coverage_90": 0.9329941618015013,
+          "conformal_coverage_95": 0.9731479357798165
+        },
+        "Q4 (high)": {
+          "label": "Q4 (high)",
+          "n_nodes": 831200,
+          "feature_range": [
+            0.13527140021324158,
+            10.574563026428223
+          ],
+          "spearman_rho": 0.40636831729699274,
+          "p_value": 0.0,
+          "mae_veh_h": 6.76627938381632,
+          "mean_sigma_veh_h": 1.926680634455456,
+          "conformal_coverage_90": 0.7836417228103946,
+          "conformal_coverage_95": 0.8763053416746872
+        }
+      }
+    },
+    "CAP_RED": {
+      "feature": "CAPACITY_REDUCTION",
+      "short_name": "CAP_RED",
+      "quartile_boundaries": [
+        0.2861502766609192,
+        0.2861502766609192,
+        0.2861502766609192
+      ],
+      "quartiles": {
+        "Q1 (low)": {
+          "label": "Q1 (low)",
+          "n_nodes": 400283,
+          "feature_range": [
+            -20.618494033813477,
+            -0.410671204328537
+          ],
+          "spearman_rho": 0.3324165703898769,
+          "p_value": 0.0,
+          "mae_veh_h": 7.75831020329484,
+          "mean_sigma_veh_h": 2.604621902855292,
+          "conformal_coverage_90": 0.733910758138617,
+          "conformal_coverage_95": 0.857545786356153
+        },
+        "Q4 (high)": {
+          "label": "Q4 (high)",
+          "n_nodes": 2763217,
+          "feature_range": [
+            0.2861502766609192,
+            0.2861502766609192
+          ],
+          "spearman_rho": 0.4663149519470487,
+          "p_value": 0.0,
+          "mae_veh_h": 3.3955266548238883,
+          "mean_sigma_veh_h": 1.1896662519515298,
+          "conformal_coverage_90": 0.9255870964893456,
+          "conformal_coverage_95": 0.964192099281381
+        }
+      }
+    },
+    "SPD": {
+      "feature": "FREESPEED",
+      "short_name": "SPD",
+      "quartile_boundaries": [
+        0.04508694261312485,
+        0.04508694261312485,
+        0.04508694261312485
+      ],
+      "quartiles": {
+        "Q1 (low)": {
+          "label": "Q1 (low)",
+          "n_nodes": 508500,
+          "feature_range": [
+            -2.0315821170806885,
+            -0.30102455615997314
+          ],
+          "spearman_rho": 0.7846121661004395,
+          "p_value": 0.0,
+          "mae_veh_h": 1.1183717615958395,
+          "mean_sigma_veh_h": 0.8329439542427175,
+          "conformal_coverage_90": 0.9899115044247787,
+          "conformal_coverage_95": 0.9958466076696165
+        },
+        "Q4 (high)": {
+          "label": "Q4 (high)",
+          "n_nodes": 2655000,
+          "feature_range": [
+            0.04508694261312485,
+            6.275094032287598
+          ],
+          "spearman_rho": 0.37982235427880023,
+          "p_value": 0.0,
+          "mae_veh_h": 4.489417937853108,
+          "mean_sigma_veh_h": 1.4713144553319208,
+          "conformal_coverage_90": 0.8843691148775894,
+          "conformal_coverage_95": 0.9420508474576271
+        }
+      }
+    },
+    "LEN": {
+      "feature": "LENGTH",
+      "short_name": "LEN",
+      "quartile_boundaries": [
+        -0.6071720868349075,
+        -0.30310218036174774,
+        0.20540481805801392
+      ],
+      "quartiles": {
+        "Q1 (low)": {
+          "label": "Q1 (low)",
+          "n_nodes": 787900,
+          "feature_range": [
+            -0.7952825427055359,
+            -0.6071842908859253
+          ],
+          "spearman_rho": 0.5456676485573438,
+          "p_value": 0.0,
+          "mae_veh_h": 4.045403468178861,
+          "mean_sigma_veh_h": 1.3923682111615925,
+          "conformal_coverage_90": 0.8931450691712146,
+          "conformal_coverage_95": 0.9454055083132378
+        },
+        "Q2": {
+          "label": "Q2",
+          "n_nodes": 791400,
+          "feature_range": [
+            -0.6071680188179016,
+            -0.3031255006790161
+          ],
+          "spearman_rho": 0.4052179189431165,
+          "p_value": 0.0,
+          "mae_veh_h": 4.1685103880386025,
+          "mean_sigma_veh_h": 1.4014325162488943,
+          "conformal_coverage_90": 0.8951743745261562,
+          "conformal_coverage_95": 0.9478620166793025
+        },
+        "Q3": {
+          "label": "Q3",
+          "n_nodes": 789600,
+          "feature_range": [
+            -0.30307886004447937,
+            0.2053632289171219
+          ],
+          "spearman_rho": 0.40051211525071784,
+          "p_value": 0.0,
+          "mae_veh_h": 3.986598777268554,
+          "mean_sigma_veh_h": 1.4040356779243446,
+          "conformal_coverage_90": 0.9027228976697061,
+          "conformal_coverage_95": 0.9525962512664641
+        },
+        "Q4 (high)": {
+          "label": "Q4 (high)",
+          "n_nodes": 794600,
+          "feature_range": [
+            0.2054811716079712,
+            22.530820846557617
+          ],
+          "spearman_rho": 0.5523369656943093,
+          "p_value": 0.0,
+          "mae_veh_h": 3.591675990671407,
+          "mean_sigma_veh_h": 1.2775291844216037,
+          "conformal_coverage_90": 0.9142084067455324,
+          "conformal_coverage_95": 0.9568839667757362
+        }
+      }
+    }
+  },
+  "references": [
+    "Ovadia et al. (2019), NeurIPS",
+    "Barber et al. (2021), Information and Inference"
+  ]
+}

@@ -1,0 +1,188 @@
+{
+  "verification_type": "CRPS/MAE theoretical ratio (main)",
+  "claim": "CRPS/MAE = 1/sqrt(2) ~ 0.707 for perfectly calibrated Gaussian",
+  "analytical": {
+    "E_CRPS_coefficient": 0.5641895835,
+    "E_MAE_coefficient": 0.7978845608,
+    "ratio_computed": 0.7071067812,
+    "ratio_1_over_sqrt2": 0.7071067812,
+    "exact_match": true
+  },
+  "monte_carlo_sigma5": {
+    "n_samples": 10000000,
+    "sigma": 5.0,
+    "seed": 42,
+    "mean_crps": 2.820076,
+    "mean_mae": 3.988156,
+    "expected_crps": 2.820948,
+    "expected_mae": 3.989423,
+    "mc_ratio": 0.707113,
+    "theoretical_ratio": 0.707107,
+    "pct_error": 0.0008,
+    "pass": true
+  },
+  "monte_carlo_sigma1_37": {
+    "n_samples": 5000000,
+    "sigma": 1.37,
+    "seed": 99,
+    "mean_crps": 0.772914,
+    "mean_mae": 1.093103,
+    "expected_crps": 0.77294,
+    "expected_mae": 1.093102,
+    "mc_ratio": 0.707082,
+    "theoretical_ratio": 0.707107,
+    "pct_error": 0.0035,
+    "pass": true
+  },
+  "thesis_cross_checks": [
+    {
+      "check": "CRPS/MAE = 0.857",
+      "json_value": 0.857,
+      "thesis_value": 0.857,
+      "pass": true
+    },
+    {
+      "check": "CRPS mean = 3.38",
+      "json_value": 3.383,
+      "thesis_value": 3.38,
+      "pass": true
+    },
+    {
+      "check": "14.3% below MAE",
+      "computed": 14.3,
+      "thesis_value": 14.3,
+      "pass": true
+    },
+    {
+      "check": "~21% excess over optimum",
+      "computed": 21.2,
+      "thesis_value": 21,
+      "pass": true
+    },
+    {
+      "check": "CRPS main vs verify match",
+      "main": 0.857,
+      "verify": 0.857,
+      "pass": true
+    }
+  ],
+  "thesis_cross_checks_all_pass": true,
+  "results_inventory": [
+    {
+      "file": "crps_t8.json",
+      "exists": true,
+      "size": 2810,
+      "status": "OK"
+    },
+    {
+      "file": "crps_t8_verification.json",
+      "exists": true,
+      "size": 725,
+      "status": "OK"
+    },
+    {
+      "file": "pit_t8.json",
+      "exists": true,
+      "size": 3013,
+      "status": "OK"
+    },
+    {
+      "file": "pit_t8_verification.json",
+      "exists": true,
+      "size": 410,
+      "status": "OK"
+    },
+    {
+      "file": "pit_after_tempscaling_t8.json",
+      "exists": true,
+      "size": 2512,
+      "status": "OK"
+    },
+    {
+      "file": "pit_after_tempscaling_t8_verification.json",
+      "exists": true,
+      "size": 493,
+      "status": "OK"
+    },
+    {
+      "file": "winkler_t8.json",
+      "exists": true,
+      "size": 2235,
+      "status": "OK"
+    },
+    {
+      "file": "winkler_t8_verification.json",
+      "exists": true,
+      "size": 1025,
+      "status": "OK"
+    },
+    {
+      "file": "selective_prediction_s30.json",
+      "exists": true,
+      "size": 2711,
+      "status": "OK"
+    },
+    {
+      "file": "nll_results.json",
+      "exists": true,
+      "size": 541,
+      "status": "OK"
+    },
+    {
+      "file": "bootstrap_ci_results.json",
+      "exists": true,
+      "size": 466,
+      "status": "OK"
+    },
+    {
+      "file": "temperature_scaling_t8.json",
+      "exists": true,
+      "size": 2629,
+      "status": "OK"
+    },
+    {
+      "file": "reliability_diagram_t8.json",
+      "exists": true,
+      "size": 1062,
+      "status": "OK"
+    },
+    {
+      "file": "conformal_conditional_coverage_t8.json",
+      "exists": true,
+      "size": 4610,
+      "status": "OK"
+    },
+    {
+      "file": "stratified_uq_t8.json",
+      "exists": true,
+      "size": 8899,
+      "status": "OK"
+    },
+    {
+      "file": "per_graph_variation_t8.json",
+      "exists": true,
+      "size": 14935,
+      "status": "OK"
+    },
+    {
+      "file": "ensemble_bug_diagnostic.json",
+      "exists": true,
+      "size": 982,
+      "status": "OK"
+    },
+    {
+      "file": "ensemble_bug_root_cause.json",
+      "exists": true,
+      "size": 613,
+      "status": "OK"
+    },
+    {
+      "file": "s_convergence_results.json",
+      "exists": true,
+      "size": 3375,
+      "status": "OK"
+    }
+  ],
+  "results_inventory_all_ok": true,
+  "overall_pass": true
+}

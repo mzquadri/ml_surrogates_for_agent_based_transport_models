@@ -1,0 +1,112 @@
+{
+  "description": "Selective prediction (risk-coverage) from S=30 MC Dropout NPZ",
+  "data_source": "C:\\Users\\zamin\\OneDrive\\Desktop\\Nazim_thesis\\ml_surrogates_for_agent_based_transport_models\\data\\TR-C_Benchmarks\\point_net_transf_gat_8th_trial_lower_dropout\\uq_results\\mc_dropout_full_100graphs_mc30.npz",
+  "deterministic_source": "C:\\Users\\zamin\\OneDrive\\Desktop\\Nazim_thesis\\ml_surrogates_for_agent_based_transport_models\\data\\TR-C_Benchmarks\\point_net_transf_gat_8th_trial_lower_dropout\\uq_results\\deterministic_full_100graphs.npz",
+  "mc_samples": 30,
+  "n_total_nodes": 3163500,
+  "n_graphs": 100,
+  "baseline_mc_mae": 3.9476,
+  "baseline_mc_rmse": 7.2065,
+  "baseline_det_mae": 3.9573,
+  "baseline_det_rmse": 7.1183,
+  "retention_table": [
+    {
+      "retained_pct": 100,
+      "n_nodes": 3163500,
+      "MAE": 3.9476,
+      "RMSE": 7.2065
+    },
+    {
+      "retained_pct": 95,
+      "n_nodes": 3005325,
+      "MAE": 3.4787,
+      "RMSE": 6.1143
+    },
+    {
+      "retained_pct": 90,
+      "n_nodes": 2847150,
+      "MAE": 3.2257,
+      "RMSE": 5.6778
+    },
+    {
+      "retained_pct": 85,
+      "n_nodes": 2688975,
+      "MAE": 3.0514,
+      "RMSE": 5.4117
+    },
+    {
+      "retained_pct": 80,
+      "n_nodes": 2530800,
+      "MAE": 2.9131,
+      "RMSE": 5.2125
+    },
+    {
+      "retained_pct": 75,
+      "n_nodes": 2372625,
+      "MAE": 2.7945,
+      "RMSE": 5.0453
+    },
+    {
+      "retained_pct": 70,
+      "n_nodes": 2214450,
+      "MAE": 2.6893,
+      "RMSE": 4.897
+    },
+    {
+      "retained_pct": 60,
+      "n_nodes": 1898100,
+      "MAE": 2.5008,
+      "RMSE": 4.6362
+    },
+    {
+      "retained_pct": 50,
+      "n_nodes": 1581750,
+      "MAE": 2.3197,
+      "RMSE": 4.377
+    },
+    {
+      "retained_pct": 40,
+      "n_nodes": 1265400,
+      "MAE": 2.1333,
+      "RMSE": 4.1269
+    },
+    {
+      "retained_pct": 30,
+      "n_nodes": 949050,
+      "MAE": 1.9218,
+      "RMSE": 3.851
+    },
+    {
+      "retained_pct": 25,
+      "n_nodes": 790875,
+      "MAE": 1.7926,
+      "RMSE": 3.6835
+    },
+    {
+      "retained_pct": 10,
+      "n_nodes": 316350,
+      "MAE": 1.0555,
+      "RMSE": 2.8141
+    }
+  ],
+  "key_reductions": {
+    "retain_90pct": {
+      "mae": 3.2257,
+      "rmse": 5.6778,
+      "mae_reduction_pct": 18.3,
+      "rmse_reduction_pct": 21.2
+    },
+    "retain_50pct": {
+      "mae": 2.3197,
+      "rmse": 4.377,
+      "mae_reduction_pct": 41.2,
+      "rmse_reduction_pct": 39.3
+    },
+    "retain_25pct": {
+      "mae": 1.7926,
+      "rmse": 3.6835,
+      "mae_reduction_pct": 54.6,
+      "rmse_reduction_pct": 48.9
+    }
+  }
+}

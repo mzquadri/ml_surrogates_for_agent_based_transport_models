@@ -466,8 +466,8 @@ def mc_dropout_predict_hetero(model, data, num_samples: int = 30, device: torch.
     - device (torch.device): Device to run on.
 
     Returns:
-    - dict with keys: 'mean', 'sigma_aleatoric', 'sigma_epistemic', 'sigma_total'
-      all as numpy arrays of shape (num_nodes, 1).
+    - (mean_mu, sigma_aleatoric, sigma_epistemic, sigma_total)
+      each a numpy array of shape (num_nodes, 1).
     """
     was_training = model.training
 
@@ -510,9 +510,9 @@ def mc_dropout_predict_hetero(model, data, num_samples: int = 30, device: torch.
     for m, was_train in bn_layers:
         m.train(was_train)
 
-    return {
-        'mean': mean_prediction.cpu().numpy(),
-        'sigma_aleatoric': var_aleatoric.sqrt().cpu().numpy(),
-        'sigma_epistemic': var_epistemic.sqrt().cpu().numpy(),
-        'sigma_total': var_total.sqrt().cpu().numpy(),
-    }
+    mean_mu = mean_prediction.cpu().numpy()
+    sigma_aleatoric = var_aleatoric.sqrt().cpu().numpy()
+    sigma_epistemic = var_epistemic.sqrt().cpu().numpy()
+    sigma_total = var_total.sqrt().cpu().numpy()
+
+    return mean_mu, sigma_aleatoric, sigma_epistemic, sigma_total

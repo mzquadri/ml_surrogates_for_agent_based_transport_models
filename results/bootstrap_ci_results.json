@@ -1,0 +1,20 @@
+{
+  "graph_level_mean_rho": {
+    "mean": 0.4643,
+    "std": 0.0234,
+    "ci_95_lo": 0.4599,
+    "ci_95_hi": 0.4689,
+    "bootstrap_se": 0.0023,
+    "n_graphs": 100,
+    "n_bootstrap": 10000
+  },
+  "aggregate_rho_block_bootstrap": {
+    "aggregate_rho": 0.482,
+    "mean_of_per_graph_rhos": 0.4643,
+    "ci_95_lo": 0.4598,
+    "ci_95_hi": 0.4689,
+    "bootstrap_se": 0.0023,
+    "n_bootstrap": 10000,
+    "method": "block_bootstrap_by_graph"
+  }
+}

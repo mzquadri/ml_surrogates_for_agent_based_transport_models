@@ -1,0 +1,157 @@
+{
+  "analysis": "conformal_conditional_coverage_by_sigma",
+  "description": "Conformal coverage stratified by MC Dropout sigma deciles",
+  "n_eval_nodes": 2530800,
+  "n_cal_nodes": 632700,
+  "global_quantiles": {
+    "q90": 9.99325749,
+    "q95": 14.769979187499981
+  },
+  "adaptive_quantiles": {
+    "q90_adapt": 7.5817549594034634,
+    "q95_adapt": 11.35716669737804
+  },
+  "sigma_deciles": [
+    {
+      "decile": 1,
+      "sigma_range": [
+        0.053343426,
+        0.44835702
+      ],
+      "n_nodes": 253080,
+      "global_coverage_90": 0.9857278330962541,
+      "global_coverage_95": 0.9944246878457405,
+      "adaptive_coverage_90": 0.900288446341078,
+      "adaptive_coverage_95": 0.9368895211000474,
+      "mae_veh_h": 1.024113244869062,
+      "mean_sigma": 0.2757933512995496
+    },
+    {
+      "decile": 2,
+      "sigma_range": [
+        0.4483578,
+        0.5893935
+      ],
+      "n_nodes": 253080,
+      "global_coverage_90": 0.966180654338549,
+      "global_coverage_95": 0.9872253832780149,
+      "adaptive_coverage_90": 0.8425043464517149,
+      "adaptive_coverage_95": 0.909048522206417,
+      "mae_veh_h": 2.193309354507093,
+      "mean_sigma": 0.5230260280682788
+    },
+    {
+      "decile": 3,
+      "sigma_range": [
+        0.5893937,
+        0.70871806
+      ],
+      "n_nodes": 253080,
+      "global_coverage_90": 0.9579856171961435,
+      "global_coverage_95": 0.9837205626679311,
+      "adaptive_coverage_90": 0.8598545914335388,
+      "adaptive_coverage_95": 0.9241662715346926,
+      "mae_veh_h": 2.4841157718808313,
+      "mean_sigma": 0.6492954049755413
+    },
+    {
+      "decile": 4,
+      "sigma_range": [
+        0.7087182,
+        0.8349749
+      ],
+      "n_nodes": 253080,
+      "global_coverage_90": 0.9503556187766714,
+      "global_coverage_95": 0.9795598229808756,
+      "adaptive_coverage_90": 0.8744231073178441,
+      "adaptive_coverage_95": 0.9352378694483957,
+      "mae_veh_h": 2.744501574645075,
+      "mean_sigma": 0.7706192237535959
+    },
+    {
+      "decile": 5,
+      "sigma_range": [
+        0.8349755,
+        0.9815257
+      ],
+      "n_nodes": 253080,
+      "global_coverage_90": 0.9408289868816184,
+      "global_coverage_95": 0.974905168326221,
+      "adaptive_coverage_90": 0.8861585269480007,
+      "adaptive_coverage_95": 0.9439860913545124,
+      "mae_veh_h": 3.053311494372137,
+      "mean_sigma": 0.905750283884582
+    },
+    {
+      "decile": 6,
+      "sigma_range": [
+        0.9815262,
+        1.1663435
+      ],
+      "n_nodes": 253080,
+      "global_coverage_90": 0.9298087561245456,
+      "global_coverage_95": 0.9690572151098467,
+      "adaptive_coverage_90": 0.8984668879405722,
+      "adaptive_coverage_95": 0.9524656235182551,
+      "mae_veh_h": 3.3888341075761326,
+      "mean_sigma": 1.0696099423084797
+    },
+    {
+      "decile": 7,
+      "sigma_range": [
+        1.1663451,
+        1.4235438
+      ],
+      "n_nodes": 253080,
+      "global_coverage_90": 0.9148214003477161,
+      "global_coverage_95": 0.9616524419155998,
+      "adaptive_coverage_90": 0.9110755492334439,
+      "adaptive_coverage_95": 0.9604868025920658,
+      "mae_veh_h": 3.8028454821468185,
+      "mean_sigma": 1.2867290360344559
+    },
+    {
+      "decile": 8,
+      "sigma_range": [
+        1.4235448,
+        1.8318372
+      ],
+      "n_nodes": 253080,
+      "global_coverage_90": 0.8936897423739529,
+      "global_coverage_95": 0.9502173225857437,
+      "adaptive_coverage_90": 0.925975975975976,
+      "adaptive_coverage_95": 0.9700529476845267,
+      "mae_veh_h": 4.474817183705276,
+      "mean_sigma": 1.6094840263343606
+    },
+    {
+      "decile": 9,
+      "sigma_range": [
+        1.8318383,
+        2.6672523
+      ],
+      "n_nodes": 253080,
+      "global_coverage_90": 0.848814604077762,
+      "global_coverage_95": 0.9271692745376956,
+      "adaptive_coverage_90": 0.9436186186186186,
+      "adaptive_coverage_95": 0.9804172593646278,
+      "mae_veh_h": 5.71263579253851,
+      "mean_sigma": 2.184324251012723
+    },
+    {
+      "decile": 10,
+      "sigma_range": [
+        2.667271,
+        35.789856
+      ],
+      "n_nodes": 253080,
+      "global_coverage_90": 0.6291804962857594,
+      "global_coverage_95": 0.7807689268215584,
+      "adaptive_coverage_90": 0.9623676307886834,
+      "adaptive_coverage_95": 0.9886122965070333,
+      "mae_veh_h": 10.479387904976322,
+      "mean_sigma": 4.564252100621543
+    }
+  ],
+  "reference": "Barber et al. (2021), Information and Inference"
+}

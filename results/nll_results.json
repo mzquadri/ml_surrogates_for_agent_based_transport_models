@@ -1,0 +1,23 @@
+{
+  "t8_mc_dropout": {
+    "nll_mean": 21.6452,
+    "nll_std": 885.8186,
+    "nll_median": 2.6905,
+    "n_nodes": 3163500,
+    "source": "mc_dropout_full_100graphs_mc30.npz"
+  },
+  "t8_mc_dropout_temp_scaled": {
+    "nll_mean": 4.7464,
+    "nll_std": 121.2771,
+    "nll_median": 2.4174,
+    "temperature": 2.7025,
+    "n_nodes": 3163500
+  },
+  "t7_mc_dropout": {
+    "nll_mean": 37.2205,
+    "nll_std": 667.4562,
+    "nll_median": 3.0719,
+    "n_nodes": 3163500,
+    "source": "mc_dropout_full_100graphs_mc30.npz"
+  }
+}

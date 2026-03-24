@@ -1,0 +1,130 @@
+{
+  "metric": "CRPS (Gaussian closed-form)",
+  "reference": "Gneiting & Raftery (2007), JASA 102(477), Eq. 21",
+  "model": "T8 MC Dropout S=30",
+  "data_source": "C:\\Users\\zamin\\OneDrive\\Desktop\\Nazim_thesis\\ml_surrogates_for_agent_based_transport_models\\data\\TR-C_Benchmarks\\point_net_transf_gat_8th_trial_lower_dropout\\uq_results\\mc_dropout_full_100graphs_mc30.npz",
+  "n_nodes": 3163500,
+  "n_graphs": 100,
+  "crps_mean": 3.383,
+  "crps_median": 1.3292,
+  "crps_std": 5.6284,
+  "crps_q25": 0.4517,
+  "crps_q75": 3.9342,
+  "crps_q95": 13.3101,
+  "crps_min": 0.0107,
+  "crps_max": 145.0826,
+  "mae_reference": 3.9476,
+  "crps_over_mae": 0.857,
+  "decile_breakdown": [
+    {
+      "decile": 1,
+      "sigma_range": [
+        0.0424,
+        0.434
+      ],
+      "n_nodes": 316350,
+      "mean_crps": 0.9665,
+      "mean_mae": 1.0555,
+      "mean_sigma": 0.2659
+    },
+    {
+      "decile": 2,
+      "sigma_range": [
+        0.434,
+        0.5748
+      ],
+      "n_nodes": 316350,
+      "mean_crps": 1.9895,
+      "mean_mae": 2.2063,
+      "mean_sigma": 0.5086
+    },
+    {
+      "decile": 3,
+      "sigma_range": [
+        0.5748,
+        0.6946
+      ],
+      "n_nodes": 316350,
+      "mean_crps": 2.2364,
+      "mean_mae": 2.5037,
+      "mean_sigma": 0.6348
+    },
+    {
+      "decile": 4,
+      "sigma_range": [
+        0.6946,
+        0.8206
+      ],
+      "n_nodes": 316350,
+      "mean_crps": 2.4529,
+      "mean_mae": 2.7679,
+      "mean_sigma": 0.7564
+    },
+    {
+      "decile": 5,
+      "sigma_range": [
+        0.8206,
+        0.9676
+      ],
+      "n_nodes": 316350,
+      "mean_crps": 2.6958,
+      "mean_mae": 3.0654,
+      "mean_sigma": 0.8916
+    },
+    {
+      "decile": 6,
+      "sigma_range": [
+        0.9676,
+        1.1524
+      ],
+      "n_nodes": 316350,
+      "mean_crps": 2.9706,
+      "mean_mae": 3.4059,
+      "mean_sigma": 1.0558
+    },
+    {
+      "decile": 7,
+      "sigma_range": [
+        1.1524,
+        1.409
+      ],
+      "n_nodes": 316350,
+      "mean_crps": 3.2993,
+      "mean_mae": 3.8204,
+      "mean_sigma": 1.2726
+    },
+    {
+      "decile": 8,
+      "sigma_range": [
+        1.409,
+        1.8155
+      ],
+      "n_nodes": 316350,
+      "mean_crps": 3.8222,
+      "mean_mae": 4.48,
+      "mean_sigma": 1.5942
+    },
+    {
+      "decile": 9,
+      "sigma_range": [
+        1.8155,
+        2.6498
+      ],
+      "n_nodes": 316350,
+      "mean_crps": 4.8144,
+      "mean_mae": 5.7268,
+      "mean_sigma": 2.1685
+    },
+    {
+      "decile": 10,
+      "sigma_range": [
+        2.6498,
+        44.2913
+      ],
+      "n_nodes": 316350,
+      "mean_crps": 8.5825,
+      "mean_mae": 10.4439,
+      "mean_sigma": 4.5385
+    }
+  ]
+}

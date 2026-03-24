@@ -1,0 +1,66 @@
+{
+  "metric": "Winkler Interval Score",
+  "reference": "Winkler (1972), JASA 67(337), 187-191",
+  "model": "T8 MC Dropout S=30",
+  "data_source": "C:\\Users\\zamin\\OneDrive\\Desktop\\Nazim_thesis\\ml_surrogates_for_agent_based_transport_models\\data\\TR-C_Benchmarks\\point_net_transf_gat_8th_trial_lower_dropout\\uq_results\\mc_dropout_full_100graphs_mc30.npz",
+  "conformal_source": "C:\\Users\\zamin\\OneDrive\\Desktop\\Nazim_thesis\\ml_surrogates_for_agent_based_transport_models\\data\\TR-C_Benchmarks\\point_net_transf_gat_8th_trial_lower_dropout\\uq_results\\conformal_standard.json",
+  "n_nodes": 3163500,
+  "n_graphs": 100,
+  "note": "Conformal quantiles from 50/50 split applied to full dataset for comparison",
+  "intervals": {
+    "90pct": {
+      "alpha": 0.1,
+      "gaussian": {
+        "z_multiplier": 1.6449,
+        "mean_winkler": 49.6848,
+        "median_winkler": 8.8783,
+        "std_winkler": 101.8901,
+        "coverage_pct": 48.6,
+        "mean_width": 4.5026
+      },
+      "conformal_absolute": {
+        "q_hat": 9.9196,
+        "mean_winkler": 35.7739,
+        "median_winkler": 19.8392,
+        "std_winkler": 78.4263,
+        "coverage_pct": 90.0,
+        "mean_width": 19.8392
+      },
+      "conformal_sigma_scaled": {
+        "k_hat": 7.7406,
+        "mean_winkler": 32.326,
+        "median_winkler": 16.7549,
+        "std_winkler": 59.2547,
+        "coverage_pct": 90.0,
+        "mean_width": 21.1891
+      }
+    },
+    "95pct": {
+      "alpha": 0.05,
+      "gaussian": {
+        "z_multiplier": 1.96,
+        "mean_winkler": 87.2727,
+        "median_winkler": 8.8442,
+        "std_winkler": 195.7268,
+        "coverage_pct": 54.8,
+        "mean_width": 5.3652
+      },
+      "conformal_absolute": {
+        "q_hat": 14.6766,
+        "mean_winkler": 47.6456,
+        "median_winkler": 29.3532,
+        "std_winkler": 126.6313,
+        "coverage_pct": 95.0,
+        "mean_width": 29.3532
+      },
+      "conformal_sigma_scaled": {
+        "k_hat": 11.6471,
+        "mean_winkler": 43.633,
+        "median_winkler": 23.9295,
+        "std_winkler": 87.9083,
+        "coverage_pct": 95.0,
+        "mean_width": 31.8829
+      }
+    }
+  }
+}

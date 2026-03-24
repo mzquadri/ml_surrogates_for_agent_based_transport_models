@@ -1,0 +1,44 @@
+{
+  "analysis": "t7_error_detection_auroc",
+  "description": "Error detection and UQ quality metrics for Trial 7",
+  "trial": 7,
+  "n_nodes": 3163500,
+  "n_graphs": 100,
+  "mc_samples": 30,
+  "spearman_rho": 0.4459946296867467,
+  "spearman_p_value": 0.0,
+  "mae_veh_h": 4.073697566986084,
+  "auroc": {
+    "top_10pct": 0.7416034046518823,
+    "top_20pct": 0.715135282067149
+  },
+  "auprc": {
+    "top_10pct": 0.3210051531781432,
+    "top_20pct": 0.446651733725021
+  },
+  "selective_prediction": {
+    "retain_50pct": {
+      "mae": 2.513357400894165,
+      "reduction_pct": 38.30279838977672
+    },
+    "retain_90pct": {
+      "mae": 3.3155710697174072,
+      "reduction_pct": 18.610279354379635
+    }
+  },
+  "k95": 16.15368566513059,
+  "raw_gaussian_coverage_95": 0.4835343764817449,
+  "t8_comparison": {
+    "rho": 0.482,
+    "mae": 3.948,
+    "auroc_top_10pct": 0.7585,
+    "auroc_top_20pct": 0.7401,
+    "k95": 11.34,
+    "selective_50_mae": 2.32,
+    "selective_90_mae": 3.23
+  },
+  "references": [
+    "Ovadia et al. (2019), Can You Trust Your Model's Uncertainty?, NeurIPS",
+    "Lakshminarayanan et al. (2017), Simple and Scalable Predictive Uncertainty, NeurIPS"
+  ]
+}
