@@ -16,21 +16,16 @@ import sys, os
 
 sys.path.insert(
     0,
-    os.path.join(
-        os.path.dirname(os.path.abspath(__file__)),
-        "..",
-        "thesis",
-        "latex_tum_official",
-        "figures",
-    ),
+    os.path.dirname(os.path.abspath(__file__)),
 )
 from thesis_style import *
 
-RESULTS_PATH = r"C:\Users\zamin\OneDrive\Desktop\Nazim_thesis\ml_surrogates_for_agent_based_transport_models\docs\verified\phase3_results\s_convergence_results.json"
+REPO = Path(__file__).resolve().parent.parent.parent
+RESULTS_PATH = str(REPO / "docs/verified/phase3_results/s_convergence_results.json")
 
 # Output paths
-FIGURES_DIR = r"C:\Users\zamin\OneDrive\Desktop\Nazim_thesis\ml_surrogates_for_agent_based_transport_models\thesis\latex_tum_official\figures"
-VERIFIED_DIR = r"C:\Users\zamin\OneDrive\Desktop\Nazim_thesis\ml_surrogates_for_agent_based_transport_models\docs\verified\figures"
+FIGURES_DIR = str(REPO / "thesis/latex_tum_official/figures")
+VERIFIED_DIR = str(REPO / "docs/verified/figures")
 
 with open(RESULTS_PATH) as f:
     data = json.load(f)

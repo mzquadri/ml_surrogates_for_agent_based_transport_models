@@ -6,11 +6,7 @@ Usage: conda run -n thesis-env python scripts/run_fig31_fig32_redesign.py
 import sys, os
 
 # Add figures directory to path
-fig_dir = os.path.normpath(
-    os.path.join(
-        os.path.dirname(__file__), "..", "thesis", "latex_tum_official", "figures"
-    )
-)
+fig_dir = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, fig_dir)
 
 # Import and run the two functions

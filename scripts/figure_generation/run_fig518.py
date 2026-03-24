@@ -7,18 +7,10 @@ Fixes: uniform bar widths, amber reference lines, no label overlap.
 import os, sys
 import numpy as np
 
-sys.path.insert(
-    0,
-    os.path.join(
-        os.path.dirname(os.path.abspath(__file__)),
-        "thesis",
-        "latex_tum_official",
-        "figures",
-    ),
-)
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from thesis_style import *
 
-REPO = os.path.dirname(os.path.abspath(__file__))
+REPO = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
 
 FOOTNOTE = (
     "Results based on 1,000 of 10,000 available MATSim scenarios "

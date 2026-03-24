@@ -4,7 +4,7 @@ import json, numpy as np, pandas as pd
 from pathlib import Path
 from sklearn.metrics import roc_auc_score, average_precision_score
 
-REPO = Path(__file__).resolve().parent
+REPO = Path(__file__).resolve().parent.parent.parent
 CSV = (
     REPO
     / "data"

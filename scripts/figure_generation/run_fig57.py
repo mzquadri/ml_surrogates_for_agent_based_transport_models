@@ -11,6 +11,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from thesis_style import *
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+REPO = os.path.abspath(os.path.join(SCRIPT_DIR, "..", ".."))
 
 # ── Verified values ─────────────────────────────────────────────────────
 # Source: docs/verified/phase3_results/verify_all_metrics_summary.json
@@ -95,8 +96,9 @@ ax.set_title(
 fig.tight_layout(pad=1.5)
 
 # ── Save ────────────────────────────────────────────────────────────────
-out_pdf = os.path.join(SCRIPT_DIR, "fig7_calibration.pdf")
-out_png = os.path.join(SCRIPT_DIR, "fig7_calibration.png")
+out_dir = os.path.join(REPO, "thesis", "latex_tum_official", "figures")
+out_pdf = os.path.join(out_dir, "fig7_calibration.pdf")
+out_png = os.path.join(out_dir, "fig7_calibration.png")
 fig.savefig(out_pdf, dpi=300, bbox_inches="tight", facecolor=BG)
 fig.savefig(out_png, dpi=300, bbox_inches="tight", facecolor=BG)
 plt.close(fig)

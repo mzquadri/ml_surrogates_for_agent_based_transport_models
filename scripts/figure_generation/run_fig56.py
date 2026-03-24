@@ -281,8 +281,9 @@ fig.text(
 fig.tight_layout(pad=1.8, rect=[0, 0.02, 1, 0.94])
 
 # ── Save ────────────────────────────────────────────────────────────────
-out_pdf = os.path.join(SCRIPT_DIR, "t8_conformal_conditional.pdf")
-out_png = os.path.join(SCRIPT_DIR, "t8_conformal_conditional.png")
+_out_dir = os.path.join(REPO_ROOT, "thesis", "latex_tum_official", "figures")
+out_pdf = os.path.join(_out_dir, "t8_conformal_conditional.pdf")
+out_png = os.path.join(_out_dir, "t8_conformal_conditional.png")
 fig.savefig(out_pdf, dpi=300, bbox_inches="tight", facecolor=BG)
 fig.savefig(out_png, dpi=300, bbox_inches="tight", facecolor=BG)
 plt.close(fig)

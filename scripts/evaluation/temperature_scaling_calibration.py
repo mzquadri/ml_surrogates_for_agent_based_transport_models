@@ -17,10 +17,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import minimize_scalar
 import os
+from pathlib import Path
 
 # Paths
-MODEL_FOLDER = 'data/TR-C_Benchmarks/point_net_transf_gat_8th_trial_lower_dropout'
-FIGURES_DIR = 'thesis/latex_tum_official/figures'
+_REPO = Path(__file__).resolve().parent.parent.parent
+MODEL_FOLDER = str(_REPO / 'data/TR-C_Benchmarks/point_net_transf_gat_8th_trial_lower_dropout')
+FIGURES_DIR = str(_REPO / 'thesis/latex_tum_official/figures')
 
 # Light pastel color scheme (consistent with thesis)
 COLORS = {

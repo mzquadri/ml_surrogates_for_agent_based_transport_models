@@ -34,19 +34,11 @@ import sys, os
 
 sys.path.insert(
     0,
-    os.path.join(
-        os.path.dirname(os.path.abspath(__file__)),
-        "..",
-        "thesis",
-        "latex_tum_official",
-        "figures",
-    ),
+    os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "figure_generation"),
 )
 from thesis_style import *
 
-REPO = Path(
-    r"C:\Users\zamin\OneDrive\Desktop\Nazim_thesis\ml_surrogates_for_agent_based_transport_models"
-)
+REPO = Path(__file__).resolve().parent.parent.parent
 T8_UQ = (
     REPO
     / "data/TR-C_Benchmarks/point_net_transf_gat_8th_trial_lower_dropout/uq_results"

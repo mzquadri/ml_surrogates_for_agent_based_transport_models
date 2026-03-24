@@ -7,19 +7,11 @@ Values from verified JSON: selective_prediction_s30.json
 import os, sys, json
 import numpy as np
 
-sys.path.insert(
-    0,
-    os.path.join(
-        os.path.dirname(os.path.abspath(__file__)),
-        "thesis",
-        "latex_tum_official",
-        "figures",
-    ),
-)
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from thesis_style import *
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-REPO = os.path.abspath(os.path.join(SCRIPT_DIR))
+REPO = os.path.abspath(os.path.join(SCRIPT_DIR, "..", ".."))
 
 # ── Load verified JSON ──────────────────────────────────────────────────
 JSON_PATH = os.path.join(

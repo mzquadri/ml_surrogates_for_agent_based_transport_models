@@ -6,15 +6,7 @@ Values cross-checked against UQ_CALIBRATION_AUDIT_T7.md.
 import sys, os, numpy as np
 from scipy import stats
 
-sys.path.insert(
-    0,
-    os.path.join(
-        os.path.dirname(os.path.abspath(__file__)),
-        "thesis",
-        "latex_tum_official",
-        "figures",
-    ),
-)
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from thesis_style import *
 
 import matplotlib
@@ -22,7 +14,7 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-REPO = os.path.dirname(os.path.abspath(__file__))
+REPO = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
 T7_DIR = os.path.join(
     REPO,
     "data",

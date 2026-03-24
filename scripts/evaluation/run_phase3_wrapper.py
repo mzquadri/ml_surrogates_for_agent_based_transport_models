@@ -7,8 +7,8 @@ import os
 import sys
 import subprocess
 
-REPO = os.path.dirname(os.path.abspath(__file__))
-FIGURES_DIR = os.path.join(REPO, "thesis", "latex_tum_official", "figures")
+REPO = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+FIGURES_DIR = os.path.join(REPO, "scripts", "figure_generation")
 SCRIPT = os.path.join(FIGURES_DIR, "generate_phase3_figures.py")
 PYTHON = sys.executable
 

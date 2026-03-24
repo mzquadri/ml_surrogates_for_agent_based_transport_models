@@ -20,7 +20,7 @@ from scipy import stats
 from pathlib import Path
 
 # ── Paths ─────────────────────────────────────────────────────────────────────
-REPO = Path(__file__).resolve().parent
+REPO = Path(__file__).resolve().parent.parent.parent
 T7_DIR = (
     REPO
     / "data/TR-C_Benchmarks/point_net_transf_gat_7th_trial_80_10_10_split/uq_results"
@@ -35,12 +35,7 @@ import sys
 
 sys.path.insert(
     0,
-    os.path.join(
-        os.path.dirname(os.path.abspath(__file__)),
-        "thesis",
-        "latex_tum_official",
-        "figures",
-    ),
+    os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "figure_generation"),
 )
 from thesis_style import *
 

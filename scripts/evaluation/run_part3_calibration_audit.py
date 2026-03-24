@@ -23,7 +23,7 @@ from scipy import stats
 from pathlib import Path
 
 # ── Paths ─────────────────────────────────────────────────────────────────────
-REPO = Path(__file__).resolve().parent
+REPO = Path(__file__).resolve().parent.parent.parent
 CSV = (
     REPO
     / "data/TR-C_Benchmarks"
@@ -38,12 +38,7 @@ import sys
 
 sys.path.insert(
     0,
-    os.path.join(
-        os.path.dirname(os.path.abspath(__file__)),
-        "thesis",
-        "latex_tum_official",
-        "figures",
-    ),
+    os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "figure_generation"),
 )
 from thesis_style import *
 

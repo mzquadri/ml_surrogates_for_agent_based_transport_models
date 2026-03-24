@@ -10,9 +10,9 @@ import os
 import sys
 import subprocess
 
-REPO = os.path.dirname(os.path.abspath(__file__))
-FIGURES_DIR = os.path.join(REPO, "thesis", "latex_tum_official", "figures")
-SCRIPTS_DIR = os.path.join(REPO, "scripts")
+REPO = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+FIGURES_DIR = os.path.join(REPO, "scripts", "figure_generation")
+EVAL_DIR = os.path.join(REPO, "scripts", "evaluation")
 PYTHON = sys.executable
 
 env = os.environ.copy()
@@ -20,7 +20,7 @@ env["PYTHONUTF8"] = "1"
 
 # Each entry: (script_path, working_directory, description)
 scripts = [
-    # --- Scripts in thesis/latex_tum_official/figures/ ---
+    # --- Scripts in scripts/figure_generation/ ---
     (
         os.path.join(FIGURES_DIR, "generate_network_intro_figure.py"),
         FIGURES_DIR,
@@ -31,40 +31,40 @@ scripts = [
         FIGURES_DIR,
         "pointnet_data_flow",
     ),
-    # --- Scripts in scripts/ ---
+    # --- Scripts in scripts/evaluation/ ---
     (
-        os.path.join(SCRIPTS_DIR, "compute_pit.py"),
+        os.path.join(EVAL_DIR, "compute_pit.py"),
         REPO,
         "t8_pit_histogram",
     ),
     (
-        os.path.join(SCRIPTS_DIR, "compute_pit_after_tempscaling.py"),
+        os.path.join(EVAL_DIR, "compute_pit_after_tempscaling.py"),
         REPO,
         "t8_pit_after_tempscaling",
     ),
     (
-        os.path.join(SCRIPTS_DIR, "generate_s_convergence_figure.py"),
+        os.path.join(FIGURES_DIR, "generate_s_convergence_figure.py"),
         REPO,
         "t8_s_convergence",
     ),
     (
-        os.path.join(SCRIPTS_DIR, "regenerate_fig58_s30.py"),
+        os.path.join(FIGURES_DIR, "regenerate_fig58_s30.py"),
         REPO,
         "t8_selective_prediction_curve (S=30)",
     ),
-    # --- Scripts in repo root ---
+    # --- run_part* scripts now live in scripts/evaluation/ ---
     (
-        os.path.join(REPO, "run_part2_uq_analyses.py"),
+        os.path.join(EVAL_DIR, "run_part2_uq_analyses.py"),
         REPO,
         "t8_error_detection_auroc + t8_selective_prediction_curve",
     ),
     (
-        os.path.join(REPO, "run_part3_calibration_audit.py"),
+        os.path.join(EVAL_DIR, "run_part3_calibration_audit.py"),
         REPO,
         "t8_calibration_curve + t8_interval_width_comparison",
     ),
     (
-        os.path.join(REPO, "run_part4_t7_crosscheck.py"),
+        os.path.join(EVAL_DIR, "run_part4_t7_crosscheck.py"),
         REPO,
         "t7_selective_prediction + t7_calibration + t7_interval_width",
     ),

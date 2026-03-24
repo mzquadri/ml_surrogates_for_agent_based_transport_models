@@ -8,18 +8,10 @@ Values from verified JSON: reliability_diagram_t8.json
 import os, sys, json
 import numpy as np
 
-sys.path.insert(
-    0,
-    os.path.join(
-        os.path.dirname(os.path.abspath(__file__)),
-        "thesis",
-        "latex_tum_official",
-        "figures",
-    ),
-)
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from thesis_style import *
 
-REPO = os.path.dirname(os.path.abspath(__file__))
+REPO = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
 JSON_PATH = os.path.join(
     REPO, "docs", "verified", "phase3_results", "reliability_diagram_t8.json"
 )

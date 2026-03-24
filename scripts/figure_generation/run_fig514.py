@@ -3,15 +3,7 @@
 import sys, os, numpy as np, pandas as pd
 
 # thesis_style
-sys.path.insert(
-    0,
-    os.path.join(
-        os.path.dirname(os.path.abspath(__file__)),
-        "thesis",
-        "latex_tum_official",
-        "figures",
-    ),
-)
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from thesis_style import *
 
 import matplotlib
@@ -26,7 +18,7 @@ from sklearn.metrics import (
 )
 
 # ── Data ──────────────────────────────────────────────────────────────────────
-REPO = os.path.dirname(os.path.abspath(__file__))
+REPO = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
 CSV = os.path.join(
     REPO,
     "data",
