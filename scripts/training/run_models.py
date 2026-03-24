@@ -21,7 +21,7 @@ if scripts_path not in sys.path:
     sys.path.append(scripts_path)
 
 from training.help_functions import *
-from gnn.help_functions import GNN_Loss, compute_baseline_of_mean_target, compute_baseline_of_no_policies
+from gnn.help_functions import GNN_Loss, HeteroscedasticNLLLoss, compute_baseline_of_mean_target, compute_baseline_of_no_policies
 
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 
@@ -71,6 +71,7 @@ def main():
                         'If not provided, defaults params will be used.')
     parser.add_argument("--loss_fct", type=str, default="mse", help="The loss function to use. Supported: mse, l1.")
     parser.add_argument("--use_weighted_loss", type=str_to_bool, default=False, help="Whether to use weighted loss (based on vol_base_case) or not.")
+    parser.add_argument("--heteroscedastic", type=str_to_bool, default=False, help="Whether to use heteroscedastic regression (outputs mean + log-variance, trains with Gaussian NLL loss).")
     parser.add_argument("--predict_mode_stats", type=str_to_bool, default=False, help="Whether to predict mode stats or not.")
     parser.add_argument("--use_bootstrapping", type=str_to_bool, default=False, help="Whether to use bootstrapping for train-validation split.")
     parser.add_argument("--num_epochs", type=int, default=1000, help="Number of epochs to train for.")
@@ -93,6 +94,9 @@ def main():
         if torch.cuda.is_available():
             device = torch.device("cuda")
             print(f"Using GPU: {torch.cuda.get_device_name(0)}")
+        elif hasattr(torch, 'xpu') and torch.xpu.is_available():
+            device = torch.device("xpu")
+            print(f"Using Intel Arc GPU: {torch.xpu.get_device_name(0)}")
         else:
             device = torch.device("cpu")
             print("No GPU available, using CPU")
@@ -125,7 +129,10 @@ def main():
                                         device=device)
         
         gnn_instance = gnn_instance.to(device)  
-        loss_fct = GNN_Loss(config.loss_fct, datalist[0].x.shape[0], device, config.use_weighted_loss)
+        if config.heteroscedastic:
+            loss_fct = HeteroscedasticNLLLoss(device)
+        else:
+            loss_fct = GNN_Loss(config.loss_fct, datalist[0].x.shape[0], device, config.use_weighted_loss)
 
         ## Not needed now, Naive MSE doesn't tell anything!
         # baseline_loss_mean_target = compute_baseline_of_mean_target(dataset=train_dl, loss_fct=loss_fct, device=device, scalers=scalers_train)

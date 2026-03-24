@@ -54,6 +54,25 @@ class GNN_Loss:
 
         else:
             return self.loss_fct(y_pred, y_true)
+class HeteroscedasticNLLLoss:
+    """
+    Gaussian NLL loss for heteroscedastic regression.
+
+    Implements Eq. 5 from Kendall & Gal (2017, NeurIPS):
+        L = (1/N) sum_i [ exp(-s_i) * (y_i - mu_i)^2 + s_i ]
+    where s_i = log(sigma^2_i) is the predicted log-variance per node.
+    Log-variance is clamped to [-10, 10] for numerical stability.
+    """
+
+    def __init__(self, device: torch.device):
+        self.device = device
+
+    def __call__(self, mu: Tensor, log_var: Tensor, y_true: Tensor) -> Tensor:
+        log_var = torch.clamp(log_var, min=-10.0, max=10.0)
+        loss = torch.exp(-log_var) * (y_true - mu) ** 2 + log_var
+        return loss.mean()
+
+
 class LinearWarmupCosineDecayScheduler:
     def __init__(self, 
                  initial_lr: float, 
@@ -190,6 +209,8 @@ def validate_model_during_training(config: object,
             # Standard Forward Pass
             if config.predict_mode_stats:
                 node_predicted, mode_stats_pred = model(data)
+            elif getattr(config, 'heteroscedastic', False):
+                node_predicted, node_log_var = model(data)
             else:
                 node_predicted = model(data)
 
@@ -205,6 +226,8 @@ def validate_model_during_training(config: object,
                 val_loss += val_loss_node_predictions + val_loss_mode_stats
                 mode_stats_targets.append(targets_mode_stats)
                 mode_stats_predictions.append(mode_stats_pred)
+            elif getattr(config, 'heteroscedastic', False):
+                val_loss += loss_func(node_predicted, node_log_var, targets_node_predictions).item()
             else:
                 val_loss += loss_func(node_predicted, targets_node_predictions, x_unscaled).item()
 
@@ -429,3 +452,67 @@ def mc_dropout_predict(model, data, num_samples: int = 50, device: torch.device 
 
     # Return as numpy (move to CPU first)
     return mean_prediction.cpu().numpy(), uncertainty.cpu().numpy()
+
+
+def mc_dropout_predict_hetero(model, data, num_samples: int = 30, device: torch.device = None):
+    """
+    MC Dropout inference for heteroscedastic models (Kendall & Gal, 2017, Section 3.2).
+    Decomposes predictive uncertainty into aleatoric and epistemic components.
+
+    Parameters:
+    - model: PointNetTransfGAT with heteroscedastic=True.
+    - data: Input graph data.
+    - num_samples (int): Number of stochastic forward passes.
+    - device (torch.device): Device to run on.
+
+    Returns:
+    - dict with keys: 'mean', 'sigma_aleatoric', 'sigma_epistemic', 'sigma_total'
+      all as numpy arrays of shape (num_nodes, 1).
+    """
+    was_training = model.training
+
+    model = model.to(device)
+    data = data.to(device)
+
+    # Enable dropout during inference
+    model.train()
+
+    # Freeze BatchNorm layers if any
+    bn_layers = []
+    for m in model.modules():
+        if isinstance(m, torch.nn.modules.batchnorm._BatchNorm):
+            bn_layers.append((m, m.training))
+            m.eval()
+
+    mu_samples = []
+    log_var_samples = []
+
+    with torch.inference_mode():
+        for _ in range(num_samples):
+            mu, log_var = model(data)
+            mu_samples.append(mu.detach())
+            log_var_samples.append(log_var.detach())
+
+    # Stack: shape (num_samples, num_nodes, 1)
+    mu_stack = torch.stack(mu_samples, dim=0)
+    log_var_stack = torch.stack(log_var_samples, dim=0)
+
+    # Kendall & Gal (2017) decomposition:
+    #   sigma^2_aleatoric = mean_t( exp(log_var_t) )
+    #   sigma^2_epistemic = Var_t( mu_t )
+    var_aleatoric = torch.exp(log_var_stack).mean(dim=0)
+    var_epistemic = mu_stack.var(dim=0, unbiased=False)
+    var_total = var_aleatoric + var_epistemic
+
+    mean_prediction = mu_stack.mean(dim=0)
+
+    model.train(was_training)
+    for m, was_train in bn_layers:
+        m.train(was_train)
+
+    return {
+        'mean': mean_prediction.cpu().numpy(),
+        'sigma_aleatoric': var_aleatoric.sqrt().cpu().numpy(),
+        'sigma_epistemic': var_epistemic.sqrt().cpu().numpy(),
+        'sigma_total': var_total.sqrt().cpu().numpy(),
+    }

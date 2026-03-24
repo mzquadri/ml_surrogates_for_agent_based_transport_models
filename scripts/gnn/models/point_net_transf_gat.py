@@ -25,6 +25,7 @@ class PointNetTransfGAT(BaseGNN):
                 dropout: float = 0.3, 
                 use_dropout: bool = False,
                 predict_mode_stats: bool = False,
+                heteroscedastic: bool = False,
                 dtype: torch.dtype = torch.float32,
                 log_to_wandb: bool = False):
         
@@ -40,6 +41,8 @@ class PointNetTransfGAT(BaseGNN):
         - dropout (float, optional): Dropout rate. Default is 0.0.
         - use_dropout (bool, optional): Whether to use dropout. Default is False.
         - predict_mode_stats (bool, optional): Whether to predict mode stats. Default is False.
+        - heteroscedastic (bool, optional): If True, output (mean, log_var) per node for heteroscedastic
+          regression following Kendall & Gal (2017, NeurIPS). Default is False.
         """
         # Call parent class constructor
         super().__init__(
@@ -50,6 +53,8 @@ class PointNetTransfGAT(BaseGNN):
             predict_mode_stats=predict_mode_stats,
             dtype=dtype,
             log_to_wandb=log_to_wandb)
+        
+        self.heteroscedastic = heteroscedastic
         
         # Architecture-specific parameters
         self.pnc_local = point_net_conv_layer_structure_local_mlp
@@ -92,7 +97,12 @@ class PointNetTransfGAT(BaseGNN):
         self.gat_graph_layers = GeoSequential('x, edge_index', layers_global)
         
         # Output layer (final GAT layer as per paper)
-        self.gat_final = GATConv(64, 1)
+        # For heteroscedastic regression: dual heads for mean and log-variance
+        if self.heteroscedastic:
+            self.gat_final_mean = GATConv(64, 1)
+            self.gat_final_logvar = GATConv(64, 1)
+        else:
+            self.gat_final = GATConv(64, 1)
         
         # Mode stats predictor (if enabled)
         if self.predict_mode_stats:
@@ -123,6 +133,12 @@ class PointNetTransfGAT(BaseGNN):
         x = self.point_net_conv_2(x, pos2, edge_index)
         
         x = self.gat_graph_layers(x, edge_index)
+
+        if self.heteroscedastic:
+            mean_pred = self.gat_final_mean(x, edge_index)
+            log_var_pred = self.gat_final_logvar(x, edge_index)
+            return mean_pred, log_var_pred
+        
         node_predictions = self.gat_final(x, edge_index)
         
         if self.predict_mode_stats:

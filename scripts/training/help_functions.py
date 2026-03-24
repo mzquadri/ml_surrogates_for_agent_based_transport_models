@@ -506,7 +506,7 @@ def create_gnn_model(gnn_arch: str, config: object, model_kwargs: dict, device: 
         "log_to_wandb": True} # During training, yes
 
     if gnn_arch == "point_net_transf_gat":
-        return PointNetTransfGAT(**common_kwargs, **model_kwargs).to(device)
+        return PointNetTransfGAT(**common_kwargs, heteroscedastic=getattr(config, 'heteroscedastic', False), **model_kwargs).to(device)
     
     elif gnn_arch == "graphSAGE":
         return GraphSAGE(**common_kwargs, **model_kwargs).to(device)

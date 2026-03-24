@@ -8,7 +8,7 @@ import wandb
 import torch
 import torch.nn as nn
 import torch.optim as optim
-from torch.cuda.amp import GradScaler, autocast
+from torch.amp import GradScaler
 from torch.utils.data import DataLoader
 
 # Add the 'scripts' directory to Python Path
@@ -103,7 +103,7 @@ class BaseGNN(nn.Module, ABC):
         if config is None:
             raise ValueError("Config cannot be None")
         
-        scaler = GradScaler()
+        scaler = GradScaler(device.type)
         total_steps = config.num_epochs * len(train_dl)
         scheduler = LinearWarmupCosineDecayScheduler(initial_lr=config.lr, total_steps=total_steps)
         best_val_loss = float('inf')
@@ -155,13 +155,16 @@ class BaseGNN(nn.Module, ABC):
                 if config.predict_mode_stats:
                     targets_mode_stats = data.mode_stats
             
-                with autocast():
+                with torch.amp.autocast(device_type=device.type):
                     # Forward pass
                     if config.predict_mode_stats:
                         predicted, mode_stats_pred = self(data)
                         train_loss_node_predictions = loss_fct(predicted, targets_node_predictions, x_unscaled)
                         train_loss_mode_stats = mode_stats_loss(mode_stats_pred, targets_mode_stats)
                         train_loss = train_loss_node_predictions + train_loss_mode_stats
+                    elif getattr(config, 'heteroscedastic', False):
+                        predicted, log_var = self(data)
+                        train_loss = loss_fct(predicted, log_var, targets_node_predictions)
                     else:
                         predicted = self(data)
                         train_loss = loss_fct(predicted, targets_node_predictions, x_unscaled)
