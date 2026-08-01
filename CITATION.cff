@@ -1,0 +1,15 @@
+cff-version: 1.2.0
+message: "If you use this work, please cite it as below."
+title: "Uncertainty Quantification for GNN Surrogates of Agent-Based Transport Models"
+authors:
+  - family-names: Quadri
+    given-names: Mohd Zamin
+date-released: 2026-04-01
+url: "https://github.com/mzquadri/ml_surrogates_for_agent_based_transport_models"
+abstract: "Master's thesis on post-hoc uncertainty quantification for graph neural network surrogates of agent-based transport simulations."
+keywords:
+  - uncertainty quantification
+  - graph neural networks
+  - transport simulation
+  - conformal prediction
+license: "Proprietary"

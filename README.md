@@ -58,15 +58,19 @@ environment-minimal.yml      Conda environment (cross-platform)
 ## Reproducing Results
 
 ```bash
+git clone https://github.com/mzquadri/ml_surrogates_for_agent_based_transport_models.git
+cd ml_surrogates_for_agent_based_transport_models
 conda env create -f environment-minimal.yml
 conda activate traffic-gnn
 
-python run_part2_uq_analyses.py         # Selective prediction + error detection
-python run_part3_calibration_audit.py   # Calibration, ECE, temperature scaling
-python run_part4_t7_crosscheck.py       # Trial 7 cross-replication
+python scripts/evaluation/run_part2_uq_analyses.py       # Selective prediction + error detection
+python scripts/evaluation/run_part3_calibration_audit.py # Calibration and conformal coverage
+python scripts/evaluation/run_part4_t7_crosscheck.py     # Trial 7 cross-check
 ```
 
-To recompile the thesis: `cd thesis/latex_tum_official && pdflatex main.tex && biber main && pdflatex main.tex && pdflatex main.tex`
+The scripts reproduce analyses from versioned prediction artifacts; they do not retrain the models or rerun MATSim simulations. See [`docs/verified/REPRODUCIBILITY_GAP_SUMMARY.md`](docs/verified/REPRODUCIBILITY_GAP_SUMMARY.md) for a precise account of included artifacts and known limitations.
+
+To compile the thesis: `cd thesis/latex_tum_official && pdflatex main.tex && biber main && pdflatex main.tex && pdflatex main.tex`
 
 ---
 
@@ -80,4 +84,8 @@ This thesis takes the trained models from the above work as given and contribute
 
 ## License
 
-Submitted as a Master's thesis at the Technical University of Munich. Contact the author for reuse permissions.
+This repository is published for academic review and portfolio purposes. Reuse of the thesis text, figures, trained models, and included research artifacts requires prior permission from the author and, where applicable, the original data and model owners.
+
+## Citation
+
+See [`CITATION.cff`](CITATION.cff) for citation metadata.
