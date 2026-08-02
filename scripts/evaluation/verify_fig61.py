@@ -2,8 +2,9 @@
 
 import json
 import numpy as np
+from pathlib import Path
 
-JSON_PATH = r"C:\Users\zamin\OneDrive\Desktop\Nazim_thesis\ml_surrogates_for_agent_based_transport_models\docs\verified\phase3_results\s_convergence_results.json"
+JSON_PATH = Path(__file__).resolve().parents[2] / "docs/verified/phase3_results/s_convergence_results.json"
 
 with open(JSON_PATH) as f:
     data = json.load(f)

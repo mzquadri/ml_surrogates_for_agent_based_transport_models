@@ -1,0 +1,32 @@
+{
+  "trial_name": "5th_trial_paper_exact",
+  "hyperparameters": {
+    "batch_size": 8,
+    "gradient_accumulation": 3,
+    "use_dropout": true,
+    "dropout": 0.3,
+    "use_weighted_loss": false,
+    "lr": 0.0005
+  },
+  "validation_metrics": {
+    "r2": 0.55,
+    "pearson": 0.75,
+    "spearman": 0.22,
+    "loss": 53.61
+  },
+  "test_metrics": {
+    "r2": 0.5552933216094971,
+    "pearson": 0.746771514415741,
+    "spearman": 0.22764630288520518,
+    "mse": 60.495391845703125,
+    "rmse": 7.777878284454346,
+    "mae": 4.2421159744262695,
+    "mape": 3526863104.0,
+    "loss": 58.99715369088309
+  },
+  "num_test_samples": 1581750,
+  "improvement_vs_4th_trial": {
+    "r2_gain": 0.3152933120727539,
+    "percentage_improvement": 131.37220764160156
+  }
+}

@@ -1,0 +1,86 @@
+{
+  "random_forest": {
+    "r2": 0.6612154245376587,
+    "mae": 3.2628376483917236,
+    "rmse": 6.516431726511762,
+    "training_time_seconds": 115.12432265281677,
+    "n_train_used": 25308000,
+    "n_test_used": 3163500,
+    "backend": "cuML (GPU)",
+    "hyperparams_source": "cuML library defaults (https://docs.rapids.ai/api/cuml/stable/)",
+    "hyperparams": {
+      "n_estimators": 100,
+      "max_depth": 16,
+      "min_samples_leaf": 1,
+      "bootstrap": true,
+      "random_state": 42
+    }
+  },
+  "gradient_boosting": {
+    "r2": 0.741398811340332,
+    "mae": 2.773897886276245,
+    "rmse": 5.693289691897747,
+    "training_time_seconds": 174.8780117034912,
+    "n_train_used": 25308000,
+    "algorithm": "XGBoost (hist, GPU)",
+    "best_iteration": 9999,
+    "eval_set": "100-graph scenario-level held-out validation (matches T8 protocol)",
+    "hyperparams_source": "XGBoost library defaults (https://xgboost.readthedocs.io/en/stable/parameter.html) + standard early stopping (Chen & Guestrin, 2016)",
+    "hyperparams": {
+      "max_depth": 6,
+      "learning_rate": 0.3,
+      "subsample": 1.0,
+      "colsample_bytree": 1.0,
+      "n_estimators_max": 10000,
+      "early_stopping_rounds": 50,
+      "tree_method": "hist",
+      "device": "cuda",
+      "random_state": 42
+    }
+  },
+  "mlp": {
+    "r2": 0.49283915758132935,
+    "mae": 3.8831138610839844,
+    "rmse": 7.97298423619508,
+    "training_time_seconds": 29708.811389684677,
+    "hidden_layers": "(100,)",
+    "best_epoch": 200,
+    "best_val_mse": 62.645911327214286,
+    "n_train_used": 25308000,
+    "hyperparams_source": "scikit-learn MLPRegressor defaults (https://scikit-learn.org/stable/modules/generated/sklearn.neural_network.MLPRegressor.html); batch_size 4096 from published large-data tabular regime (pytorch_tabular default 1024; TabNet 4096 [Arik & Pfister 2021]; Goyal et al. 2017 verified up to 8192).",
+    "hyperparams": {
+      "hidden_layer_sizes": "(100,)",
+      "max_iter": 200,
+      "patience": 10,
+      "tol": 0.0001,
+      "lr": 0.001,
+      "weight_decay": 0.0001,
+      "batch_size": 4096,
+      "optimizer": "AdamW"
+    }
+  },
+  "random_forest_conformal": {
+    "q_90": 8.736579895019531,
+    "q_95": 12.963913917541504,
+    "picp_90": 89.97597597597597,
+    "picp_95": 94.98245614035088,
+    "cal_size": 1581750,
+    "eval_size": 1581750
+  },
+  "scope": {
+    "split_seed": 42,
+    "train_test_split": "80/10/10 scenario-level (matches T8)",
+    "n_train_graphs": 800,
+    "n_val_graphs": 100,
+    "n_test_graphs": 100,
+    "n_train_nodes": 25308000,
+    "n_test_nodes": 3163500,
+    "features": [
+      "VOL_BASE_CASE",
+      "CAPACITY_BASE_CASE",
+      "CAPACITY_REDUCTION",
+      "FREESPEED",
+      "LENGTH"
+    ]
+  }
+}

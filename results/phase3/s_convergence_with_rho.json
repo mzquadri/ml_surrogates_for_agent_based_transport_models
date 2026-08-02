@@ -1,0 +1,670 @@
+{
+  "convergence_graphs": [
+    {
+      "graph_idx": 0,
+      "s_results": [
+        {
+          "S": 5,
+          "mean_sigma": 1.2820031642913818,
+          "spearman_rho": 0.4220120105261024,
+          "spearman_pval": 0.0
+        },
+        {
+          "S": 10,
+          "mean_sigma": 1.414953351020813,
+          "spearman_rho": 0.4476904090054492,
+          "spearman_pval": 0.0
+        },
+        {
+          "S": 15,
+          "mean_sigma": 1.4562017917633057,
+          "spearman_rho": 0.45865319942903826,
+          "spearman_pval": 0.0
+        },
+        {
+          "S": 20,
+          "mean_sigma": 1.478693962097168,
+          "spearman_rho": 0.4607427024056209,
+          "spearman_pval": 0.0
+        },
+        {
+          "S": 25,
+          "mean_sigma": 1.4910472631454468,
+          "spearman_rho": 0.46533374239067565,
+          "spearman_pval": 0.0
+        },
+        {
+          "S": 30,
+          "mean_sigma": 1.5002069473266602,
+          "spearman_rho": 0.46696775824397796,
+          "spearman_pval": 0.0
+        },
+        {
+          "S": 35,
+          "mean_sigma": 1.5067079067230225,
+          "spearman_rho": 0.468152330367809,
+          "spearman_pval": 0.0
+        },
+        {
+          "S": 40,
+          "mean_sigma": 1.5127780437469482,
+          "spearman_rho": 0.46946627205016667,
+          "spearman_pval": 0.0
+        },
+        {
+          "S": 45,
+          "mean_sigma": 1.5151513814926147,
+          "spearman_rho": 0.47039188663294346,
+          "spearman_pval": 0.0
+        },
+        {
+          "S": 50,
+          "mean_sigma": 1.5179246664047241,
+          "spearman_rho": 0.4711842889666277,
+          "spearman_pval": 0.0
+        }
+      ]
+    },
+    {
+      "graph_idx": 1,
+      "s_results": [
+        {
+          "S": 5,
+          "mean_sigma": 1.248691439628601,
+          "spearman_rho": 0.43783322515444834,
+          "spearman_pval": 0.0
+        },
+        {
+          "S": 10,
+          "mean_sigma": 1.3756591081619263,
+          "spearman_rho": 0.461583080809868,
+          "spearman_pval": 0.0
+        },
+        {
+          "S": 15,
+          "mean_sigma": 1.416792631149292,
+          "spearman_rho": 0.47059558662278544,
+          "spearman_pval": 0.0
+        },
+        {
+          "S": 20,
+          "mean_sigma": 1.4410319328308105,
+          "spearman_rho": 0.4754078290721269,
+          "spearman_pval": 0.0
+        },
+        {
+          "S": 25,
+          "mean_sigma": 1.4534868001937866,
+          "spearman_rho": 0.4804524508206312,
+          "spearman_pval": 0.0
+        },
+        {
+          "S": 30,
+          "mean_sigma": 1.4627668857574463,
+          "spearman_rho": 0.48295955294142673,
+          "spearman_pval": 0.0
+        },
+        {
+          "S": 35,
+          "mean_sigma": 1.4680023193359375,
+          "spearman_rho": 0.48450409960157326,
+          "spearman_pval": 0.0
+        },
+        {
+          "S": 40,
+          "mean_sigma": 1.4725373983383179,
+          "spearman_rho": 0.48661371417979327,
+          "spearman_pval": 0.0
+        },
+        {
+          "S": 45,
+          "mean_sigma": 1.4762966632843018,
+          "spearman_rho": 0.48700992350534933,
+          "spearman_pval": 0.0
+        },
+        {
+          "S": 50,
+          "mean_sigma": 1.4809077978134155,
+          "spearman_rho": 0.48743273272838317,
+          "spearman_pval": 0.0
+        }
+      ]
+    },
+    {
+      "graph_idx": 2,
+      "s_results": [
+        {
+          "S": 5,
+          "mean_sigma": 1.0733397006988525,
+          "spearman_rho": 0.42652707365257236,
+          "spearman_pval": 0.0
+        },
+        {
+          "S": 10,
+          "mean_sigma": 1.1885160207748413,
+          "spearman_rho": 0.45139997326581255,
+          "spearman_pval": 0.0
+        },
+        {
+          "S": 15,
+          "mean_sigma": 1.2260667085647583,
+          "spearman_rho": 0.4586077910618154,
+          "spearman_pval": 0.0
+        },
+        {
+          "S": 20,
+          "mean_sigma": 1.2457276582717896,
+          "spearman_rho": 0.46660847798159005,
+          "spearman_pval": 0.0
+        },
+        {
+          "S": 25,
+          "mean_sigma": 1.257109522819519,
+          "spearman_rho": 0.4710993025186957,
+          "spearman_pval": 0.0
+        },
+        {
+          "S": 30,
+          "mean_sigma": 1.2643588781356812,
+          "spearman_rho": 0.4735821221591413,
+          "spearman_pval": 0.0
+        },
+        {
+          "S": 35,
+          "mean_sigma": 1.2711191177368164,
+          "spearman_rho": 0.47654179028103116,
+          "spearman_pval": 0.0
+        },
+        {
+          "S": 40,
+          "mean_sigma": 1.2749730348587036,
+          "spearman_rho": 0.4787723937883509,
+          "spearman_pval": 0.0
+        },
+        {
+          "S": 45,
+          "mean_sigma": 1.2781331539154053,
+          "spearman_rho": 0.4796414169593279,
+          "spearman_pval": 0.0
+        },
+        {
+          "S": 50,
+          "mean_sigma": 1.2808817625045776,
+          "spearman_rho": 0.4798573246958816,
+          "spearman_pval": 0.0
+        }
+      ]
+    },
+    {
+      "graph_idx": 3,
+      "s_results": [
+        {
+          "S": 5,
+          "mean_sigma": 0.7907863855361938,
+          "spearman_rho": 0.3652491249146196,
+          "spearman_pval": 0.0
+        },
+        {
+          "S": 10,
+          "mean_sigma": 0.8776016235351562,
+          "spearman_rho": 0.38684957687232574,
+          "spearman_pval": 0.0
+        },
+        {
+          "S": 15,
+          "mean_sigma": 0.9084200263023376,
+          "spearman_rho": 0.3994737217818536,
+          "spearman_pval": 0.0
+        },
+        {
+          "S": 20,
+          "mean_sigma": 0.9226608276367188,
+          "spearman_rho": 0.40646757980800535,
+          "spearman_pval": 0.0
+        },
+        {
+          "S": 25,
+          "mean_sigma": 0.9320598840713501,
+          "spearman_rho": 0.40750341977997306,
+          "spearman_pval": 0.0
+        },
+        {
+          "S": 30,
+          "mean_sigma": 0.9397750496864319,
+          "spearman_rho": 0.4097347518899799,
+          "spearman_pval": 0.0
+        },
+        {
+          "S": 35,
+          "mean_sigma": 0.9449675679206848,
+          "spearman_rho": 0.4111199456427146,
+          "spearman_pval": 0.0
+        },
+        {
+          "S": 40,
+          "mean_sigma": 0.9476253986358643,
+          "spearman_rho": 0.41169226658192226,
+          "spearman_pval": 0.0
+        },
+        {
+          "S": 45,
+          "mean_sigma": 0.9498569369316101,
+          "spearman_rho": 0.41253076437076974,
+          "spearman_pval": 0.0
+        },
+        {
+          "S": 50,
+          "mean_sigma": 0.9519941210746765,
+          "spearman_rho": 0.41349749437284516,
+          "spearman_pval": 0.0
+        }
+      ]
+    },
+    {
+      "graph_idx": 4,
+      "s_results": [
+        {
+          "S": 5,
+          "mean_sigma": 1.5300514698028564,
+          "spearman_rho": 0.450301833656124,
+          "spearman_pval": 0.0
+        },
+        {
+          "S": 10,
+          "mean_sigma": 1.678765892982483,
+          "spearman_rho": 0.48338633752525656,
+          "spearman_pval": 0.0
+        },
+        {
+          "S": 15,
+          "mean_sigma": 1.7360312938690186,
+          "spearman_rho": 0.49185604769050106,
+          "spearman_pval": 0.0
+        },
+        {
+          "S": 20,
+          "mean_sigma": 1.7625553607940674,
+          "spearman_rho": 0.4963422801493625,
+          "spearman_pval": 0.0
+        },
+        {
+          "S": 25,
+          "mean_sigma": 1.7773220539093018,
+          "spearman_rho": 0.49774261313055557,
+          "spearman_pval": 0.0
+        },
+        {
+          "S": 30,
+          "mean_sigma": 1.7873444557189941,
+          "spearman_rho": 0.4997638214796857,
+          "spearman_pval": 0.0
+        },
+        {
+          "S": 35,
+          "mean_sigma": 1.7930123805999756,
+          "spearman_rho": 0.5021721911075362,
+          "spearman_pval": 0.0
+        },
+        {
+          "S": 40,
+          "mean_sigma": 1.798353910446167,
+          "spearman_rho": 0.5031162344231886,
+          "spearman_pval": 0.0
+        },
+        {
+          "S": 45,
+          "mean_sigma": 1.802172303199768,
+          "spearman_rho": 0.5039200898908258,
+          "spearman_pval": 0.0
+        },
+        {
+          "S": 50,
+          "mean_sigma": 1.804628610610962,
+          "spearman_rho": 0.5047787598733311,
+          "spearman_pval": 0.0
+        }
+      ]
+    },
+    {
+      "graph_idx": 5,
+      "s_results": [
+        {
+          "S": 5,
+          "mean_sigma": 1.0189929008483887,
+          "spearman_rho": 0.4243663523257756,
+          "spearman_pval": 0.0
+        },
+        {
+          "S": 10,
+          "mean_sigma": 1.125465989112854,
+          "spearman_rho": 0.4502959265789404,
+          "spearman_pval": 0.0
+        },
+        {
+          "S": 15,
+          "mean_sigma": 1.1617807149887085,
+          "spearman_rho": 0.45732620650770905,
+          "spearman_pval": 0.0
+        },
+        {
+          "S": 20,
+          "mean_sigma": 1.176225185394287,
+          "spearman_rho": 0.46070808770088256,
+          "spearman_pval": 0.0
+        },
+        {
+          "S": 25,
+          "mean_sigma": 1.1889568567276,
+          "spearman_rho": 0.46330860856858674,
+          "spearman_pval": 0.0
+        },
+        {
+          "S": 30,
+          "mean_sigma": 1.1943538188934326,
+          "spearman_rho": 0.46624159786159713,
+          "spearman_pval": 0.0
+        },
+        {
+          "S": 35,
+          "mean_sigma": 1.199190616607666,
+          "spearman_rho": 0.46758476916840613,
+          "spearman_pval": 0.0
+        },
+        {
+          "S": 40,
+          "mean_sigma": 1.202841877937317,
+          "spearman_rho": 0.4682779102647182,
+          "spearman_pval": 0.0
+        },
+        {
+          "S": 45,
+          "mean_sigma": 1.2054364681243896,
+          "spearman_rho": 0.46955581074245767,
+          "spearman_pval": 0.0
+        },
+        {
+          "S": 50,
+          "mean_sigma": 1.208441972732544,
+          "spearman_rho": 0.4706990432297016,
+          "spearman_pval": 0.0
+        }
+      ]
+    },
+    {
+      "graph_idx": 6,
+      "s_results": [
+        {
+          "S": 5,
+          "mean_sigma": 1.2460606098175049,
+          "spearman_rho": 0.42217353869498825,
+          "spearman_pval": 0.0
+        },
+        {
+          "S": 10,
+          "mean_sigma": 1.3734140396118164,
+          "spearman_rho": 0.449874390989036,
+          "spearman_pval": 0.0
+        },
+        {
+          "S": 15,
+          "mean_sigma": 1.4139612913131714,
+          "spearman_rho": 0.45684974382064464,
+          "spearman_pval": 0.0
+        },
+        {
+          "S": 20,
+          "mean_sigma": 1.4329612255096436,
+          "spearman_rho": 0.46129062088531614,
+          "spearman_pval": 0.0
+        },
+        {
+          "S": 25,
+          "mean_sigma": 1.4467129707336426,
+          "spearman_rho": 0.4661050007747444,
+          "spearman_pval": 0.0
+        },
+        {
+          "S": 30,
+          "mean_sigma": 1.455552339553833,
+          "spearman_rho": 0.46768998428438024,
+          "spearman_pval": 0.0
+        },
+        {
+          "S": 35,
+          "mean_sigma": 1.466717004776001,
+          "spearman_rho": 0.469659995534135,
+          "spearman_pval": 0.0
+        },
+        {
+          "S": 40,
+          "mean_sigma": 1.4711511135101318,
+          "spearman_rho": 0.4717365214466003,
+          "spearman_pval": 0.0
+        },
+        {
+          "S": 45,
+          "mean_sigma": 1.475050449371338,
+          "spearman_rho": 0.4731040054092022,
+          "spearman_pval": 0.0
+        },
+        {
+          "S": 50,
+          "mean_sigma": 1.4780861139297485,
+          "spearman_rho": 0.4737813822413644,
+          "spearman_pval": 0.0
+        }
+      ]
+    },
+    {
+      "graph_idx": 7,
+      "s_results": [
+        {
+          "S": 5,
+          "mean_sigma": 1.1197220087051392,
+          "spearman_rho": 0.41362891271002944,
+          "spearman_pval": 0.0
+        },
+        {
+          "S": 10,
+          "mean_sigma": 1.235639214515686,
+          "spearman_rho": 0.44024763833902597,
+          "spearman_pval": 0.0
+        },
+        {
+          "S": 15,
+          "mean_sigma": 1.2751538753509521,
+          "spearman_rho": 0.4495423042172327,
+          "spearman_pval": 0.0
+        },
+        {
+          "S": 20,
+          "mean_sigma": 1.2972338199615479,
+          "spearman_rho": 0.4553331249486524,
+          "spearman_pval": 0.0
+        },
+        {
+          "S": 25,
+          "mean_sigma": 1.3088802099227905,
+          "spearman_rho": 0.4583396494615793,
+          "spearman_pval": 0.0
+        },
+        {
+          "S": 30,
+          "mean_sigma": 1.3160159587860107,
+          "spearman_rho": 0.4600073876356612,
+          "spearman_pval": 0.0
+        },
+        {
+          "S": 35,
+          "mean_sigma": 1.321269154548645,
+          "spearman_rho": 0.461635189622945,
+          "spearman_pval": 0.0
+        },
+        {
+          "S": 40,
+          "mean_sigma": 1.3261765241622925,
+          "spearman_rho": 0.46264121247795725,
+          "spearman_pval": 0.0
+        },
+        {
+          "S": 45,
+          "mean_sigma": 1.3284202814102173,
+          "spearman_rho": 0.4626884360953391,
+          "spearman_pval": 0.0
+        },
+        {
+          "S": 50,
+          "mean_sigma": 1.3319700956344604,
+          "spearman_rho": 0.4629936032618447,
+          "spearman_pval": 0.0
+        }
+      ]
+    },
+    {
+      "graph_idx": 8,
+      "s_results": [
+        {
+          "S": 5,
+          "mean_sigma": 1.3289461135864258,
+          "spearman_rho": 0.4306170714142128,
+          "spearman_pval": 0.0
+        },
+        {
+          "S": 10,
+          "mean_sigma": 1.4728665351867676,
+          "spearman_rho": 0.4608290938194552,
+          "spearman_pval": 0.0
+        },
+        {
+          "S": 15,
+          "mean_sigma": 1.5188724994659424,
+          "spearman_rho": 0.4718480083025598,
+          "spearman_pval": 0.0
+        },
+        {
+          "S": 20,
+          "mean_sigma": 1.5459851026535034,
+          "spearman_rho": 0.47542419131488345,
+          "spearman_pval": 0.0
+        },
+        {
+          "S": 25,
+          "mean_sigma": 1.556455135345459,
+          "spearman_rho": 0.47884165637046233,
+          "spearman_pval": 0.0
+        },
+        {
+          "S": 30,
+          "mean_sigma": 1.5641423463821411,
+          "spearman_rho": 0.4791479983411214,
+          "spearman_pval": 0.0
+        },
+        {
+          "S": 35,
+          "mean_sigma": 1.572030782699585,
+          "spearman_rho": 0.48193830857078535,
+          "spearman_pval": 0.0
+        },
+        {
+          "S": 40,
+          "mean_sigma": 1.5776386260986328,
+          "spearman_rho": 0.4838574751711327,
+          "spearman_pval": 0.0
+        },
+        {
+          "S": 45,
+          "mean_sigma": 1.579723596572876,
+          "spearman_rho": 0.4834302997415362,
+          "spearman_pval": 0.0
+        },
+        {
+          "S": 50,
+          "mean_sigma": 1.5828412771224976,
+          "spearman_rho": 0.4836288787671595,
+          "spearman_pval": 0.0
+        }
+      ]
+    },
+    {
+      "graph_idx": 9,
+      "s_results": [
+        {
+          "S": 5,
+          "mean_sigma": 1.1472687721252441,
+          "spearman_rho": 0.40985536343595774,
+          "spearman_pval": 0.0
+        },
+        {
+          "S": 10,
+          "mean_sigma": 1.26462984085083,
+          "spearman_rho": 0.4366802930585372,
+          "spearman_pval": 0.0
+        },
+        {
+          "S": 15,
+          "mean_sigma": 1.3052310943603516,
+          "spearman_rho": 0.4463323824098681,
+          "spearman_pval": 0.0
+        },
+        {
+          "S": 20,
+          "mean_sigma": 1.324629783630371,
+          "spearman_rho": 0.4513565865359226,
+          "spearman_pval": 0.0
+        },
+        {
+          "S": 25,
+          "mean_sigma": 1.3356128931045532,
+          "spearman_rho": 0.45125008122385146,
+          "spearman_pval": 0.0
+        },
+        {
+          "S": 30,
+          "mean_sigma": 1.3438166379928589,
+          "spearman_rho": 0.4517299538920435,
+          "spearman_pval": 0.0
+        },
+        {
+          "S": 35,
+          "mean_sigma": 1.3503533601760864,
+          "spearman_rho": 0.45385805327396683,
+          "spearman_pval": 0.0
+        },
+        {
+          "S": 40,
+          "mean_sigma": 1.3534247875213623,
+          "spearman_rho": 0.45592609378082455,
+          "spearman_pval": 0.0
+        },
+        {
+          "S": 45,
+          "mean_sigma": 1.3563801050186157,
+          "spearman_rho": 0.4572695036316171,
+          "spearman_pval": 0.0
+        },
+        {
+          "S": 50,
+          "mean_sigma": 1.3594480752944946,
+          "spearman_rho": 0.45812676816278186,
+          "spearman_pval": 0.0
+        }
+      ]
+    }
+  ],
+  "S_values": [
+    5,
+    10,
+    15,
+    20,
+    25,
+    30,
+    35,
+    40,
+    45,
+    50
+  ],
+  "MAX_S": 50,
+  "seed": 42,
+  "n_graphs": 10,
+  "note": "spearman_rho = corr(sigma_S, |y - mu_S|) per graph per S"
+}

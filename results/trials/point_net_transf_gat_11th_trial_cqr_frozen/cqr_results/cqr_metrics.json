@@ -1,0 +1,49 @@
+{
+  "experiment": "point_net_transf_gat_11th_trial_cqr_frozen",
+  "trial": 11,
+  "strategy": "frozen_backbone_cqr",
+  "reference": "Romano, Patterson & Candes (2019) NeurIPS arXiv:1905.03222",
+  "implementation": "yromano/cqr (github.com/yromano/cqr)",
+  "alpha": 0.1,
+  "tau_lo": 0.05,
+  "tau_hi": 0.95,
+  "n_cal": 3163500,
+  "n_test": 3163500,
+  "conformal_quantiles": {
+    "Q_hat_90": 0.12436389923095703,
+    "Q_hat_95": 3.6225805282592773,
+    "Q_hat_90_index": 2847150,
+    "Q_hat_95_index": 3005325
+  },
+  "test_metrics": {
+    "PICP_90_pct": 89.82241188556978,
+    "PICP_95_pct": 94.9078552236447,
+    "width_90": 17.82509422302246,
+    "width_95": 24.82152557373047,
+    "r2_midpoint": 0.5835253000259399,
+    "mae_midpoint": 4.3015241622924805,
+    "rmse_midpoint": 7.2250752449035645,
+    "spearman_rho": 0.2943316987324961,
+    "n_crossings_corrected": 0
+  },
+  "calibration_sanity": {
+    "PICP_90_cal_pct": 90.00003161055793,
+    "PICP_95_cal_pct": 95.00003161055793
+  },
+  "baseline_comparison": {
+    "baseline_r2": 0.5957,
+    "baseline_picp90": 90.02,
+    "baseline_picp95": 95.01,
+    "baseline_conformal_q90": 9.92,
+    "baseline_conformal_q95": 14.677
+  },
+  "gate_results": {
+    "r2_ge_0.57": true,
+    "picp90_ge_88": true,
+    "picp95_ge_93": true,
+    "width90_lt_width95": true,
+    "q_hat_90_finite_pos": true,
+    "q_hat_95_finite_pos": true
+  },
+  "gate_status": "PASS"
+}

@@ -2,117 +2,148 @@
 
 \chapter{Discussion}\label{chapter:discussion}
 
-This chapter contextualises the experimental findings, examines limitations, and considers what the results mean for practitioners aiming to deploy uncertainty-aware traffic prediction systems.
+\section{Freezing the Backbone: An Empirical Observation}\label{sec:freeze_principle}
 
-\section{Interpretation of Results}
+Trials~10 and 11 share head, loss, data, calibration protocol and learning rate ($5\times10^{-4}$, inherited from T8 in both cases); the only design difference is whether the backbone is fine-tuned end-to-end (T10) or frozen (T11).\ T10 collapses to $R^2 = 0.4057$ and fails three of the six gates; T11 reaches $R^2 = 0.5835$ and passes all six (Tables~\ref{tab:t10_gates}, \ref{tab:t11_gates}).\ T9 (frozen backbone, heteroscedastic head, NLL loss) reaches $k_{95} = 2.84$ -- four times better than T8 -- but misses the $R^2$ gate at $0.4991$, consistent with the NLL/MSE trade-off of Section~\ref{sec:hetero_bg}.\ Within the scope of this thesis (PointNetTransfGAT, the $1{,}000$-scenario subset, the loss and head pairings tested), the backbone-trainability flag alone is enough to flip the CQR result; we report this as an empirical observation, not a general principle.
 
-\subsection{MC Dropout Uncertainty Quality}
+\begin{quote}\itshape
+When adding an uncertainty-aware head on top of an MSE-trained backbone, freezing the backbone and training only the head appears to be the safer choice in the experimental setting studied here.
+\end{quote}
 
-The primary finding of this thesis is that MC Dropout with $S = 30$ stochastic forward passes achieves Spearman~$\rho = 0.4820$ between predicted uncertainty and absolute prediction error for Trial~8 (100 test graphs, 3,163,500 node-level predictions). This indicates a statistically significant, moderate positive monotonic relationship: nodes assigned higher $\sigma$ by MC Dropout consistently tend to incur larger absolute errors ($p \approx 0$, $n = 3{,}163{,}500$). The result is practically meaningful---it enables principled triage of predictions, routing high-uncertainty outputs for manual review or full MATSim re-simulation while accepting low-uncertainty outputs with confidence.
+\section{The Layered Calibration Hierarchy}\label{sec:calibration_hierarchy}
 
-This result aligns with the theoretical motivation of Gal and Ghahramani~\cite{gal2016dropout}, who showed that MC Dropout approximates Bayesian inference by sampling from an approximate posterior over model weights. In contrast to point estimates, which provide no indication of reliability, the $\rho = 0.4820$ correlation provides a practically useful signal for deployment.
+The four post-hoc treatments of $\sigma$ compose into a layered pipeline (Table~\ref{tab:calibration_hierarchy}).\ MC Dropout supplies the $\sigma$ ranking, $\sigma$-scaling gives a quick approximate $1\sigma$ probability, and adaptive conformal gives the deployment interval with near-nominal empirical marginal coverage on the held-out scenarios.
 
-\subsection{Cross-Trial Robustness of UQ Findings}
-
-A key question is whether the UQ findings for the best-performing trial (T8) are specific to that configuration or reflect a general property of the architecture. Section~\ref{sec:t7_crosscheck} presents a full replication on Trial~7 ($\rho = 0.4460$, dropout $= 0.3$), which uses the same architecture but different hyperparameters. The results confirm that the core conclusions hold across both trials: selective prediction reduces MAE monotonically with uncertainty filtering (41.6\% at 50\% retention for T8 vs 38.3\% for T7), raw MC Dropout intervals severely undercover at all nominal levels, and conformal prediction restores near-exact nominal coverage for both models. Trial~7 exhibits a larger empirical scaling factor ($k_{95} = 16.15$ vs $11.34$), consistent with its higher dropout rate producing more diffuse but less calibrated uncertainty estimates. This cross-trial consistency strengthens confidence that the UQ findings are not artefacts of a single model configuration.
-
-\subsection{Ensemble Results and Their Limitations}
-
-Experiments~A and~B show that ensemble-based uncertainty estimates achieve lower Spearman~$\rho$ values (0.1035--0.1601) than the standalone T8 MC Dropout result (0.4820). However, these two sets of numbers are not directly comparable: the ensemble experiments suffer from a data distribution mismatch in the evaluation subset ($R^2 \approx 0.003$), which substantially depresses both predictive accuracy and uncertainty-ranking quality. The standalone T8 evaluation, by contrast, uses its properly matched 100-graph test split. The gap between $\rho = 0.16$ and $\rho = 0.48$ for the same MC Dropout method on the same model illustrates the magnitude of this confound and cautions against interpreting the ensemble results as evidence that ensembling is inherently inferior to MC Dropout.
-
-Within the confounded evaluation context, MC Dropout still outperforms ensemble variance by 55\% ($\rho = 0.1600$ vs $\rho = 0.1035$), suggesting some robustness advantage. The finding that identical-architecture ensemble members produce highly correlated predictions is consistent with the broader ensemble literature~\cite{lakshminarayanan2017simple}: when ensemble members share the same architecture and training procedure, their diversity is limited, reducing the ensemble's ability to detect novel or difficult inputs. However, whether architecturally diverse ensembles or ensembles evaluated under matched conditions would outperform MC Dropout remains an open question that future work should address with carefully controlled train/test splits.
-
-\subsection{Predictive Performance in Context}
-
-Trial~8 achieves test $R^2 = 0.5957$ (MAE $= 3.96$ veh/h, RMSE $= 7.12$ veh/h) on the 80/10/10 split. These metrics reflect the model's ability to predict traffic volume \emph{changes} ($\Delta v$) at the node level across 3,163,500 predictions spanning 100 scenarios.
-
-Trial~1, which uses a \texttt{Linear(64$\to$1)} final layer and zero dropout, achieves $R^2 = 0.7860$ and MAE $= 2.97$ veh/h---the highest accuracy among all trials. This demonstrates that the PointNetTransfGAT backbone learns expressive representations of the road network and policy inputs. However, Trial~1 is \emph{structurally incompatible} with MC Dropout uncertainty quantification: its zero effective dropout rate means all stochastic forward passes produce identical outputs ($\sigma = 0$ everywhere), making the uncertainty estimation framework undefined. The exclusion of Trial~1 from UQ experiments is therefore not a limitation but a necessary methodological constraint: MC Dropout requires non-zero dropout by definition~\cite{gal2016dropout}.
-
-A plausible contributing factor to Trial~1's accuracy advantage is architectural: the \texttt{GATConv(64$\to$1)} final layer used in Trials~2--8 introduces a neighbourhood aggregation step at the output, which may smooth per-node predictions toward local averages. This smoothing introduces an inductive bias that is well-suited to spatially correlated phenomena but may be mismatched to the highly variable, node-specific $\Delta v$ targets in this dataset. A \texttt{Linear(64$\to$1)} projection, by contrast, produces the final prediction as a function solely of the node's own 64-dimensional embedding, without any neighbourhood-level influence at the output stage. However, Trial~1 also differs from Trials~2--8 in batch size (32 vs 8) and learning rate ($10^{-3}$ vs $5 \times 10^{-4}$), and these confounds cannot be isolated without dedicated ablation experiments. The architectural hypothesis therefore remains speculative in the absence of controlled comparisons.
-
-The gap between Trial~1 ($R^2 = 0.79$) and Trial~8 ($R^2 = 0.60$) suggests meaningful headroom for future work: an architecture that combines the accuracy of a simpler output head with a separate uncertainty mechanism (e.g., heteroscedastic regression or evidential deep learning) could potentially recover Trial~1-level accuracy while still providing uncertainty estimates.
-
-\textbf{Context:} All results in this thesis are based on 1,000 of 10,000 available MATSim scenarios (10\% subset). The original Natterer~et~al.~\cite{natterer2025ml} work used the full 10,000-scenario dataset and achieved $R^2 = 0.91$ overall. Our results represent a preliminary investigation under data-limited conditions; the 10$\times$ difference in training data scale is the most likely explanation for the performance gap.
-
-\section{Conformal Prediction vs MC Dropout Intervals}
-
-Conformal prediction provides \emph{coverage-guaranteed} intervals: the 95\% conformal interval ($\pm$14.68 veh/h) guarantees that at least 95\% of true values fall within it, on average, under the exchangeability assumption. This guarantee holds regardless of the model's internal uncertainty representation.
-
-In contrast, MC Dropout uncertainty $\sigma$ is \emph{not} a calibrated standard deviation---a well-documented property of approximate Bayesian methods (Section~\ref{sec:reliability_diagram}). T8 requires a scaling factor of $k_{95} = 11.34$ to achieve 95\% coverage using $\pm k \sigma$ intervals---versus the $k = 1.96$ expected for a calibrated Gaussian. Even after temperature scaling ($T = 2.70$), the effective $k_{95} \approx 5.30$ remains far from 1.96, confirming that the raw $\sigma$ from MC Dropout is most effective as a ranking signal for selective prediction and error detection, rather than as a probability distribution. Adaptive conformal prediction (Section~\ref{sec:conformal_conditional}) combines the advantages of both approaches: by normalising nonconformity scores with $\sigma$, it produces uncertainty-adaptive intervals that maintain conditional coverage across uncertainty deciles while preserving the marginal guarantee.
-
-These three approaches form a natural hierarchy: MC Dropout provides adaptive, node-specific uncertainty scores useful for prediction ranking and selective filtering; temperature scaling improves the calibration of the Gaussian interpretation; and conformal prediction provides formal coverage guarantees. In practice, combining MC Dropout (for selective prediction) with adaptive conformal intervals (for coverage guarantees) represents the most complete approach.
-
-\section{Practical Implications}
-
-\subsection{Deployment Recommendations}
-
-Several practical recommendations follow from these results. \textbf{MC Dropout with $S = 30$ samples} is the most effective uncertainty estimator found here, achieving $\rho = 0.4820$ at a cost of 228 minutes for 3.16M predictions on a T4 GPU; a dropout rate of 0.2 (T8) outperforms 0.3 (T5--T7). \textbf{Selective prediction} is an immediate practical gain: filtering to the 50\% most confident predictions reduces MAE by 41.6\% (from 3.94 to $\approx$2.31~veh/h), and even discarding only the 10\% most uncertain nodes yields an 18.5\% improvement. When \textbf{formal coverage guarantees} are needed, adaptive conformal prediction achieves near-exact nominal coverage across all uncertainty deciles while producing node-specific interval widths (Section~\ref{sec:conformal_conditional}); for the simplest deployment, standard conformal prediction achieves near-exact marginal coverage ($\pm$14.68~veh/h for 95\% on the primary 50/50 split). \textbf{Temperature scaling} ($T = 2.70$) is a lightweight post-hoc improvement (no retraining required) that reduces ECE by 82\%, useful when approximate but improved calibration suffices. The raw $\sigma$ from MC Dropout should never be used as a calibrated probability distribution: the $k_{95} = 11.34$ factor means it is far more useful as a ranking signal than as a stand-in for a standard deviation. Finally, the ensemble results suggest that \textbf{identical-architecture ensembles} evaluated under the present protocol do not outperform single-model MC Dropout; however, this finding is confounded by the evaluation distribution mismatch (Section~\ref{sec:ensemble_caveat}), and architecturally diverse ensembles under matched evaluation remain a promising direction for future work.
-
-\subsection{Decision Support Integration}
-
-Uncertainty estimates translate naturally into a tiered review workflow for urban planners. Predictions in the bottom 50\% of MC Dropout $\sigma$ can be accepted with confidence, with an expected MAE of $\approx$2.31~veh/h. Those in the 50--90\% range are candidates for sensitivity analysis or cross-checking against alternative models. Predictions in the top 10\% of $\sigma$ should be flagged for full MATSim simulation verification before informing a policy decision. This tiered approach lets planners allocate expensive full-simulation resources only where genuine uncertainty warrants it.
-
-\begin{figure}[htbp]
+\begin{table}[htbp]
 \centering
-\includegraphics[width=\textwidth]{figures/fig9_policy_explanation.pdf}
-\caption[Uncertainty-guided policy decision framework (T8)]{Uncertainty-guided decision framework. The GNN surrogate (T8, $S=30$ MC Dropout) routes each prediction: \textbf{ACCEPT} (bottom 50\% $\sigma$, MAE $\approx$2.31~veh/h, $-$41.6\%); \textbf{FLAG} (50--90\%, manual review); \textbf{REJECT} (top 10\%, full MATSim re-simulation). Source: \texttt{trial8\_uq\_ablation\_results.csv}.}
-\label{fig:policy_explanation}
-\end{figure}
+\caption[Layered calibration hierarchy]{Layered calibration hierarchy: each row adds one capability.\ Numbers from Sections~\ref{sec:mc_results}--\ref{sec:scoring_results}.}
+\label{tab:calibration_hierarchy}
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{lccccc}
+\toprule
+Layer & Ranking $\rho$ & ECE & $1\sigma$ cov.\ & $90\%$ marginal cov.\ & Conditional cov.\ range \\
+\midrule
+Raw MC Dropout & 0.4820 & 0.356 & 32.7\% & 48.55\% & --- \\
+$+$ $\sigma$-scaling ($T = 2.887$) & 0.4820 & \textbf{0.034} & \textbf{68.0\%} & --- & --- \\
+$+$ Standard conformal & 0.4820 & --- & --- & \textbf{90.02\%} & $[59.0\%, 98.1\%]$ \\
+$+$ Adaptive conformal & 0.4820 & --- & --- & 89.87\% & $\mathbf{[83.7\%, 96.4\%]}$ \\
+\bottomrule
+\end{tabular}
+\\[0.3em]
+\footnotesize Each row reports the metric native to that calibration layer.\ $\sigma$-scaling targets the $1\sigma$ Gaussian probability and leaves the conformal residual quantile untouched; conformal prediction targets the marginal $90\%$ interval and does not change the underlying $\sigma$.
+\end{table}
 
-\section{Limitations}
+\section{Stratified UQ: Why $\rho$ Drops on Large $|\Delta v|$}\label{sec:stratified_why}
 
-\subsection{10\% Data Subset}
+The Q1$\to$Q4 contrast ($\rho = 0.721 \to 0.100$) is best read as ``MC Dropout works mechanically on trivial segments and breaks on hard ones'' rather than as ``MC Dropout is highly informative on easy regimes'': Q1 is dominated by $|\Delta v| = 0$ segments where $|\text{error}|$ and $\sigma$ both reduce to functions of small output magnitudes, so the high Q1 $\rho$ is partly an artefact of shared dependence.\ The substantive Q4 degradation is real and has three contributing mechanisms: (i)~\textbf{dynamic range} -- Q4 has $\bar{|y|} \approx 14$ veh/h and MAE $10.08$ vs Q1's $\bar{|y|} \approx 0$ and MAE $1.24$, so absolute error spans a much wider range than absolute $\sigma$ and Spearman noise dominates; (ii)~\textbf{near-capacity saturation} -- many Q4 segments sit near the knee of the flow--density curve where small policy changes trigger non-linear equilibrium shifts that MC Dropout variance does not capture (informed by traffic-equilibrium domain knowledge, not measured directly here); (iii)~\textbf{sparse training coverage} -- large-$|\Delta v|$ segments are rare in the $1{,}000$-scenario subset.\ Mitigations include heteroscedastic heads (T9 captures aleatoric uncertainty, dominant here), explicit OOD detectors, and feature-conditional conformal methods.
 
-All experiments in this thesis use only 1,000 of 10,000 available MATSim scenarios. This limits the diversity of training examples and likely contributes to the gap between Trial~8's $R^2 = 0.5957$ and the higher performance that might be achievable with the full dataset. Whether MC Dropout uncertainty quality ($\rho = 0.4820$) improves, degrades, or remains stable with more training data is an open question.
+\section{The Exchangeability Assumption}\label{sec:exchangeability}
 
-\subsection{Ensemble Evaluation Confound}
+Every conformal statement in this thesis rests on exchangeability, which is not strictly satisfied at the node level: nodes within a single graph share the same policy input and sit in a spatially correlated road network.\ The calibration and evaluation splits are therefore at the \emph{scenario} level (50 calibration / 50 evaluation graphs, randomly assigned with seed $42$).\ Exchangeability is enforced by splitting scenarios, and is more plausible at the scenario level than at the node level; node-level dependence remains within each graph and is not removed by the scenario split.\ The coverage guarantee should therefore be read as a marginal-over-scenarios statement: averaged across scenarios (and within a scenario, across nodes), at least $90\%$ or $95\%$ of residuals fall inside the conformal interval, as the observed $90.02\%$ and $95.01\%$ confirm.\ Within a single scenario, coverage can deviate; the per-graph standard-conformal coverage range is $[80.5\%, 93.7\%]$ at the $90\%$ target.\ A natural extension is graph-level nonconformity scoring (aggregating residuals to a per-graph score before computing the conformal quantile), which would restore strict exchangeability at the node-aggregate level at the cost of coarser intervals.
 
-The ensemble experiments suffer from a data distribution mismatch that produces near-zero $R^2$ in the shared evaluation subset. This confound means that the observed ensemble $\rho$ values (0.10--0.16) cannot be taken as reliable estimates of ensemble UQ quality under fair conditions. The same confound depresses MC Dropout's $\rho$ from 0.4820 (standalone) to 0.1600 (ensemble subset), confirming that the evaluation protocol---not the UQ method---drives the low scores. Future work should re-run ensemble experiments with a single, shared train/test split to obtain an unconfounded comparison between MC Dropout and ensemble-based uncertainty estimation.
+\section{The PIT Diagnostic and CRPS/MAE Ratio}\label{sec:pit_discussion}
 
-\subsection{Single Case Study}
+PIT mean $0.433$ (ideal $0.500$) and first-bin mass $28.4\%$ indicate asymmetric underdispersion with an upward bias in $\hat\mu$.\ $\sigma$-scaling reduces the PIT KS from $0.245$ to $0.104$ but cannot shift the predictive centre, so conformal prediction handles the residual tails because its intervals expand around $\hat\mu$ regardless of where $\hat\mu$ sits; CQR (Trial~11) supports asymmetric intervals when the residual distribution itself is asymmetric.\ The CRPS/MAE ratio of $0.857$ exceeds the Gaussian-calibrated optimum $1/\sqrt{2} \approx 0.707$ by $\approx 21\%$, quantifying the calibration cost of underdispersed $\sigma$.
 
-Our experiments use a single road network (Paris). Generalization to other cities, network topologies, or policy types requires additional validation. The feature correlation patterns (e.g., high-traffic roads being harder to predict) may not hold universally.
+\section{Answers to the Research Questions}\label{sec:rq_answers}
 
-\subsection{MC Dropout Calibration: A Known Limitation with Practical Solutions}
+Each answer below is structured the same way: a direct answer, the supporting evidence, and the main limitation.
 
-The $k_{95} = 11.34$ finding confirms that MC Dropout $\sigma$ is not a calibrated standard deviation---a property that is well established in the approximate Bayesian inference literature. Gal and Ghahramani~\cite{gal2016dropout} note that the variational posterior produced by MC Dropout is typically too concentrated, and subsequent work has consistently observed that raw MC Dropout uncertainty underestimates true prediction variance in absolute terms~\cite{laves2020well}. The reliability diagram analysis (Section~\ref{sec:reliability_diagram}) quantifies this systematically for our setting: the Expected Calibration Error (ECE) of 0.265 means that, on average, observed coverage deviates from the nominal level by 26.5 percentage points.
+\textbf{RQ1.\ How effectively does MC Dropout capture epistemic uncertainty?}\ MC Dropout works as a \emph{ranking} signal on Trial~8 but is not a calibrated probability model.\ Evidence: pooled $\rho = 0.4820$ between $\sigma$ and $|\text{error}|$; mean per-graph $\rho = 0.464$ with bootstrap 95\% CI $[0.460, 0.469]$; AUROC for top-10\% error detection $0.7548$; retaining the 50\% most confident predictions reduces MAE by $41.2\%$.\ Limitation: $k_{95} = 11.66$ vs Gaussian $1.96$, so raw $\sigma$ is not a calibrated standard deviation without an additional scaling or conformal step (RQ4).
 
-This miscalibration does \emph{not} diminish the ranking value of MC Dropout uncertainty. The Spearman~$\rho = 0.4820$ correlation, the selective prediction gains ($-$41.6\% MAE at 50\% retention), and the AUROC results (0.76 for top-10\% error detection) all rely on the \emph{ordering} of $\sigma$ values, not their absolute magnitudes. Post-hoc temperature scaling~\cite{guo2017calibration, laves2020well} with an optimal $T = 2.70$ reduces the ECE from 0.269 to 0.048---an 82\% improvement---confirming that a simple rescaling captures most of the calibration gap. However, residual miscalibration persists at high nominal levels (83.3\% observed vs 95\% nominal), reflecting the non-Gaussian shape of the residual distribution, which has heavier tails than any single-parameter Gaussian rescaling can capture. Temperature scaling is therefore a useful intermediate step between raw MC Dropout and full conformal prediction, but should not be relied upon for formal coverage guarantees. The three-method hierarchy demonstrated in this thesis---MC Dropout for ranking, temperature scaling for improved calibration, conformal prediction for formal coverage guarantees---provides a practical resolution that addresses each level of the calibration problem.
+\textbf{RQ2.\ How does MC Dropout compare with ensemble-based UQ?}\ Deep Ensemble wins on point accuracy, MC Dropout on uncertainty ranking.\ Evidence: Deep Ensemble $R^2 = 0.6841$ at $\rho = 0.3997$, $k_{95} = 15.18$; MC Dropout $\rho = 0.4820$, $k_{95} = 11.66$.\ Limitation: only one architecture family tested; architecturally diverse ensembles could change this trade-off and were not evaluated.
 
-\subsection{Conditional Coverage: A Theoretical Limitation Resolved by Adaptive Conformal Prediction}
+\textbf{RQ3.\ Does combining MC Dropout with seed-ensemble variance add benefit?}\ Essentially no: quadrature gives $\rho = 0.4909$ vs $0.4908$ for MC Dropout alone, within sampling noise.\ The useful signal in seed-ensemble variance is already captured by MC Dropout itself.\ Limitation: null result is specific to single-architecture ensembling; cross-family ensembles (GAT + GraphSAGE + GCN) might yield independent disagreement signals.
 
-Barber~et~al.~\cite{barber2021limits} prove that distribution-free conditional coverage is impossible without additional assumptions---a fundamental theoretical result that applies to \emph{all} conformal methods, not a weakness of our particular implementation. Our analysis confirms this theoretical prediction in practice: standard conformal intervals with a global quantile over-cover low-uncertainty nodes (98.6\% at 90\% nominal for decile D1) and under-cover high-uncertainty nodes (62.9\% for D10). This disparity is the mathematically inevitable consequence of applying fixed-width intervals to a heterogeneous prediction task.
+\textbf{RQ4.\ Can distribution-free methods deliver trustworthy intervals without retraining?}\ Yes, in an empirical marginal sense: the layered framework (MC Dropout + $\sigma$-scaling + adaptive conformal) requires no backbone retraining.\ Evidence: $\mathrm{PICP}_{90} = 90.02\%$, $\mathrm{PICP}_{95} = 95.01\%$ on T8; $\sigma$-scaling at $T = 2.887$ reduces ECE by $90.5\%$ and hits Gaussian $1\sigma$ within $0.3$ pp; adaptive conformal narrows conditional coverage from $[59.0\%, 98.1\%]$ to $[83.7\%, 96.4\%]$; Winkler scores $49.68 \to 35.78 \to 32.32$.\ Limitation: marginal coverage is averaged over scenarios; the formal exchangeability guarantee is only approximated within a single graph (Section~\ref{sec:exchangeability}), so strong UQ metrics do not by themselves imply policy-level reliability for any individual scenario.
 
-Adaptive conformal prediction, which normalises nonconformity scores by $\sigma$, provides the principled solution: it produces node-specific interval widths that are wider where MC Dropout signals higher uncertainty and narrower where it signals confidence. This largely resolves the conditional coverage disparity (90.0\%--96.2\% across deciles at the 90\% level), demonstrating that the MC Dropout ranking signal carries genuine calibration information even when its absolute magnitudes are miscalibrated. The combination of MC Dropout uncertainty (for adaptive interval widths) with conformal prediction (for the marginal coverage guarantee) thus addresses both the ranking and calibration limitations identified in this thesis.
+\textbf{RQ5.\ Can uncertainty-aware training extensions improve native UQ while preserving accuracy?}\ Yes, but only when the MSE-trained backbone is kept frozen.\ Evidence: T9 (heteroscedastic, frozen) reaches $k_{95} = 2.84$ but misses the $R^2$ gate at $0.4991$; T10 (CQR, full backbone unfrozen, learning rate $5\times10^{-4}$) collapses to $R^2 = 0.4057$ and fails three of six gates; T11 (same CQR head, frozen, identical learning rate) passes all six gates at $R^2 = 0.5835$.\ The T10/T11 contrast isolates a single design knob -- backbone trainability -- and is the strongest empirical evidence for the freezing observation.\ Limitation: reported here as an observation specific to PointNetTransfGAT, the $1{,}000$-scenario subset and the loss/head pairings tested, not as a universal principle.
 
-The stratified analysis by feature quartiles (Section~\ref{sec:stratified_uq}) reveals that prediction difficulty and uncertainty quality both vary substantially across the input space. Low-volume, low-capacity road segments are predicted with high accuracy (MAE $\approx 1.0$--$1.4$ veh/h) and excellent ranking ($\rho \approx 0.74$--$0.81$), while high-traffic segments are harder to predict (MAE $\approx 4.5$--$8.0$ veh/h) with degraded ranking ($\rho \approx 0.26$--$0.41$). This heterogeneity has practical implications for deployment: uncertainty-guided filtering is most effective for the easy-to-predict majority of the network, where the model already achieves high accuracy. For the most challenging high-volume segments, the uncertainty signal is weaker, precisely where it is most needed---motivating future work on feature-conditional or group-conditional conformal methods that could provide tighter guarantees for specific road categories.
+\section{Primary Findings}\label{sec:primary_results}
 
-\subsection{Stability Across Scenarios and Trials}
+\begin{enumerate}
+ \item \textbf{MC Dropout works as a ranking signal at modest cost.}\ For T8, $\rho = 0.4820$ between $\sigma$ and absolute error, with AUROC $= 0.7548$ for top-10\% error detection.\ Across all 100 test scenarios no graph drops below $\rho = 0.41$.
 
-The per-graph analysis (Section~\ref{sec:per_graph_variation}) provides reassurance that the aggregate UQ quality metrics are not driven by outlier scenarios. Spearman~$\rho$ is consistent across 100 test graphs (mean = 0.464, std = 0.023, range [0.41, 0.51]), confirming that uncertainty ranking is a robust property of the model across diverse traffic scenarios. Cross-trial validation on T7 (Section~\ref{sec:t7_crosscheck}, Section~\ref{sec:t7_auroc}) further strengthens this conclusion: T7 achieves AUROC values of 0.742 and 0.715 for top-10\% and top-20\% error detection---slightly below T8 but following the same pattern.
+ \item \textbf{The calibration cascade closes the gap to near-nominal empirical marginal coverage.}\ Raw MC Dropout requires $k_{95} = 11.66$ for $95\%$ coverage; regression $\sigma$-scaling at $T = 2.887$ brings this to $4.04$ and reduces ECE by $90.5\%$ (from $0.356$ to $0.034$).\ Adaptive conformal then narrows conditional coverage from $[59.0\%, 98.1\%]$ to $[83.7\%, 96.4\%]$ across uncertainty deciles.
 
-\section{Future Directions}
+ \item \textbf{In these experiments, freezing the MSE-trained backbone is the strongest observed design choice when adding an uncertainty-aware head.}\ T9 (frozen, heteroscedastic head) is a partial positive; T10 (CQR, unfrozen backbone, learning rate $5\times10^{-4}$ from T8) collapses to $R^2 = 0.4057$; T11 (same CQR head, identical learning rate, backbone frozen) clears all six gates with $R^2 = 0.5835$.\ Since T10 and T11 share head, loss, data, calibration protocol and learning rate, the contrast isolates a single design knob -- the backbone-trainability flag.\ This is reported as an observation that holds for the architecture, the data subset, and the loss and head pairings tested in this thesis, and not as a general principle for all MSE-trained surrogates.
 
-\subsection{Conformal Risk Control}
+ \item \textbf{Deep ensembling and MC Dropout are complementary, not competing.}\ The five-member Deep Ensemble achieves the project's highest GNN-based, UQ-capable point accuracy ($R^2 = 0.6841$, $+14.8\%$ over T8) but its weakest UQ ranking ($\rho = 0.3997$).\ MC Dropout sits on the opposite corner of the trade-off.\ Pairing both at $\approx 5\times$ training compute gives the best of both.
 
-Beyond fixed-coverage conformal prediction, conformal risk control~\cite{angelopoulos2023conformal} enables coverage guarantees on arbitrary loss functions. Combined with the adaptive conformal approach validated in Section~\ref{sec:conformal_conditional}, this could provide even tighter, uncertainty-adaptive intervals for traffic prediction.
+ \item \textbf{Stratified UQ has two regimes that should not be conflated.}\ On the smallest-$|\Delta v|$ quartile $\rho = 0.721$, but Q1 is dominated by segments with $|\Delta v| = 0$ (no policy effect at all), so the high correlation is partly a mechanical artefact.\ On the largest-$|\Delta v|$ quartile $\rho = 0.100$, a real breakdown driven by dynamic range, saturation effects, and sparse training-data coverage in the high-response regime.\ Uncertainty-guided filtering works best where the model is already good.
+\end{enumerate}
 
-\subsection{Advanced Calibration Methods}
+\section{What the Existing Trials Do and Do Not Prove}\label{sec:ablation_summary}
 
-Temperature scaling ($T = 2.70$) reduced ECE by 82\% but left residual miscalibration at high nominal levels due to the non-Gaussian residual distribution. More flexible calibration approaches---such as isotonic regression, Platt scaling with learned variance, or quantile recalibration~\cite{kuleshov2018accurate}---could potentially close this remaining gap without requiring model retraining.
+The thesis runs many trials, but only a subset of design questions is directly answered by them; for the others, confounders remain.\ Table~\ref{tab:ablation_summary} summarises the main questions, the empirical answer reached here, the trial that supplies the evidence, and the confounds that remain.\ This is intended as a check on over-interpretation rather than a new experiment.
 
-\subsection{Architecturally Diverse Ensembles}
+\begin{table}[p]
+\centering
+\caption[Ablation summary: what the trials do and do not prove]{Summary of which design questions are answered by the existing trials, the answer in the present setting, and the remaining confounders that should be controlled in any follow-up.}
+\label{tab:ablation_summary}
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{p{3.6cm}p{2.0cm}p{4.2cm}p{3.7cm}}
+\toprule
+\textbf{Design question} & \textbf{Answer} & \textbf{Evidence} & \textbf{Remaining confounders} \\
+\midrule
+Does dropout hurt point accuracy here? &
+No (small) &
+T1 (no dropout, $R^2 = 0.786$) vs T2--T8 (with dropout, $R^2$ in 0.51--0.60); gap also reflects Linear vs GATConv head &
+Final-layer, batch size, and learning rate all differ between T1 and the dropout trials. \\
+\midrule
+Does freezing the backbone help under CQR? &
+Yes, here &
+T10 (unfrozen, $R^2 = 0.4057$) vs T11 (same head, learning rate $5\times10^{-4}$, calibration; frozen, $R^2 = 0.5835$) &
+None within the CQR family; T10/T11 share head, loss, data, calibration and learning rate. Cross-architecture / cross-dataset replication left for future work. \\
+\midrule
+Does ensembling improve point accuracy? &
+Yes, when independently seeded &
+5-member Deep Ensemble $R^2 = 0.6841$ vs single-member range $[0.640, 0.650]$; multi-model ensemble below best single trial &
+Deep Ensemble shares architecture and hyperparameters; architecturally diverse ensembles untested. \\
+\midrule
+Does ensembling improve UQ ranking? &
+No, here &
+Deep Ensemble $\rho = 0.3997$ vs MC Dropout $\rho = 0.4820$; quadrature combination gives no gain over MC alone &
+Only one architecture family tested. \\
+\midrule
+Does raw MC Dropout give calibrated intervals? &
+No &
+$k_{95} = 11.66$ vs Gaussian $1.96$; Gaussian $95\%$ interval covers only $54.85\%$ of residuals &
+None major; follows from full-test-set audit. \\
+\midrule
+Does regression $\sigma$-scaling fully calibrate? &
+No (rescales, can't reshape) &
+After $T = 2.887$, ECE drops $90.5\%$ and $1\sigma$ hits $68.0\%$, but $2\sigma$/$3\sigma$ stay below Gaussian target &
+Calibration set is a node-level subset; node-within-graph correlation breaks strict scenario independence. \\
+\midrule
+Does the freezing observation generalise? &
+Untested &
+Only PointNetTransfGAT on Paris $1{,}000$-scenario subset under MSE-trained backbones is evaluated &
+Architecture, dataset, intervention type, and backbone objective all held fixed. \\
+\bottomrule
+\end{tabular}
+\end{table}
 
-Our negative ensemble results suggest future work should explore ensembles combining architecturally diverse models (e.g., GAT, GraphSAGE, GCN) trained on the same data. True diversity may unlock ensemble UQ benefits not observed with identical architectures.
+\section{Limitations and Future Directions}\label{sec:limitations}
 
-\subsection{Full 10,000-Scenario Training}
+\begin{itemize}
+\item \textbf{Data scale.}\ $1{,}000$ of $10{,}000$ scenarios, reused across all eleven trials so that method-to-method comparisons sit on identical data.\ The resulting $3{,}163{,}500$ node-level test predictions give per-graph Spearman $\rho$ standard deviation $0.023$ (bootstrap 95\% CI $\pm 0.005$ on the mean), which is the relevant precision for the relative UQ rankings that are this thesis's contribution.\ The absolute $R^2 = 0.5957$ on T8 is below the $R^2 > 0.9$ reported by~\textcite{natterer2025ml} at full scale; replicating the UQ comparisons at full scale is the most direct piece of future work.
+\item \textbf{T1 vs T8 confounds.}\label{sec:t1_vs_t8_limitation}\ Final layer (Linear vs GATConv), batch size (32 vs 8) and learning rate ($10^{-3}$ vs $5\times10^{-4}$) all differ.\ T1 has \texttt{use\_dropout=False}, so MC Dropout is undefined; T8 is the strongest UQ-compatible base (Table~\ref{tab:t1_t8_de_compact}).
+\item \textbf{Single network, single policy type.}\ Paris + capacity-reduction only; generalisation to other cities and policy types is untested.
+\item \textbf{Non-GNN baseline scope.}\ RF, XGBoost and MLP reported (Section~\ref{sec:non_gnn_baselines}); tree-native UQ extensions (quantile regression forests, NGBoost) not evaluated.
+\item \textbf{MC Dropout inference cost.}\ Inference scales linearly in the number of stochastic forward passes $S$; Trial~11 (frozen-backbone CQR) and GEBM~\cite{fuchsgruber2024energy} are single-forward-pass alternatives that eliminate this overhead when latency matters.
+\item \textbf{Future work.}\ Repeat at full $10{,}000$-scenario scale; controlled T1-vs-T8 ablation; architecturally diverse ensembles (GAT + GraphSAGE + GCN); conformal risk control~\cite{angelopoulos2023conformal} and feature-conditional conformal; multi-city validation; explicit OOD detectors for the large-$|\Delta v|$ regime.
+\end{itemize}
 
-The most direct improvement would be training on the full 10,000-scenario dataset to assess whether model accuracy and uncertainty quality improve proportionally with data scale.
+\section{Threats to Validity}\label{sec:threats_to_validity}
 
-\subsection{Out-of-Distribution Detection}
-
-Explicit OOD detectors could flag scenarios unlike any training example, complementing uncertainty estimation with categorical reliability assessment for novel policy interventions.
-
-\subsection{Active Learning}
-
-Uncertainty estimates could guide active learning: selecting high-uncertainty scenarios for additional MATSim simulation to expand training data where most needed.
+\begin{itemize}
+\item \textbf{Dataset selection.}\ The $1{,}000$-scenario subset is the first 20 contiguous batches of the $10{,}000$-scenario Natterer corpus~\cite{natterer2025ml} rather than a uniform random sample, so a mild batch-ordering selection bias cannot be excluded.\ All eleven trials share the same subset, so the relative method-to-method comparisons that constitute the contribution remain valid; only the absolute accuracy and UQ figures inherit the potential bias.
+\item \textbf{External validity.}\ One road network (Paris), one intervention type (capacity reduction).\ Generalisation to other cities, topologies and policy types (road pricing, new infrastructure) is untested.
+\item \textbf{Model family.}\ All trials are PointNetTransfGAT variants.\ Transfer of the accuracy/UQ trade-offs and the freezing observation to other GNN families (GraphSAGE, GCN, message-passing transformers) or to non-graph models is untested.
+\item \textbf{Baseline scope.}\ RF, XGBoost and MLP reported (Section~\ref{sec:non_gnn_baselines}); tree-native UQ extensions (quantile regression forests, NGBoost) not evaluated, so whether tree-native methods can match MC Dropout's ranking or the adaptive conformal conditional-coverage range is left as future work.
+\item \textbf{Metrics.}\ Strong UQ metrics ($\rho$, AUROC, PICP, $k_{95}$, CRPS) do not on their own imply policy-level usefulness.\ Whether uncertainty-guided filtering changes the quality of an actual planner decision requires user studies or simulated decision pipelines outside the scope here.
+\end{itemize}

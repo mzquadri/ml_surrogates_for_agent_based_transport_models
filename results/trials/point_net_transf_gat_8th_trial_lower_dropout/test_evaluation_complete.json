@@ -1,0 +1,41 @@
+{
+  "trial_name": "8th_trial_lower_dropout",
+  "hyperparameters": {
+    "batch_size": 8,
+    "gradient_accumulation": 3,
+    "use_dropout": true,
+    "dropout": 0.2,
+    "use_weighted_loss": false,
+    "lr": 0.0005,
+    "split": "80-10-10"
+  },
+  "validation_metrics": {
+    "r2": 0.597,
+    "pearson": 0.7734,
+    "spearman": 0.2912,
+    "loss": 49.27
+  },
+  "test_metrics": {
+    "r2": 0.5957479476928711,
+    "pearson": 0.772649347782135,
+    "spearman": 0.29292836091897745,
+    "mse": 50.66969680786133,
+    "rmse": 7.118265151977539,
+    "mae": 3.957288980484009,
+    "mape": 3673256448.0,
+    "loss": 50.6784301170936
+  },
+  "num_test_samples": 3163500,
+  "diagnosis": {
+    "overfitting": "NO OVERFITTING",
+    "underfitting": "OPTIMAL FIT",
+    "val_test_gap_percent": 0.20972448587417603,
+    "variance_coverage_percent": 74.52997589111328
+  },
+  "comparison_with_trial5": {
+    "trial5_r2": 0.5553,
+    "trial8_r2": 0.5957479476928711,
+    "improvement": 0.04044795036315918,
+    "percentage_improvement": 7.283981800079346
+  }
+}

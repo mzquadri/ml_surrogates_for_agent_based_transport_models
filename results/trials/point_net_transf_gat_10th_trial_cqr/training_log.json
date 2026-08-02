@@ -1,0 +1,32 @@
+{
+  "experiment": "point_net_transf_gat_10th_trial_cqr",
+  "hyperparameters": {
+    "dropout": 0.2,
+    "lr": 0.0005,
+    "batch_size": 8,
+    "gradient_accumulation": 3,
+    "num_epochs": 1000,
+    "patience": 25,
+    "alpha": 0.1,
+    "tau_lo": 0.05,
+    "tau_hi": 0.95,
+    "in_channels": 5,
+    "split": "80/10/10",
+    "seed": 42
+  },
+  "results": {
+    "best_val_pinball": 1.031234044295091,
+    "best_epoch": 860,
+    "total_epochs_run": 885,
+    "training_time_minutes": 5219.488114345074
+  },
+  "history": [
+    {
+      "epoch": 1,
+      "train_pinball": 3.9919081020355223,
+      "val_pinball": 3.9614787651942325,
+      "r2_midpoint": null
+    }
+  ],
+  "history_truncated_note": "History truncated at source; only the first epoch was recorded."
+}

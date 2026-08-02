@@ -34,7 +34,7 @@ TUM_LIGHT_GRAY = '#DADADA'
 COLORS = [TUM_BLUE, TUM_ORANGE, TUM_GREEN, TUM_DARK_BLUE, '#64A0C8', '#98C6EA', TUM_GRAY, '#C4071B']
 
 # Output directory
-OUTPUT_DIR = Path(r"c:\Users\zamin\OneDrive\Desktop\Nazim_thesis\ml_surrogates_for_agent_based_transport_models\thesis\latex\figures")
+OUTPUT_DIR = Path(__file__).resolve().parents[2] / "docs/hd_plots"
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
 # =============================================================================

@@ -2,263 +2,90 @@
 
 \chapter{Methodology}\label{chapter:methodology}
 
-This chapter describes the GNN architecture adopted for traffic prediction, the three uncertainty quantification methods evaluated in this thesis, and the metrics used to assess both predictive accuracy and uncertainty quality.
+\section{Provenance and Reused Components}\label{sec:provenance}
 
-\section{Problem Formulation}
+This thesis builds on infrastructure provided by Natterer~et~al.~\cite{natterer2025ml} and adds the uncertainty-quantification layer on top.\ To keep the contribution transparent:
 
-We formulate traffic prediction as a node-level regression task on a directed graph. Given a road network $G = (V, E)$ where nodes represent road segments and edges represent connectivity, we aim to predict the change in traffic volume $\Delta v_i$ for each node $i$ after a policy intervention.
+\paragraph{Reused (provided by Natterer~et~al.).}\ The MATSim simulation pipeline that generated the $10{,}000$ Paris policy scenarios; the PointNetTransfGAT architecture template (PointNetConv + TransformerConv + GATConv layers on the directed line graph); the five-feature node representation (\texttt{VOL\_BASE\_CASE}, \texttt{CAPACITY\_BASE\_CASE}, \texttt{CAPACITY\_REDUCTION}, \texttt{FREESPEED}, \texttt{LENGTH}); and the dataset preprocessing convention.
 
-\subsection{Input Features}
+\paragraph{Implemented and evaluated in this thesis.}\ All 11 trials T1--T11 (trained from scratch on the $1{,}000$-scenario subset) and the five-seed Deep Ensemble; the full UQ evaluation framework (MC Dropout at $S = 30$, $S$-convergence study, calibration audit via $k_p$, regression $\sigma$-scaling, split and adaptive conformal prediction, selective prediction, AUROC for top-error detection, CRPS / PIT / Winkler scoring); the three uncertainty-aware training extensions T9 (heteroscedastic head) and T10/T11 (CQR heads) including the frozen-vs-unfrozen-backbone comparison; the three non-GNN baselines (Random Forest, XGBoost, MLP) evaluated on the same scenario-level held-out test set; all experimental analyses, figures, tables and the resulting discussion.
 
-Each node $i$ is characterized by five input features:
+\section{Problem Formulation}\label{sec:problem_form}
+
+The task is node-level regression on a directed line graph.\ Given a road network $\mathcal{G} = (V, E)$ with nodes $v \in V$ representing road segments and edges encoding adjacency, the goal is to predict the change in traffic volume at each segment after a policy intervention,
+\begin{equation}\label{eq:target}
+ \Delta v_i = v_i^\text{policy} - v_i^\text{baseline}.
+\end{equation}
+Targets are positive, negative, or zero; most road segments are unaffected by a typical capacity reduction.\ Each node carries five scalar features, \texttt{VOL\_BASE\_CASE}, \texttt{CAPACITY\_BASE\_CASE}, \texttt{CAPACITY\_REDUCTION} (negative values denoting reductions), \texttt{FREESPEED}, \texttt{LENGTH}, together with the 2D start and end coordinates of the road segment, which are consumed by the PointNetConv layers below.\ Although both \texttt{CAPACITY\_REDUCTION} (Table~\ref{tab:feature_stats}) and $\Delta v$ contain a similar zero mass ($88.7\%$), this should not be read as implying that only directly modified segments can change.\ Unmodified links can still experience volume changes through traffic rerouting and spillover effects in MATSim equilibrium~\cite{natterer2025ml}; the observed alignment of the two zero shares is an empirical property of this dataset and preprocessing, not a structural guarantee, and should be interpreted cautiously when reasoning about which segments are predictable.
 
 \begin{table}[htbp]
 \centering
-\caption[Input features for each road segment (node)]{Input features for each road segment (node).}
-\label{tab:features}
-\begin{tabular}{llp{7cm}}
+\caption[Raw-unit statistics for the five input features]{Raw-unit statistics for the five input features.\ Mean and std are from the T8 \texttt{StandardScaler} fitted on the training partition (used for normalisation throughout the thesis); the median is from the 100-graph test set ($n = 3{,}163{,}500$ nodes).\ Following Natterer et al.~\cite{natterer2025ml}, the HIGHWAY road-type feature is excluded so the models remain comparable to their baseline; any predictive signal from HIGHWAY is therefore dropped.}
+\label{tab:feature_stats}
+\begin{tabular}{lrrrl}
 \toprule
-\textbf{Feature} & \textbf{Unit} & \textbf{Description} \\
+Feature & Mean & Std & Median & Notes \\
 \midrule
-\texttt{VOL\_BASE\_CASE} & vehicles/hour & Traffic volume in baseline scenario \\
-\texttt{CAPACITY\_BASE\_CASE} & vehicles/hour & Road segment capacity \\
-\texttt{CAPACITY\_REDUCTION} & vehicles/hour & Policy-induced capacity reduction (absolute, $\leq 0$) \\
-\texttt{FREESPEED} & m/s & Free-flow speed limit \\
-\texttt{LENGTH} & meters & Road segment length \\
+\texttt{VOL\_BASE\_CASE}      & 50.9   & 135.8  & 10.9 & vehicles per hour, right-skewed \\
+\texttt{CAPACITY\_BASE\_CASE} & 1029   & 1264   & 480  & vehicles per hour \\
+\texttt{CAPACITY\_REDUCTION}  & $-92.4$ & 332.2 & 0    & vehicles per hour, 88.7\% zeros \\
+\texttt{FREESPEED}            & 8.15   & 4.01   & 8.33 & m/s, 6 discrete urban bands \\
+\texttt{LENGTH}               & 91.6   & 109.9  & 58.4 & metres, range 4.2 to 2569 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=\textwidth]{figures/fig3_feature_distributions.pdf}
-\caption[Distribution of input features across the training set]{Distribution of the five input features across 200 training graphs (6,327,000 node observations). Dashed vertical lines mark the median. \texttt{VOL\_BASE\_CASE} and \texttt{CAPACITY\_BASE\_CASE} are right-skewed, reflecting the heavy-tailed nature of urban traffic volumes; \texttt{FREESPEED} is concentrated at a few discrete speed-limit values; \texttt{LENGTH} spans several orders of magnitude. \emph{Results based on 1,000 of 10,000 available MATSim scenarios (10\% subset).}}
-\label{fig:feature_distributions}
-\end{figure}
+\section{Model Architecture}\label{sec:architecture}
 
-\subsection{Target Variable}
+The surrogate uses the PointNetTransfGAT architecture introduced by Natterer~et~al.~\cite{natterer2025ml}, which combines PointNet~\cite{qi2017pointnet}, transformer attention~\cite{shi2021masked}, and graph attention layers~\cite{velickovic2018graph} into a single end-to-end model.\ Trial~1 uses a \texttt{Linear(64$\to$1)} final layer; Trials~2--8 use \texttt{GATConv(64$\to$1)}, adding a final round of attention-weighted neighbour aggregation.\ Because Trial~1 was trained without dropout, MC Dropout is undefined for it (every stochastic forward pass produces an identical output).
 
-The target variable is:
-\begin{equation}
-    \Delta v_i = v_i^{\text{policy}} - v_i^{\text{baseline}}
-\end{equation}
-representing the change in traffic volume on segment $i$ after the policy intervention is applied.
-
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=\textwidth]{figures/fig10_node_vs_graph.pdf}
-\caption[Node-level vs graph-level GNN prediction with MC Dropout uncertainty]{Node-level predictions ($\Delta v$ per node, with per-node MC Dropout $\sigma$) and graph-level evaluation (MAE per scenario with uncertainty error bars). T8: 100 test graphs $\times$ 31,635 nodes $=$ 3,163,500 total predictions. Source: \texttt{mc\_dropout\_full\_metrics\_model8\_mc30\_100graphs.json}.}
-\label{fig:node_vs_graph}
-\end{figure}
-
-\section{Model Architecture}
-
-We use the PointNetTransfGAT architecture developed by Natterer~et~al.~\cite{natterer2025ml}, which combines ideas from PointNet~\cite{qi2017pointnet}, graph transformers~\cite{shi2021masked}, and graph attention networks~\cite{velickovic2018graph} into a single end-to-end model for node-level regression on road networks.
-
-\textbf{Note on architectural variants:} Trial~1 uses a \texttt{Linear(64$\to$1)} final prediction layer, while Trials~2--8 use a \texttt{GATConv(64$\to$1)} final layer. This difference makes Trial~1 results not directly comparable with Trials~2--8, and Trial~1 is excluded from MC Dropout UQ experiments (effective dropout $= 0.0$).
-
-\subsection{Geometric Representation}
-
-A key design choice in the architecture is how it encodes the physical geometry of road segments. Each node carries two 2D positional coordinates: the start point of its corresponding road segment, $\mathbf{pos}[:,0,:] \in \mathbb{R}^{N \times 2}$, and its end point, $\mathbf{pos}[:,1,:] \in \mathbb{R}^{N \times 2}$. The two PointNetConv layers~\cite{qi2017pointnet} exploit these coordinates by computing, for each node $i$ and neighbour $j$, the relative displacement $\mathbf{pos}_j - \mathbf{pos}_i$ as part of the local MLP input. This means the first PointNetConv uses the start-point geometry of each segment relative to its neighbours, while the second uses the end-point geometry. The effect is that the model learns not only the graph-topological neighbourhood of each segment but also the spatial proximity of where segments begin and end in the 2D plane---an inductive bias well-suited to the geometry of real road networks.
-
-\subsection{Layer-by-Layer Architecture}
-
-Table~\ref{tab:architecture} details the complete forward pass through the network. All dimensions and layer specifications are verified directly from \texttt{scripts/gnn/models/\allowbreak{}point\_net\_transf\_gat.py}.
+The first two layers are PointNetConv layers and consume per-node start and end coordinates.\ The input data tensor also stores a midpoint coordinate, which is left in place to keep the preprocessing pipeline of Natterer et al.~\cite{natterer2025ml} identical, but the architecture used here does not consume it.\ For each pair of neighbours $(i,j)$ the local MLP receives the relative displacement $\mathbf{pos}_j - \mathbf{pos}_i$ concatenated with the node feature vector; the first layer uses start-point geometry, and the second uses end-point geometry.\ This pair of layers encodes both the graph topology and the 2D spatial proximity of the segments.\ Two TransformerConv layers with four attention heads each follow, then a GATConv produces the 64-dimensional embedding fed into the final output layer (Table~\ref{tab:architecture}).
 
 \begin{table}[htbp]
-\centering
-\caption[PointNetTransfGAT layer progression]{PointNetTransfGAT layer progression. Input: node features $\mathbf{x} \in \mathbb{R}^{N \times 5}$, positional coordinates $\mathbf{pos} \in \mathbb{R}^{N \times 3 \times 2}$ (start, end, and midpoint coordinates; only start and end are used in the forward pass). All dimensions verified from \texttt{point\_net\_transf\_gat.py}.}
-\label{tab:architecture}
-\begin{tabular}{clp{5.2cm}cc}
-\toprule
-\textbf{Stage} & \textbf{Layer} & \textbf{Operation} & \textbf{In dim} & \textbf{Out dim} \\
-\midrule
-1 & PointNetConv-1 & Local MLP: $7 \to 256$ (feat+pos\_start); global MLP: $256 \to 512 \to 512$ & 5 & 512 \\
-2 & PointNetConv-2 & Local MLP: $514 \to 256$ (feat+pos\_end); global MLP: $256 \to 512 \to 128$ & 512 & 128 \\
-3 & TransformerConv-1 & 4 attention heads, $64$ dims/head & 128 & 256 \\
-4 & TransformerConv-2 & 4 attention heads, $128$ dims/head & 256 & 512 \\
-5 & GATConv & 1 head & 512 & 64 \\
-6a & GATConv (final) & 1 head; \textbf{Trials~2--8} & 64 & 1 \\
-6b & Linear (final) & Point projection; \textbf{Trial~1 only} & 64 & 1 \\
-\bottomrule
-\end{tabular}
+ \centering
+ \caption[PointNetTransfGAT layer-by-layer architecture]{PointNetTransfGAT architecture.\ The input consists of node features $\mathbf{x} \in \mathbb{R}^{N \times 5}$ and positional coordinates $\mathbf{pos} \in \mathbb{R}^{N \times 3 \times 2}$.\ The three coordinate slots in $\mathbf{pos}$ correspond to the segment start, end, and midpoint, but the layers below only consume the start and end coordinates.}
+ \label{tab:architecture}
+ \begin{tabular}{clp{4.7cm}cc}
+ \toprule
+ \textbf{Stage} & \textbf{Layer} & \textbf{Operation} & \textbf{In} & \textbf{Out} \\
+ \midrule
+ 1 & PointNetConv-1 & Local MLP $7 \to 256$; global $256 \to 512 \to 512$ & 5 & 512 \\
+ 2 & PointNetConv-2 & Local MLP $514 \to 256$; global $256 \to 512 \to 128$ & 512 & 128 \\
+ 3 & TransformerConv-1 & 4 heads, 64 dims/head & 128 & 256 \\
+ 4 & TransformerConv-2 & 4 heads, 128 dims/head & 256 & 512 \\
+ 5 & GATConv (mid) & 1 head & 512 & 64 \\
+ 6 & GATConv / Linear & 1 head (T2--T8) or pointwise (T1) & 64 & 1 \\
+ \bottomrule
+ \end{tabular}
 \end{table}
 
-In Stage~1, the local MLP receives a $7$-dimensional input: the 5 node features concatenated with the 2D start-position displacement $(\mathbf{pos}_j - \mathbf{pos}_i)[:,0,:]$. In Stage~2, the local MLP receives $514$ dimensions: the 512-dimensional embedding from Stage~1 concatenated with the 2D end-position displacement. The TransformerConv layers~\cite{shi2021masked} apply multi-head attention over the graph edges; the GATConv layers~\cite{velickovic2018graph} aggregate neighbourhood information with learned attention weights.
-
-\textbf{Dropout placement:} Dropout is applied within the local and global MLPs of both PointNetConv layers, and between the TransformerConv layers. All dropout calls are gated by the \texttt{use\_dropout} flag (default: \texttt{False}); the flag must be set to \texttt{True} at inference time to activate MC Dropout uncertainty estimation. The architecture also includes a \texttt{predict\_mode\_stats} branch (a TransformerEncoder-based mode predictor) that was implemented in code but was not activated in any of the eight training trials reported in this thesis.
+Dropout is applied within both PointNetConv MLPs and between the TransformerConv layers, gated by the \texttt{use\_dropout} flag.\ For the uncertainty-aware extensions in Chapter~\ref{chapter:experiments}, the $1{,}416{,}768$-parameter T8 backbone is frozen (\texttt{requires\_grad=False}) and only a small new output head ($134$ parameters in both T9 and T11) is optimised, motivated by the NLL--MSE trade-off (Section~\ref{sec:hetero_bg}).\ Two subtleties of "frozen" deserve mention: T9 freezes the backbone \emph{weights} but keeps backbone dropout active during head training and inference, so the backbone supplies epistemic uncertainty via stochastic forward passes through the head; T11 freezes the weights \emph{and} forces backbone dropout off (single deterministic forward pass), since CQR does not require MC samples.
 
 \begin{figure}[htbp]
-\centering
-\includegraphics[width=\textwidth]{figures/fig8_architecture.pdf}
-\caption[PointNetTransfGAT architecture: data flow diagram]{PointNetTransfGAT architecture. Two PointNetConv layers encode start- and end-point geometry (512 and 128 channels); two TransformerConv layers capture long-range attention (256 and 512 channels, 4 heads each); two GATConv layers produce the final embedding and scalar prediction (64 then 1 channel). Trial~1 replaces the final \texttt{GATConv(64$\to$1)} with \texttt{Linear(64$\to$1)}. Verified from \texttt{point\_net\_transf\_gat.py}.}
-\label{fig:architecture}
+ \centering
+ \includegraphics[height=0.6\textheight,keepaspectratio]{figures/new/fig29_pointnet_architecture.pdf}
+ \caption[PointNetTransfGAT data flow]{Information flow through the PointNetTransfGAT architecture, top to bottom.\ The input graph is first encoded by two PointNetConv layers that extract local geometric features from each segment's start and end points.\ Two TransformerConv layers then capture longer-range relationships through self-attention across the network, two GATConv layers produce the final node embedding, and a final output layer (\texttt{GATConv(64$\to$1)} for T2--T8 and \texttt{Linear(64$\to$1)} for T1; see Table~\ref{tab:architecture}) produces the predicted change in traffic volume per node.\ Dropout, when enabled by the \texttt{use\_dropout} flag (T2, T5, T6, T7, T8), is applied within the PointNetConv MLPs and between the TransformerConv layers and remains active during MC Dropout inference for uncertainty estimation.}
+ \label{fig:architecture}
 \end{figure}
 
-% The following figure is retained for supplementary illustration of the end-to-end data flow.
+\section{Uncertainty Quantification Methods}\label{sec:uq_methods}
 
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=\textwidth]{figures/pointnet_data_flow.pdf}
-\caption[End-to-end data flow: road network to traffic prediction with uncertainty]{End-to-end data flow from road network to traffic prediction with uncertainty. The Paris road network (31,635 nodes) is encoded as a feature matrix ($N \times 5$) with positional coordinates, processed through the GNN, and produces per-node $\Delta v$ predictions with MC Dropout uncertainty $\sigma$. T8 achieves Spearman~$\rho = 0.4820$ (100 test graphs, $S = 30$).}
-\label{fig:data_flow}
-\end{figure}
+This thesis compares six UQ \emph{families} -- MC Dropout, seed-ensemble variance, multi-model ensembles, Deep Ensembles, heteroscedastic regression (Trial~9), and CQR (Trials~10--11) -- and three post-hoc calibration and deployment tools that compose on top of the families: split and adaptive conformal prediction, regression $\sigma$-scaling, and selective prediction.\ The mathematical formulations and references appear in Sections~\ref{sec:mc_dropout_bg}--\ref{sec:uq_metrics_bg} of Chapter~\ref{chapter:background}; this section specifies the procedural choices made in this thesis.
 
-\subsection{Hyperparameter Summary}
+\paragraph{MC Dropout.}\ The trained model is evaluated $S = 30$ times with dropout active; per-node sample mean and standard deviation across passes form the prediction $\hat\mu$ and uncertainty $\hat\sigma$.\ A formal $S$-convergence study (Section~\ref{sec:s_conv_results}) confirms that $\rho$ has converged by $S = 30$, with the relative gain from $S = 30$ to $S = 50$ at $+1.03\%$.
 
-\begin{table}[htbp]
-\centering
-\caption[PointNetTransfGAT hyperparameters by trial group]{Key hyperparameters of the PointNetTransfGAT model, grouped by trial. Full per-trial configurations are given in Table~\ref{tab:trials}.}
-\label{tab:hyperparams}
-\begin{tabular}{lll}
-\toprule
-\textbf{Parameter} & \textbf{Value / Range} & \textbf{Trials} \\
-\midrule
-Hidden channels (PointNet local, GAT) & 64 & All \\
-Hidden channels (TransformerConv) & 256 / 512 & All \\
-TransformerConv attention heads & 4 (both layers) & All \\
-GATConv attention heads & 1 & All \\
-Dropout rate & 0.2 & T8 \\
- & 0.3 & T5--T7 \\
- & 0.0 & T1, T3 \\
-Learning rate & $3\times10^{-4}$ to $10^{-3}$ & varies \\
-Batch size & 8 & T5--T8 \\
- & 16 & T2--T4 \\
- & 32 & T1 \\
-\bottomrule
-\end{tabular}
-\end{table}
+\paragraph{Deep ensembles, single-architecture ensembles, and combined uncertainty.}\ Five PointNetTransfGAT models are trained from scratch with seeds $\{42, 137, 256, 389, 512\}$ (Trial~D); inference is deterministic and the inter-member spread is the uncertainty estimate.\ Two single-architecture variants are also evaluated: Experiment~A averages MC Dropout over five inference seeds of the same T8 model; Experiment~B is an $R^2$-weighted multi-model ensemble of T2/T5/T6/T7/T8.\ When MC Dropout and ensemble variance are both available, the two can be combined in quadrature, $\sigma_\text{combined} = \sqrt{\sigma_\text{MC}^2 + \sigma_\text{ens}^2}$.
 
-\section{Uncertainty Quantification Methods}
+\paragraph{Split conformal prediction (with an adaptive variant).}\ The 100-graph T8 test set is partitioned into 50 calibration and 50 evaluation graphs ($1{,}581{,}750$ nodes each); the nonconformity score is $|y - \hat y|$ (or $|y - \hat y|/\sigma$ for the adaptive variant), the quantile uses the standard $\lceil(n+1)(1-\alpha)\rceil/n$ correction (Section~\ref{sec:conformal_bg}), and intervals are constructed at $\{50, 70, 80, 90, 95\}\%$ coverage.
 
-Three UQ approaches are implemented and compared in this thesis.
+\paragraph{Post-hoc regression $\sigma$-scaling.}\ A single scalar $T > 0$ rescales the predictive standard deviation, $\sigma_\text{scaled} = T \cdot \sigma_\text{raw}$, with the point prediction $\hat\mu$ left unchanged.\ This is the regression analogue of, not an instance of, classification temperature scaling~\cite{guo2017calibration}: that procedure rescales softmax logits ($z \mapsto z/T$) to correct over-confident probabilities, whereas the regression variant rescales the predictive standard deviation ($\sigma \mapsto T\sigma$) to correct under-dispersed intervals -- same one-parameter, held-out, post-hoc structure operating on a different output channel.\ The rescaling is empirically warranted on the present continuous-valued $\Delta v$ task because the raw MC Dropout posterior is too concentrated~\cite{foong2019between}: at $T = 1$ the nominal $1\sigma$ Gaussian interval covers only $32.7\%$ of nodes against the $68.27\%$ Gaussian target (Section~\ref{sec:ts_results}), which is exactly the failure mode a single scalar $T > 1$ is designed to correct.\ Within this regression analogue, Kuleshov, Fenner and Ermon~\cite{kuleshov2018accurate} establish the regression-calibration framework (extending Platt-style classification calibration~\cite{guo2017calibration} to regression by recalibrating the predictive distribution on a held-out set), Laves~et~al.~\cite{laves2020wellcal,laves2019temperature} specialise it to MC Dropout regression as a single-scalar $\sigma$-scaling, and Levi~et~al.~\cite{levi2022evaluating} apply the same procedure to general regression heads.\ Under a Gaussian assumption on the recalibrated residuals, the maximum-likelihood estimator has the closed form $T^{\star 2}_\text{NLL} = N^{-1}\sum_i (y_i - \hat\mu_i)^2 / \hat\sigma_i^2$; on the present data this Gaussian-NLL estimator returns $T^\star_\text{NLL} \approx 6.35$ (Section~\ref{sec:ts_results}), reflecting the heavy-tailed component of the absolute-residual distribution rather than a calibrated bulk fit.\ We therefore fit $T$ by minimising the Kuleshov ECE~\cite{kuleshov2018accurate} on a $30\%$ random node-level subset of the test set (seed $42$, $949{,}050$ nodes) and evaluate on the remaining $70\%$.\ The ECE objective targets bulk-of-distribution coverage at $1\sigma$ rather than tail-weighted likelihood and is more robust to the heavy-tailed residuals observed here; the optimal value is $T^\star = 2.887$, which reduces ECE from $0.356$ to $0.034$ and brings $1\sigma$ coverage from $32.7\%$ to $68.0\%$ (Gaussian target $68.27\%$, Section~\ref{sec:ts_results}).
 
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=\textwidth]{figures/fig12_trial_progression.pdf}
-\caption[Trial progression T1$\rightarrow$T8: architecture changes and performance]{Trial progression from T1 to T8. Top panel shows $R^2$ per trial; bottom panel shows MAE. The key architectural changes per trial are annotated below the bars. T8 (orange) achieves the best combination of predictive accuracy and uncertainty quality among MC Dropout-enabled trials. Verified from \texttt{test\_evaluation\_complete.json}.}
-\label{fig:trial_progression}
-\end{figure}
+\paragraph{Selective prediction.}\ Predictions are sorted by $\sigma$ ascending and the most confident fraction $\tau$ is retained; MAE is reported on the retained subset.\ This characterises how much accuracy can be sharpened when an abstention budget is available.
 
-\subsection{Method 1: MC Dropout}
+\section{Evaluation Metrics}\label{sec:metrics}
 
-MC Dropout~\cite{gal2016dropout, gal2016thesis} enables uncertainty estimation by keeping dropout active during inference:
-
-\begin{algorithm}[htbp]
-\caption[MC Dropout uncertainty estimation]{MC Dropout uncertainty estimation. Given a trained model with dropout layers, $S$ stochastic forward passes yield a predictive mean and standard deviation per node.}
-\label{alg:mc_dropout}
-\begin{algorithmic}
-\STATE \textbf{Input:} Input features $\mathbf{x}$, trained model $f$, number of samples $S$
-\STATE \textbf{Output:} Mean prediction $\mu$, uncertainty $\sigma$
-\FOR{$s = 1$ to $S$}
-    \STATE $\hat{y}_s \leftarrow f(\mathbf{x})$ with dropout enabled
-\ENDFOR
-\STATE $\mu \leftarrow \frac{1}{S}\sum_s \hat{y}_s$
-\STATE $\sigma \leftarrow \sqrt{\frac{1}{S}\sum_s (\hat{y}_s - \mu)^2}$
-\RETURN $\mu$, $\sigma$
-\end{algorithmic}
-\end{algorithm}
-
-We use $S = 30$ MC samples, balancing computational cost against estimate stability.
-
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=\textwidth]{figures/fig13_mc_dropout_inference.pdf}
-\caption[MC Dropout inference: S=30 stochastic forward passes]{MC Dropout inference procedure for T8. A single road network graph is passed through the GNN with dropout active for $S = 30$ stochastic forward passes, yielding 30 prediction vectors $\hat{y}_1, \ldots, \hat{y}_{30}$. Their per-node mean ($\hat{y}$) and standard deviation ($\sigma$) form the final prediction with uncertainty. Spearman rank correlation between $\sigma$ and $|y - \hat{y}|$ reaches $\rho = 0.4820$ for T8.}
-\label{fig:mc_dropout_inference}
-\end{figure}
-
-\subsection{Method 2: Deep Ensembles}
-
-Ensemble variance measures disagreement across independent training runs of the same model:
-
-\begin{equation}
-    \sigma_{\text{ens}} = \sqrt{\frac{1}{M}\sum_{m=1}^{M}(f_m(\mathbf{x}) - \bar{f}(\mathbf{x}))^2}
+The evaluation follows the metrics defined in Chapter~\ref{chapter:background}.\ Point-prediction quality is measured by $R^2$, MAE, and RMSE.\ Uncertainty ranking quality is measured by Spearman $\rho$ between $\sigma$ and $|y - \hat y|$.\ Calibration is reported via the Kuleshov ECE~\autocite{kuleshov2018accurate}, the conformal coverage probability $\mathrm{PICP}_{1-\alpha}$, and the empirical scaling factor
+\begin{equation}\label{eq:kp}
+ k_p = \mathrm{Quantile}\!\left(\left\{|y_i - \hat y_i|/(\sigma_i + \varepsilon)\right\}_{i=1}^{n};\ p\right),
 \end{equation}
-
-where $M = 5$ is the number of independently trained models.
-
-\subsection{Method 3: Combined Uncertainty}
-
-We combine MC Dropout and ensemble uncertainty:
-\begin{equation}
-    \sigma_{\text{combined}} = \sqrt{\sigma_{\text{MC}}^2 + \sigma_{\text{ens}}^2}
-\end{equation}
-
-\subsection{Method 4: Split Conformal Prediction}
-
-Split conformal prediction~\cite{vovk2005algorithmic, angelopoulos2023conformal} provides distribution-free prediction intervals with finite-sample coverage guarantees:
-
-\begin{algorithm}[htbp]
-\caption[Split conformal prediction]{Split conformal prediction. A calibration set is used to compute a coverage-valid quantile; the evaluation set receives prediction intervals with guaranteed marginal coverage.}
-\label{alg:conformal}
-\begin{algorithmic}
-\STATE \textbf{Input:} Calibration set $\mathcal{D}_\text{cal} = \{(\mathbf{x}_i, y_i)\}_{i=1}^n$, trained model $f$, coverage level $1 - \alpha$
-\STATE \textbf{Output:} Prediction interval $C(\mathbf{x}_\text{new})$ for new inputs
-\FOR{$i = 1$ to $n$}
-    \STATE $s_i \leftarrow |y_i - f(\mathbf{x}_i)|$ \COMMENT{nonconformity score}
-\ENDFOR
-\STATE $q \leftarrow \text{Quantile}\left(s_1, \ldots, s_n;\; \lceil(n+1)(1-\alpha)\rceil / n\right)$
-\RETURN $C(\mathbf{x}_\text{new}) = \left[f(\mathbf{x}_\text{new}) - q,\; f(\mathbf{x}_\text{new}) + q\right]$
-\end{algorithmic}
-\end{algorithm}
-
-\subsection{Method 5: Selective Prediction}
-
-Selective prediction uses MC Dropout uncertainty to filter out unreliable predictions, retaining only those the model is most confident about:
-
-\begin{algorithm}[htbp]
-\caption[Selective prediction via uncertainty filtering]{Selective prediction. Predictions are ranked by MC Dropout uncertainty and only the most confident fraction is retained.}
-\label{alg:selective}
-\begin{algorithmic}
-\STATE \textbf{Input:} Predictions $\hat{y}_1, \ldots, \hat{y}_n$, uncertainties $\sigma_1, \ldots, \sigma_n$, retention fraction $\tau \in (0, 1]$
-\STATE \textbf{Output:} Filtered predictions, MAE on retained set
-\STATE Sort predictions by ascending $\sigma$
-\STATE Retain top-$\tau$ fraction (i.e., the $\lfloor \tau \cdot n \rfloor$ predictions with lowest $\sigma$)
-\STATE Compute $\text{MAE}_\tau = \frac{1}{|\mathcal{R}|}\sum_{i \in \mathcal{R}} |y_i - \hat{y}_i|$ on retained set $\mathcal{R}$
-\RETURN filtered predictions, $\text{MAE}_\tau$
-\end{algorithmic}
-\end{algorithm}
-
-\subsection{Method 6: Post-Hoc Temperature Scaling}
-
-Temperature scaling~\cite{guo2017calibration, laves2020well} is a post-hoc recalibration method that learns a single scalar $T$ to rescale uncertainty estimates toward calibration:
-
-\begin{algorithm}[htbp]
-\caption[Post-hoc temperature scaling for uncertainty calibration]{Post-hoc temperature scaling. A single temperature parameter $T$ is optimised on a calibration set to minimise the Expected Calibration Error (ECE).}
-\label{alg:temperature}
-\begin{algorithmic}
-\STATE \textbf{Input:} Calibration set $(y_\text{cal}, \hat{y}_\text{cal}, \sigma_\text{cal})$, evaluation set, candidate temperatures $\mathcal{T}$
-\STATE \textbf{Output:} Optimal $T^*$, scaled uncertainties $\sigma_\text{scaled}$
-\FOR{each $T \in \mathcal{T}$}
-    \STATE $\sigma_\text{scaled} \leftarrow \sigma_\text{raw} \times T$
-    \STATE Compute Kuleshov ECE on calibration set using $\sigma_\text{scaled}$
-\ENDFOR
-\STATE $T^* \leftarrow \arg\min_{T \in \mathcal{T}} \text{ECE}(T)$
-\STATE Apply $\sigma_\text{scaled} \leftarrow \sigma_\text{raw} \times T^*$ to evaluation set
-\RETURN $T^*$, $\sigma_\text{scaled}$
-\end{algorithmic}
-\end{algorithm}
-
-\section{Evaluation Metrics}
-
-\subsection{Prediction Quality}
-
-Prediction accuracy is evaluated using three standard regression metrics. The \textbf{coefficient of determination} ($R^2$) measures the proportion of variance in the target explained by the model:
-\begin{equation}
-    R^2 = 1 - \frac{\sum_i (y_i - \hat{y}_i)^2}{\sum_i (y_i - \bar{y})^2}
-\end{equation}
-The \textbf{mean absolute error} (MAE) gives the average magnitude of prediction errors in the original units (vehicles per hour):
-\begin{equation}
-    \text{MAE} = \frac{1}{n}\sum_i |y_i - \hat{y}_i|
-\end{equation}
-The \textbf{root mean square error} (RMSE) penalises large deviations more heavily and is reported for comparability with prior work:
-\begin{equation}
-    \text{RMSE} = \sqrt{\frac{1}{n}\sum_i (y_i - \hat{y}_i)^2}
-\end{equation}
-
-\subsection{Uncertainty Quality}
-
-Uncertainty quality is assessed with three complementary measures. The \textbf{Spearman rank correlation} ($\rho$) captures the monotonic relationship between the predicted uncertainty $\sigma_i$ and the absolute error $|y_i - \hat{y}_i|$; higher values indicate that uncertainty tracks error more faithfully, and $\rho > 0$ is the minimum bar for a useful uncertainty estimate. The \textbf{Pearson correlation} ($r$) provides a linear analogue that is more sensitive to outliers, offering a cross-check on the rank-based result. Finally, the \textbf{$p$-value} of each correlation test is reported to confirm that the observed association is statistically distinguishable from zero.
-
-A well-calibrated uncertainty estimate should correlate positively with prediction error ($\rho > 0$): where uncertainty is high, actual errors should tend to be larger.
+where $\varepsilon = 10^{-8}$ is a small numerical stability constant that avoids division by zero when $\sigma_i$ is close to zero.\ For a perfectly calibrated Gaussian, $k_{0.95} = 1.96$.\ Proper scoring rules, CRPS (Equation~\eqref{eq:crps_gaussian_bg}), the PIT, and the Winkler interval score, including the PIT KS statistic, are reported on the full $3{,}163{,}500$-node test set.\ Error detection is reported via AUROC at the top-$10\%$ and top-$20\%$ error thresholds, with AUPRC as the imbalance-aware companion.

@@ -1,0 +1,35 @@
+{
+  "trial_name": "7th_trial_higher_lr_80_10_10",
+  "hyperparameters": {
+    "batch_size": 8,
+    "gradient_accumulation": 3,
+    "use_dropout": true,
+    "dropout": 0.3,
+    "use_weighted_loss": false,
+    "lr": 0.0006,
+    "split": "80-10-10"
+  },
+  "validation_metrics": {
+    "r2": 0.5497,
+    "pearson": 0.7427,
+    "spearman": 0.2255,
+    "loss": 54.94
+  },
+  "test_metrics": {
+    "r2": 0.5471095442771912,
+    "pearson": 0.7408545017242432,
+    "spearman": 0.22666330042110236,
+    "mse": 56.76612854003906,
+    "rmse": 7.534329891204834,
+    "mae": 4.060104846954346,
+    "mape": 3395215872.0,
+    "loss": 56.77361092200646
+  },
+  "num_test_samples": 3163500,
+  "comparison_with_trial5": {
+    "trial5_r2": 0.5553,
+    "trial7_r2": 0.5471095442771912,
+    "r2_difference": -0.008190453052520752,
+    "percentage_change": -1.4749600887298584
+  }
+}

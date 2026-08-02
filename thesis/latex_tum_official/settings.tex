@@ -1,85 +1,86 @@
-\PassOptionsToPackage{table,svgnames,dvipsnames}{xcolor}
+% TUM-style settings (adapted from TUM-Dev/tum-thesis-latex master branch).
+% pdfx and lstautogobble/pgfplotstable are omitted (pdfx requires additional
+% xmpdata plumbing; the last two are not strictly required).
 
-\usepackage[a-2u]{pdfx} % generate PDF/A: archival compliant, self-contained pdf
+\PassOptionsToPackage{table,svgnames,dvipsnames}{xcolor}
+\usepackage{xcolor}
+
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage[sc]{mathpazo}
 \usepackage[ngerman,american]{babel}
 \usepackage[autostyle]{csquotes}
 \usepackage[%
-  backend=biber,
-  url=false,
-  style=alphabetic,
-  maxnames=4,
-  minnames=3,
-  maxbibnames=99,
-  giveninits,
-  uniquename=init]{biblatex}
+    backend=biber,
+    url=true,
+    doi=true,
+    eprint=true,
+    style=numeric-comp,
+    sorting=none,
+    maxnames=4,
+    minnames=3,
+    maxbibnames=99,
+    giveninits,
+    uniquename=init]{biblatex}
 \usepackage{graphicx}
-\usepackage{scrhack} % necessary for listings package
-\usepackage{listings}
-\usepackage{lstautogobble}
-\usepackage{tikz}
-\usepackage{pgfplots}
-\usepackage{pgfplotstable}
 \usepackage{booktabs}
 \usepackage[final]{microtype}
 \usepackage{caption}
-\usepackage{acronym}
+\usepackage[printonlyused]{acronym}
 \usepackage{ifthen}
 
+% Additional maths / algorithms
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\usepackage{subcaption}
+\usepackage{multirow}
+\usepackage{tabularx}
+\usepackage{enumitem}
+\usepackage{float}
 
-\hypersetup{hidelinks} % removes colored boxes around references and links
+% Theorems
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}[chapter]
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}[chapter]
+\newtheorem{lemma}[theorem]{Lemma}
 
-% for fachschaft_print.pdf
-\makeatletter
-\if@twoside
-	\typeout{TUM-Dev LaTeX-Thesis-Template: twoside}
-\else
-	\typeout{TUM-Dev LaTeX-Thesis-Template: oneside}
-\fi
-\makeatother
+% Hyperref (loaded late, after most packages)
+\usepackage{hyperref}
+\hypersetup{hidelinks}
 
-\addto\extrasamerican{
-	\def\lstnumberautorefname{Line}
-	\def\chapterautorefname{Chapter}
-	\def\sectionautorefname{Section}
-	\def\subsectionautorefname{Subsection}
-	\def\subsubsectionautorefname{Subsubsection}
-}
-
-\addto\extrasngerman{
-	\def\lstnumberautorefname{Zeile}
-}
-
-% Themes
+% Colour theme resolution (template supports dark/light)
 \ifthenelse{\equal{\detokenize{dark}}{\jobname}}{%
-  % Dark theme
-  \newcommand{\bg}{black} % background
-  \newcommand{\fg}{white} % foreground
-  \usepackage[pagecolor=\bg]{pagecolor}
-  \color{\fg}
+    \newcommand{\bg}{black}
+    \newcommand{\fg}{white}
+    \usepackage[pagecolor=\bg]{pagecolor}
+    \color{\fg}
 }{%
-  % Light theme
-  \newcommand{\bg}{white} % background
-  \newcommand{\fg}{black} % foreground
+    \newcommand{\bg}{white}
+    \newcommand{\fg}{black}
 }
 
 \bibliography{bibliography}
 
-% Fix bibliography overflow: allow extra stretch in bib entries to prevent overfull hboxes
-% Long conference/journal names can overflow without this
+% Palatino-friendly tweaks
+\setkomafont{disposition}{\normalfont\bfseries}
+\linespread{1.05}
+
+% Allow up to 3em of extra inter-word stretch when a paragraph would otherwise
+% overflow the line; without this, paragraphs containing long URLs, citation
+% lists or non-breakable maths runs trigger ``Overfull \hbox'' warnings and
+% printable text drifts into the right margin.
 \setlength{\emergencystretch}{3em}
-\appto\bibsetup{\emergencystretch 3em\relax}
 
-\setkomafont{disposition}{\normalfont\bfseries} % use serif font for headings
-\linespread{1.05} % adjust line spread for mathpazo font
+% Algorithm float customisation (input/output keywords)
+\renewcommand{\algorithmicrequire}{\textbf{Input:}}
+\renewcommand{\algorithmicensure}{\textbf{Output:}}
 
-% Add table of contents to PDF bookmarks
-\BeforeTOCHead[toc]{{\clearpage\pdfbookmark[0]{\contentsname}{toc}}}
+% Table of contents bookmark
+\BeforeTOCHead[toc]{{\cleardoublepage\pdfbookmark[0]{\contentsname}{toc}}}
 
-% Define TUM corporate design colors
-% Taken from http://portal.mytum.de/corporatedesign/index_print/vorlagen/index_farben
+% ---------- TUM corporate-design colours ----------
 \definecolor{TUMBlue}{HTML}{0065BD}
 \definecolor{TUMSecondaryBlue}{HTML}{005293}
 \definecolor{TUMSecondaryBlue2}{HTML}{003359}
@@ -94,19 +95,7 @@
 \definecolor{TUMAccentLightBlue}{HTML}{98C6EA}
 \definecolor{TUMAccentBlue}{HTML}{64A0C8}
 
-% Settings for pgfplots
-\pgfplotsset{compat=newest}
-\pgfplotsset{
-  % For available color names, see http://www.latextemplates.com/svgnames-colors
-  cycle list={TUMBlue\\TUMAccentOrange\\TUMAccentGreen\\TUMSecondaryBlue2\\TUMDarkGray\\},
-}
+% Prevent blank pages in one-sided book on clearpage
+\let\cleardoublepage\clearpage
 
-% Settings for lstlistings
-\lstset{%
-  basicstyle=\ttfamily,
-  columns=fullflexible,
-  autogobble,
-  keywordstyle=\bfseries\color{TUMBlue},
-  stringstyle=\color{TUMAccentGreen},
-  captionpos=b
-}
+\raggedbottom

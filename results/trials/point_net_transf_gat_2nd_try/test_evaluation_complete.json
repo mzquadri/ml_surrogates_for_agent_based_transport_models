@@ -1,0 +1,25 @@
+{
+  "trial_name": "2nd_try",
+  "hyperparameters": {
+    "batch_size": 16,
+    "gradient_accumulation": "unknown",
+    "use_dropout": true,
+    "dropout": 0.3,
+    "use_weighted_loss": false,
+    "lr": 0.0005
+  },
+  "test_metrics": {
+    "r2": 0.5116643905639648,
+    "pearson": 0.7185320854187012,
+    "spearman": 0.20109932324744523,
+    "mse": 66.43035125732422,
+    "rmse": 8.150483998162127,
+    "mae": 4.327726364135742
+  },
+  "num_test_samples": 1581750,
+  "notes": {
+    "generated_by": "Recomputed during validation (2026-01-18)",
+    "reason": "Original test_evaluation_complete.json was not saved during training",
+    "validation_method": "Loaded model.pth, ran inference on test_dl.pt, computed metrics using repo's compute_r2_torch function"
+  }
+}

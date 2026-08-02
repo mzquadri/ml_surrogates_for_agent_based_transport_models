@@ -22,7 +22,7 @@ from matplotlib.gridspec import GridSpec
 # ============================================================
 # CONFIGURATION
 # ============================================================
-REPO = r"C:\Users\zamin\OneDrive\Desktop\Nazim_thesis\ml_surrogates_for_agent_based_transport_models"
+REPO = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 PHASE3 = os.path.join(REPO, "docs", "verified", "phase3_results")
 UQ_DIR = os.path.join(
     REPO,

@@ -1,0 +1,48 @@
+{
+  "method": "MC Dropout",
+  "config": {
+    "model": "T8 PointNetTransfGAT",
+    "dropout": 0.2,
+    "mc_samples": 30,
+    "n_test_graphs": 100,
+    "nodes_per_graph_min": 31635,
+    "nodes_per_graph_max": 31635,
+    "nodes_per_graph_mean": 31635.0,
+    "n_total_predictions": 3163500
+  },
+  "point_prediction": {
+    "r2": 0.585661772724415,
+    "mae": 3.9475570181896895,
+    "rmse": 7.206519741528803
+  },
+  "uncertainty_quality": {
+    "spearman_rho": 0.481953192179139,
+    "spearman_p_value": 0.0,
+    "mean_sigma": 1.3687029801196944,
+    "std_sigma": 1.3830674694461693,
+    "min_sigma": 0.04244612529873848,
+    "max_sigma": 44.29133987426758
+  },
+  "calibration": {
+    "k95": 11.647502726587092,
+    "k90": 7.743831625496341,
+    "coverage_at_1.96sigma": 0.548464359095938,
+    "k_50": 1.7124689058769582,
+    "cov_50_achieved": 0.5,
+    "k_70": 3.0893888401722207,
+    "cov_70_achieved": 0.7,
+    "k_80": 4.547559248358572,
+    "cov_80_achieved": 0.8,
+    "k_90": 7.743831625496341,
+    "cov_90_achieved": 0.9,
+    "k_95": 11.647502726587092,
+    "cov_95_achieved": 0.95
+  },
+  "per_graph": {
+    "mean_rho": 0.4643050082391755,
+    "std_rho": 0.023415800517194763,
+    "min_rho": 0.41040675803929055,
+    "max_rho": 0.5078702095943171,
+    "n_valid_graphs": 100
+  }
+}

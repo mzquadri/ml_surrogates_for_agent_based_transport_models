@@ -17,9 +17,7 @@ import numpy as np
 from scipy.stats import norm
 from pathlib import Path
 
-REPO = Path(
-    r"C:\Users\zamin\OneDrive\Desktop\Nazim_thesis\ml_surrogates_for_agent_based_transport_models"
-)
+REPO = Path(__file__).resolve().parents[2]
 T8_UQ = (
     REPO
     / "data/TR-C_Benchmarks/point_net_transf_gat_8th_trial_lower_dropout/uq_results"

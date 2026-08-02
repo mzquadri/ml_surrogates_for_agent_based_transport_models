@@ -7,7 +7,7 @@ import os
 import zipfile
 import glob
 
-REPO = r"C:\Users\zamin\OneDrive\Desktop\Nazim_thesis\ml_surrogates_for_agent_based_transport_models"
+REPO = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 OUT_ZIP = os.path.join(REPO, "submission_final.zip")
 
 print("Building final submission package...")

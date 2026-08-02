@@ -8,7 +8,7 @@
 | **Programme** | M.Sc. Mathematics in Science and Engineering |
 | **Supervisor**| Prof. Dr. Stephan Günnemann           |
 | **Advisor**   | Dominik Fuchsgruber, M.Sc., Elena Natterer, M.Sc. |
-| **Date**      | April 2026                            |
+| **Date**      | May 15, 2026                          |
 
 **[Read the thesis (PDF)](thesis/latex_tum_official/main.pdf)**
 
@@ -31,27 +31,30 @@ This thesis develops a post-hoc uncertainty quantification framework for a GNN s
 | MC Dropout Spearman rho | 0.482 | 0.446 |
 | Conformal 90% / 95% coverage | 90.02% / 95.01% | 89.98% / 95.03% |
 | ECE (before / after temp. scaling) | 0.269 / 0.048 | -- |
-| Selective prediction MAE reduction @80% | 16% | -- |
-| Error detection AUROC (top-10%) | 0.759 | -- |
+| Selective prediction MAE reduction @50% | 41.2% | -- |
+| Error detection AUROC (top-10%) | 0.7548 | -- |
 
-All numbers verified against raw artifacts. See [`docs/verified/`](docs/verified/) for audit reports and JSON results.
+All numbers verified against raw artifacts. See [`docs/verified/`](docs/verified/) for audit reports and JSON results, and `results/` for the canonical result set.
 
 ---
 
 ## Repository Structure
 
 ```
-thesis/latex_tum_official/   Thesis document (LaTeX source + compiled PDF)
-scripts/gnn/                 GNN architectures (PointNet + Transformer + GAT)
+thesis/latex_tum_official/   Thesis document (final LaTeX source + compiled PDF + DOCX)
+models/                      Trained model checkpoints (16 trials, PyTorch .pth)
+scripts/gnn/                 GNN architectures (PointNet + Transformer + GAT, incl. heteroscedastic + CQR variants)
 scripts/evaluation/          UQ analysis and plotting scripts
-scripts/training/            Model training pipeline
+scripts/training/            Model training pipeline (incl. deep ensemble and CQR training)
 scripts/data_preprocessing/  MATSim --> PyG graph conversion
+scripts/misc/                Figure generation and analysis helpers
 docs/                        Documentation and verified results
+results/                     Canonical result JSONs, pre-computed predictions (.npz), and per-trial metrics
 run_part{2,3,4}_*.py         Reproducibility verification scripts
 environment-minimal.yml      Conda environment (cross-platform)
 ```
 
-> Training data (~4.8 GB) and model checkpoints are excluded. All reported results reproduce from included pre-computed predictions (.npz).
+> Included: all reported result JSONs, the 16 trained model checkpoints, and the key pre-computed prediction archives (.npz) that back the reported numbers. Excluded from version control: the raw MATSim outputs and the intermediate data loaders (~7.5 GB regenerable artifacts), the two prediction archives over GitHub's 100 MB per-file limit (`experiment_a_fixed_data.npz`, `feature_data.npz`), and the Colab-side training outputs.
 
 ---
 
@@ -68,7 +71,7 @@ python scripts/evaluation/run_part3_calibration_audit.py # Calibration and confo
 python scripts/evaluation/run_part4_t7_crosscheck.py     # Trial 7 cross-check
 ```
 
-The scripts reproduce analyses from versioned prediction artifacts; they do not retrain the models or rerun MATSim simulations. See [`docs/verified/REPRODUCIBILITY_GAP_SUMMARY.md`](docs/verified/REPRODUCIBILITY_GAP_SUMMARY.md) for a precise account of included artifacts and known limitations.
+The scripts reproduce analyses from versioned prediction artifacts; they do not retrain the models or rerun MATSim simulations. The prediction archives are mirrored under `results/predictions/`; evaluation scripts look for them under the local `data/` tree, so place the extracted `data/` directory (or point the scripts' `data/` paths at `results/predictions/`) before running. See [`docs/verified/REPRODUCIBILITY_GAP_SUMMARY.md`](docs/verified/REPRODUCIBILITY_GAP_SUMMARY.md) for a precise account of included artifacts and known limitations.
 
 To compile the thesis: `cd thesis/latex_tum_official && pdflatex main.tex && biber main && pdflatex main.tex && pdflatex main.tex`
 

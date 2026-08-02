@@ -1,0 +1,26 @@
+{
+  "trial_name": "3rd_trial_weighted_loss",
+  "hyperparameters": {
+    "batch_size": 16,
+    "gradient_accumulation": "unknown",
+    "use_dropout": false,
+    "dropout": 0.0,
+    "use_weighted_loss": true,
+    "lr": 0.0005
+  },
+  "test_metrics": {
+    "r2": 0.22463977336883545,
+    "pearson": 0.6391092538833618,
+    "spearman": 0.17859241366386414,
+    "mse": 105.47556304931641,
+    "rmse": 10.270130393919324,
+    "mae": 5.989744186401367
+  },
+  "num_test_samples": 1581750,
+  "notes": {
+    "generated_by": "Recomputed during validation (2026-01-18)",
+    "reason": "Original test_evaluation_complete.json was not saved during training",
+    "validation_method": "Loaded model.pth, ran inference on test_dl.pt, computed metrics using repo's compute_r2_torch function",
+    "observation": "Low R2 (0.22) indicates overfitting - weighted loss experiment with no dropout"
+  }
+}

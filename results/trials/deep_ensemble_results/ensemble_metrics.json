@@ -1,0 +1,81 @@
+{
+  "ensemble_config": {
+    "M": 5,
+    "seeds": [
+      42,
+      137,
+      256,
+      389,
+      512
+    ],
+    "architecture": "PointNetTransfGAT",
+    "inference_mode": "deterministic (dropout OFF)",
+    "n_test_graphs": 100,
+    "nodes_per_graph_min": 31635,
+    "nodes_per_graph_max": 31635,
+    "nodes_per_graph_mean": 31635.0,
+    "n_total_predictions": 3163500
+  },
+  "point_prediction": {
+    "r2": 0.6840807795524597,
+    "mae": 3.4853219985961914,
+    "rmse": 6.292686462402344
+  },
+  "uncertainty_quality": {
+    "spearman_rho": 0.39973616235183945,
+    "spearman_p_value": 0.0,
+    "mean_sigma": 1.25758957862854,
+    "std_sigma": 1.773956060409546,
+    "min_sigma": 0.006184735335409641,
+    "max_sigma": 63.54973220825195
+  },
+  "calibration": {
+    "k95": 15.18362045288086,
+    "k90": 9.813058853149414,
+    "coverage_at_1.96sigma": 0.5104684684684685,
+    "k_50": 1.8953437805175781,
+    "cov_50_achieved": 0.5,
+    "k_70": 3.7417006492614746,
+    "cov_70_achieved": 0.7,
+    "k_80": 5.6479973793029785,
+    "cov_80_achieved": 0.8,
+    "k_90": 9.813058853149414,
+    "cov_90_achieved": 0.9,
+    "k_95": 15.18362045288086,
+    "cov_95_achieved": 0.95
+  },
+  "per_graph": {
+    "mean_rho": 0.38913758843683327,
+    "std_rho": 0.02027713125032842,
+    "min_rho": 0.34717411095780626,
+    "max_rho": 0.4282212505028114,
+    "n_valid_graphs": 100
+  },
+  "member_quality": {
+    "seed_42": {
+      "r2": 0.6403355598449707
+    },
+    "seed_137": {
+      "r2": 0.6458253860473633
+    },
+    "seed_256": {
+      "r2": 0.6497445106506348
+    },
+    "seed_389": {
+      "r2": 0.6469252109527588
+    },
+    "seed_512": {
+      "r2": 0.6489511728286743
+    }
+  },
+  "comparison_with_mc_dropout": {
+    "mc_dropout_rho": 0.482,
+    "ensemble_rho": 0.39973616235183945,
+    "rho_difference": -0.08226383764816053,
+    "rho_improvement_pct": -17.0671862340582,
+    "mc_dropout_k95": 11.65,
+    "ensemble_k95": 15.18362045288086,
+    "mc_dropout_raw_95_cov": 0.549,
+    "ensemble_raw_95_cov": 0.5104684684684685
+  }
+}

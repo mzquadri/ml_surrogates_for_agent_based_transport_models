@@ -1,0 +1,34 @@
+{
+  "trial_name": "6th_trial_lower_lr",
+  "hyperparameters": {
+    "batch_size": 8,
+    "gradient_accumulation": 3,
+    "use_dropout": true,
+    "dropout": 0.3,
+    "use_weighted_loss": false,
+    "lr": 0.0003
+  },
+  "validation_metrics": {
+    "r2": 0.5224,
+    "pearson": 0.7255,
+    "spearman": 0.1921,
+    "loss": 57.576
+  },
+  "test_metrics": {
+    "r2": 0.5223422050476074,
+    "pearson": 0.7262047529220581,
+    "spearman": 0.20064239192075894,
+    "mse": 64.97786712646484,
+    "rmse": 8.060885429382324,
+    "mae": 4.324154376983643,
+    "mape": 3578224384.0,
+    "loss": 63.31328092302595
+  },
+  "num_test_samples": 1581750,
+  "comparison_with_trial5": {
+    "trial5_r2": 0.5553,
+    "trial6_r2": 0.5223422050476074,
+    "r2_difference": -0.03295779228210449,
+    "percentage_change": -5.93513298034668
+  }
+}

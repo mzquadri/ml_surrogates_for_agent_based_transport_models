@@ -1,0 +1,123 @@
+{
+  "method": "T8 MC Dropout \u2014 adaptive conformal per sigma-decile",
+  "n_test_nodes": 1581750,
+  "n_deciles": 10,
+  "split": "test set = last 50 graphs (nodes 1581750..3163499)",
+  "q_standard": 9.428682081401348,
+  "q_adapt": 7.7085731023086685,
+  "global_standard_coverage_pct": 88.38805120910385,
+  "global_adaptive_coverage_pct": 89.88904694167852,
+  "standard_formula": "|error| <= q_standard (absolute, constant)",
+  "adaptive_formula": "|error| <= q_adapt * sigma (sigma-scaled)",
+  "deciles": [
+    {
+      "decile": 1,
+      "label": "D1_lowest_sigma",
+      "sigma_range_lo": 0.04692288115620613,
+      "sigma_range_hi": 0.44622553586959846,
+      "n_nodes": 158175,
+      "mean_sigma": 0.27108490467071533,
+      "standard_coverage_pct": 98.08376797850482,
+      "adaptive_coverage_pct": 89.44902797534377
+    },
+    {
+      "decile": 2,
+      "label": "D2",
+      "sigma_range_lo": 0.44622553586959846,
+      "sigma_range_hi": 0.5943950295448304,
+      "n_nodes": 158175,
+      "mean_sigma": 0.524929940700531,
+      "standard_coverage_pct": 95.59095938043306,
+      "adaptive_coverage_pct": 83.6927453769559
+    },
+    {
+      "decile": 3,
+      "label": "D3",
+      "sigma_range_lo": 0.5943950295448304,
+      "sigma_range_hi": 0.7203305959701538,
+      "n_nodes": 158175,
+      "mean_sigma": 0.6574872136116028,
+      "standard_coverage_pct": 94.53706337916864,
+      "adaptive_coverage_pct": 85.46356883198989
+    },
+    {
+      "decile": 4,
+      "label": "D4",
+      "sigma_range_lo": 0.7203305959701538,
+      "sigma_range_hi": 0.8534453630447387,
+      "n_nodes": 158175,
+      "mean_sigma": 0.7855777144432068,
+      "standard_coverage_pct": 93.736051841315,
+      "adaptive_coverage_pct": 87.24956535482852
+    },
+    {
+      "decile": 5,
+      "label": "D5",
+      "sigma_range_lo": 0.8534453630447387,
+      "sigma_range_hi": 1.0087559223175049,
+      "n_nodes": 158175,
+      "mean_sigma": 0.9287565350532532,
+      "standard_coverage_pct": 92.62272799114905,
+      "adaptive_coverage_pct": 88.42231705389601
+    },
+    {
+      "decile": 6,
+      "label": "D6",
+      "sigma_range_lo": 1.0087559223175049,
+      "sigma_range_hi": 1.203319668769836,
+      "n_nodes": 158175,
+      "mean_sigma": 1.1013423204421997,
+      "standard_coverage_pct": 91.50624308519045,
+      "adaptive_coverage_pct": 89.85870080606922
+    },
+    {
+      "decile": 7,
+      "label": "D7",
+      "sigma_range_lo": 1.203319668769836,
+      "sigma_range_hi": 1.4738221406936642,
+      "n_nodes": 158175,
+      "mean_sigma": 1.3301362991333008,
+      "standard_coverage_pct": 89.68926821558401,
+      "adaptive_coverage_pct": 91.06685633001422
+    },
+    {
+      "decile": 8,
+      "label": "D8",
+      "sigma_range_lo": 1.4738221406936642,
+      "sigma_range_hi": 1.8993145465850843,
+      "n_nodes": 158175,
+      "mean_sigma": 1.6675952672958374,
+      "standard_coverage_pct": 87.28370475738897,
+      "adaptive_coverage_pct": 92.73399715504979
+    },
+    {
+      "decile": 9,
+      "label": "D9",
+      "sigma_range_lo": 1.8993145465850843,
+      "sigma_range_hi": 2.7740992069244395,
+      "n_nodes": 158175,
+      "mean_sigma": 2.269571304321289,
+      "standard_coverage_pct": 81.79168642326538,
+      "adaptive_coverage_pct": 94.51746483325431
+    },
+    {
+      "decile": 10,
+      "label": "D10_highest_sigma",
+      "sigma_range_lo": 2.7740992069244395,
+      "sigma_range_hi": 34.45309829711914,
+      "n_nodes": 158175,
+      "mean_sigma": 4.730195045471191,
+      "standard_coverage_pct": 59.03903903903904,
+      "adaptive_coverage_pct": 96.4362256993836
+    }
+  ],
+  "summary": {
+    "standard_min_cov_pct": 59.03903903903904,
+    "standard_max_cov_pct": 98.08376797850482,
+    "standard_range_pp": 39.044728939465784,
+    "adaptive_min_cov_pct": 83.6927453769559,
+    "adaptive_max_cov_pct": 96.4362256993836,
+    "adaptive_range_pp": 12.7434803224277
+  },
+  "note": "Adaptive conformal distributes coverage more evenly across uncertainty deciles compared to standard (absolute threshold) conformal. D1=lowest sigma nodes, D10=highest sigma nodes."
+}

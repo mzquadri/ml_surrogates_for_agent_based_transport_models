@@ -2,106 +2,115 @@
 
 \chapter{Experimental Setup}\label{chapter:experiments}
 
-This chapter describes the dataset, training protocol, and evaluation methodology underlying the eight training trials and four UQ experiments reported in this thesis.
+\section{Dataset and Splits}\label{sec:dataset}
 
-\section{Dataset}
+The dataset is a MATSim simulation of the Paris metropolitan area provided by Natterer~et~al.~\cite{natterer2025ml}.\ Each scenario corresponds to a distinct policy intervention: a random subset of road segments is selected and assigned a capacity reduction in $\{10\%, 20\%, \dots, 100\%\}$.\ MATSim is then run from the same baseline plans, and the per-segment difference in hourly volume is recorded as the supervised target $\Delta v$ (Table~\ref{tab:dataset}).
 
-\subsection{Paris Road Network}
+\begin{table}[htbp]
+ \centering
+ \caption[Paris MATSim dataset statistics]{Paris MATSim dataset.\ All experiments use the 1{,}000-scenario subset.}
+ \label{tab:dataset}
+ \begin{tabular}{lr}
+ \toprule
+ Property & Value \\
+ \midrule
+ Road segments per graph & 31{,}635 \\
+ Available scenarios (full) & 10{,}000 \\
+ Scenarios used (10\% subset) & 1{,}000 \\
+ Test scenarios (T1--T6 split 80/15/5) & 50 \\
+ Test scenarios (T7--T11, DE; split 80/10/10) & 100 \\
+ Test predictions, T7--T11, DE & 3{,}163{,}500 \\
+ \bottomrule
+ \end{tabular}
+\end{table}
 
-Our experiments use a MATSim simulation of the Paris metropolitan area, provided by Natterer~et~al.~\cite{natterer2025ml}. Key characteristics:
+Trials~T1--T6 use an 80/15/5 split (800/150/50 scenarios); Trials~T7--T11 and the Deep Ensemble use 80/10/10 (800/100/100), with the larger 100-graph test set enabling the high-resolution UQ analyses in Chapter~\ref{chapter:results}.\ The split is at the scenario level (each scenario appears in exactly one split) with split seed $42$, ensuring identical scenario assignment across all trials that share a split configuration.
+
+\paragraph{A note on the 10\% subset.}\ The full Natterer corpus is around 200 batch files of 50 graphs each ($\approx 10{,}000$ scenarios); we load the first 20 batches, which gives the $1{,}000$-scenario subset reused across all eleven trials so that method-to-method differences are evaluated on identical data.\ The 100-graph evaluation set ($3{,}163{,}500$ node-level predictions per trial) is large enough for stable per-graph statistics: per-graph Spearman~$\rho$ has std $0.023$, with a bootstrap 95\% CI of $\pm 0.005$ on the mean.\ Possible subset-selection bias from the contiguous batch ordering, and the question of whether the findings survive at the full $10{,}000$-scenario scale, are discussed under threats to validity in Section~\ref{sec:threats_to_validity}.
+
+\section{Training Protocol}\label{sec:training_protocol}
+
+Eight base trials of the PointNetTransfGAT architecture are evaluated.\ Trial~1 uses a \texttt{Linear} final layer; T2--T8 use \texttt{GATConv}.\ Hyperparameters are listed in Table~\ref{tab:trials}.
+
+\begin{table}[htbp]
+ \centering
+ \caption[Training trials and hyperparameters]{Training trials.\ T1 uses a Linear final layer; T2--T8 use GATConv.}
+ \label{tab:trials}
+ \begin{tabular}{lcccccc}
+ \toprule
+ Trial & Batch & Split & Effective dropout & LR & Weighted MSE & Final layer \\
+ \midrule
+ T1 & 32 & 80/15/5 & 0.0$^\dagger$ & $10^{-3}$ & No & Linear \\
+ T2 & 16 & 80/15/5 & 0.3 & $5 \times 10^{-4}$ & No & GATConv \\
+ T3 & 16 & 80/15/5 & 0.0 & $5 \times 10^{-4}$ & Yes & GATConv \\
+ T4 & 16 & 80/15/5 & 0.0 & $5 \times 10^{-4}$ & Yes & GATConv \\
+ T5 & 8 & 80/15/5 & 0.3 & $5 \times 10^{-4}$ & No & GATConv \\
+ T6 & 8 & 80/15/5 & 0.3 & $3 \times 10^{-4}$ & No & GATConv \\
+ T7 & 8 & 80/10/10 & 0.3 & $6 \times 10^{-4}$ & No & GATConv \\
+ \textbf{T8} & \textbf{8} & \textbf{80/10/10} & \textbf{0.2} & $\mathbf{5 \times 10^{-4}}$ & \textbf{No} & \textbf{GATConv} \\
+ \bottomrule
+ \end{tabular}
+ \\[2pt]
+ \footnotesize $^\dagger$ T1 was instantiated with \texttt{use\_dropout=False}, so the effective dropout rate is $0$; MC Dropout is therefore undefined on T1.\ T3 and T4 likewise have effective dropout zero and are not MC-Dropout-compatible.
+\end{table}
+
+All trials use the AdamW optimiser~\cite{loshchilov2019decoupled} with weight decay $10^{-4}$ and MSE loss.\ T3 and T4 use a weighted variant $\mathcal{L}_\text{weighted} = \tfrac{1}{n}\sum_i w_i(y_i - \hat y_i)^2$, with weights $w_i$ proportional to $|y_i|$ so that non-zero-$\Delta v$ examples carry more influence.\ T3 and T4 share identical hyperparameters; T4 is a replication run of T3 with a different random seed, included to check that the weighted-MSE failure mode is systematic rather than a one-off.\ The implementation uses PyTorch~\cite{paszke2019pytorch} and PyTorch Geometric~\cite{fey2019fast}; hardware is described in Section~\ref{sec:resources}.\ The early-stopping criterion is validation $R^2$ with a patience of 25 epochs and a minimum improvement of $10^{-3}$.\ Among Trials~2--8, T8 attains the highest test $R^2 = 0.5957$ on the 100-graph evaluation set; together with active dropout ($p = 0.2$), this makes it the strongest UQ-compatible base in this exploratory comparison, and it is used as the primary model for the UQ analyses that follow.
+
+\section{Post-Hoc UQ and Ensemble Experimental Design}\label{sec:uq_design}
+
+Post-hoc analyses on Trial~8 and the ensemble experiments are summarised in Table~\ref{tab:exp_design}.\ All operate on the same 100-graph T8 test set ($3{,}163{,}500$ nodes) unless noted.
 
 \begin{table}[htbp]
 \centering
-\caption[Paris road network dataset statistics]{Dataset statistics for the Paris MATSim road network.}
-\label{tab:dataset}
-\begin{tabular}{lr}
+\caption[Post-hoc and ensemble experimental design]{Post-hoc UQ and ensemble experimental design.\ Scenario-level splits use seed $42$ throughout.}
+\label{tab:exp_design}
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{p{3.7cm}p{8.2cm}}
 \toprule
-\textbf{Property} & \textbf{Value} \\
+\textbf{Experiment} & \textbf{Protocol} \\
 \midrule
-Road segments (nodes) & 31,635 \\
-Network edges & $\sim$85,000 \\
-Available scenarios (full dataset) & 10,000 \\
-Scenarios used in this work & 1,000 (10\% subset) \\
-Training scenarios (T1--T6, 80/15/5) & 800 \\
-Training scenarios (T7--T8, 80/10/10) & 800 \\
-Test scenarios (T1--T6) & 50 \\
-Test scenarios (T7--T8) & 100 \\
-Total test predictions (T1--T6) & 1,581,750 \\
-Total test predictions (T7--T8) & 3,163,500 \\
+MC Dropout (primary)\label{sec:mc_design} & $S = 30$ stochastic forward passes; primary metric Spearman $\rho$ between $\sigma$ and $|y - \hat y|$. \\
+$S$-convergence\label{sec:s_conv_design} & 10 test graphs, $S \in \{5, 10, \dots, 50\}$. \\
+Bootstrap CI\label{sec:bootstrap_design} & Per-graph $\rho$ resampled $B = 10{,}000$ times for 95\% CI on the mean. \\
+T7 replication\label{sec:t7_design} & Same MC Dropout / AUROC / conformal protocol on Trial~7. \\
+Split conformal\label{sec:conformal_design} & Scenario-level 50/50 partition; nonconformity $|y - \hat y|$; coverage at $\{0.5, 0.7, 0.8, 0.9, 0.95\}$.\ Adaptive variant normalises by MC Dropout $\sigma$. \\
+Calibration audit\label{sec:calibration_design} & Empirical $k_p$ at $p \in \{0.5, 0.7, 0.8, 0.9, 0.95\}$ on the full test set. \\
+$\sigma$-scaling\label{sec:ts_design} & Fitted on a $30\%$ random node-level subset ($949{,}050$ nodes), evaluated on the remaining $70\%$; grid $T \in [0.5, 5.0]$, ECE-minimising. \\
+Scoring + selective + AUROC\label{sec:scoring_design} & CRPS, PIT, Winkler on the full test set; selective prediction at $\tau \in \{0.10, 0.25, 0.50, 0.75, 1.00\}$; AUROC/AUPRC at top-$10\%$ / top-$20\%$. \\
+\midrule
+Experiment A (seed ensemble)\label{sec:expA_design} & Same trained T8, 5 inference seeds; compares $\sigma_\text{MC}$, $\sigma_\text{seed-ens}$, and the quadrature combination. \\
+Experiment B (multi-model)\label{sec:expB_design} & $R^2$-weighted ensemble of T2/T5/T6/T7/T8, deterministic inference. \\
+Trial D (Deep Ensemble)\label{sec:de_design} & 5 PointNetTransfGAT trained from scratch with seeds $\{42, 137, 256, 389, 512\}$, T8 hyperparameters, 80/10/10 split. \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-\textbf{Note on data scale:} All experiments in this thesis were conducted using only \textbf{1,000 of 10,000 available MATSim scenarios (10\% subset)}, unless stated otherwise. The full 10,000-scenario dataset was used in the original work by Natterer~et~al.~\cite{natterer2025ml}.
+\section{Uncertainty-Aware Training Extensions}\label{sec:uat_design}
 
-\subsection{Scenario Generation}
-
-Each scenario represents a distinct policy intervention. A random subset of road segments is selected and assigned a capacity reduction ranging from 10\% to 100\%, with scenarios designed to cover a diverse range of intervention patterns across the network.
-
-\subsection{Data Split}
-
-Training trials T1--T6 use an \textbf{80/15/5} split (train/validation/test). Trials T7--T8 use an \textbf{80/10/10} split, providing a larger test set (100 graphs, 3,163,500 predictions) for more reliable UQ evaluation. The split is at the \emph{scenario level}---each scenario appears in exactly one split.
-
-\section{Training Protocol}
-
-\subsection{Model Training}
-
-We train 8 models with varying hyperparameters. All trials use the PointNetTransfGAT architecture~\cite{natterer2025ml}. Trial~1 differs from Trials~2--8 in its final prediction layer: Trial~1 uses a \texttt{Linear(64$\to$1)} output layer, while Trials~2--8 use \texttt{GATConv(64$\to$1)}.
+Three trials evaluate whether uncertainty-aware training objectives can produce natively calibrated intervals while preserving T8's accuracy.\ All replace T8's final \texttt{GATConv(64$\to$1)} with a $134$-parameter \texttt{GATConv(64$\to$2)} head, differing in head interpretation, loss, and backbone trainability (Table~\ref{tab:uat_design}).\ Other hyperparameters (optimiser AdamW, learning rate $5\times10^{-4}$, batch 8, 80/10/10 split) inherit from T8.\ T9 freezes the backbone weights but keeps dropout active for MC Dropout epistemic estimation ($\sigma_\text{tot} = \sqrt{\sigma_\text{alea}^2 + \sigma_\text{epi}^2}$); T10/T11 use a single deterministic forward pass.
 
 \begin{table}[htbp]
 \centering
-\caption[Training trials and hyperparameter configurations]{Training trials and configurations. T1 uses \texttt{Linear(64$\to$1)} final layer; T2--T8 use \texttt{GATConv(64$\to$1)}. Note the different data splits between trials.}
-\label{tab:trials}
-\begin{tabular}{lcccccc}
+\caption[UAT design summary]{Uncertainty-aware training extensions.\ Head output channels are $(\hat\mu,\,\log\hat\sigma^2)$ for T9 and $(\hat q^\text{lo}, \hat q^\text{hi})$ for T10/T11 ($\tau = 0.05, 0.95$).}
+\label{tab:uat_design}
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{p{0.9cm}p{2.4cm}p{2.0cm}p{1.5cm}p{4.8cm}}
 \toprule
-\textbf{Trial} & \textbf{Batch} & \textbf{Split} & \textbf{Dropout} & \textbf{LR} & \textbf{Weighted} & \textbf{Final Layer} \\
+Trial & Loss & Backbone & UQ output & Gates \\
 \midrule
-T1 & 32 & 80/15/5 & 0.0$^\dagger$ & $10^{-3}$ & No & Linear \\
-T2 & 16 & 80/15/5 & 0.3 & $5{\times}10^{-4}$ & No & GATConv \\
-T3 & 16 & 80/15/5 & 0.0 & $5{\times}10^{-4}$ & Yes & GATConv \\
-T4 & 16 & 80/15/5 & 0.0 & $5{\times}10^{-4}$ & Yes & GATConv \\
-T5 & 8 & 80/15/5 & 0.3 & $5{\times}10^{-4}$ & No & GATConv \\
-T6 & 8 & 80/15/5 & 0.3 & $3{\times}10^{-4}$ & No & GATConv \\
-T7 & 8 & 80/10/10 & 0.3 & $6{\times}10^{-4}$ & No & GATConv \\
-\textbf{T8} & \textbf{8} & \textbf{80/10/10} & \textbf{0.2} & $\mathbf{5{\times}10^{-4}}$ & \textbf{No} & \textbf{GATConv} \\
+T9\label{sec:t9_design}  & Hetero NLL ($\lambda = 0.1$)~\cite{seitzer2022pitfalls} & Frozen & MC + $\hat\sigma_\text{alea}$ & $R^2 \geq 0.55$, $\mathrm{PICP}_{90} \geq 85\%$, $\mathrm{PICP}_{95} \geq 90\%$ \\
+T10\label{sec:t10_design} & Pinball & Unfrozen & CQR + $\hat Q$ & $R^2 \geq 0.57$, $\mathrm{PICP}_{90} \geq 88\%$, $\mathrm{PICP}_{95} \geq 93\%$, $\hat Q > 0$, $W_{90} < W_{95}$ \\
+T11\label{sec:t11_design} & Pinball & Frozen & CQR + $\hat Q$ & same as T10 \\
 \bottomrule
 \end{tabular}
-\vspace{2pt}
-\begin{minipage}{\linewidth}
-\footnotesize $^\dagger$ T1 was instantiated with architecture parameter \texttt{dropout=0.3}, but \texttt{use\_dropout=False} disabled dropout during both training and inference; the effective dropout rate is 0.0. Source: \texttt{MODEL\_SUMMARY.md} for Trial~1.
-\end{minipage}
 \end{table}
 
-\subsection{Optimization}
+The single design difference between T10 and T11 is the backbone-trainability flag; head, loss, calibration protocol and learning rate are identical, so the T10/T11 contrast isolates that flag.
 
-All trials use the Adam optimizer~\cite{kingma2015adam} with mean squared error (MSE) loss, or weighted MSE where noted. Batch size varies by trial (8--32 scenarios) and learning rates are given in Table~\ref{tab:trials}. Training was conducted on an NVIDIA T4 GPU via Google Colab.
+\section{Computational Resources}\label{sec:resources}
 
-\subsection{Framework}
-
-All models are implemented in PyTorch 2.0~\cite{paszke2019pytorch} using PyTorch Geometric~\cite{fey2019fast} for graph operations, with Weights \& Biases for experiment tracking.
-
-\section{UQ Experimental Design}
-
-\subsection{MC Dropout Evaluation (T5--T8)}
-
-MC Dropout uncertainty ($S = 30$ stochastic forward passes) was evaluated on Trials 5--8, which include non-zero dropout rates. The key metric is Spearman~$\rho$ between predicted uncertainty ($\sigma$) and absolute prediction error~($|y - \hat{y}|$). Trials~5 and~6 were evaluated on 50 test graphs (1,581,750 nodes), while Trials~7 and~8 used the larger 100-graph test set (3,163,500 nodes). T8 (dropout $= 0.2$, batch $= 8$) was selected as the primary UQ model based on best test $R^2$ among comparable trials (T2--T8).
-
-\subsection{Experiment A: MC Dropout vs Ensemble Variance}
-
-Experiment~A compares MC Dropout and ensemble variance as uncertainty estimators using the same base model, T8. MC Dropout is run with $S = 30$ samples and compared against the variance across 5 independently seeded training runs, with both methods evaluated on the full 100-scenario test set (3,163,500 predictions).
-
-One important caveat: the ensemble runs in Experiment~A were evaluated on a subset that exhibited a data distribution mismatch (near-zero $R^2 \approx 0.003$). This is a known artifact of the ensemble evaluation setup and does not reflect individual model quality. Ensemble Spearman~$\rho$ values should be interpreted in this context.
-
-\subsection{Experiment B: Multi-Model Ensemble}
-
-Experiment~B asks whether combining multiple trained models improves uncertainty quantification. Five trained models (T2, T5, T6, T7, T8) are assembled into a multi-model ensemble; their disagreement on each prediction serves as the uncertainty estimate, and ensemble Spearman~$\rho$ is compared against the single-model MC Dropout result.
-
-As with Experiment~A, Experiment~B exhibits the same data distribution mismatch. Results are reported for completeness but should not be compared directly to single-model MC Dropout metrics.
-
-\subsection{Conformal Prediction (T8)}
-
-Split conformal prediction~\cite{angelopoulos2023conformal} is applied to T8 using the 100-graph test set, divided equally into 50 calibration graphs and 50 evaluation graphs. The nonconformity score is the absolute residual $|y - \hat{y}|$, and prediction intervals are constructed at both 90\% and 95\% coverage levels.
-
-\section{Computational Resources}
-
-All experiments were run on Google Colab Pro with an NVIDIA T4 GPU (16\,GB VRAM). Total training time across the eight trials was approximately 13 hours. MC Dropout inference for T8 ($S = 30$, 100 test graphs) required approximately 228 minutes.
+All training and inference used a single NVIDIA T4 GPU (16~GB VRAM).\ Wall-clock runtimes from the saved \texttt{training\_log.json} files: the eight base trials totalled $\approx 13$~h; T8 MC Dropout inference ($S=30$, 100 graphs) $228$~min; Trials~9, 10 and 11 took $14.5$, $87$ and $39.7$~h respectively; the Deep Ensemble $\approx 5\times$ a single T8 run.\ Trial~10 is the longest because it fine-tunes the full $1{,}416{,}768$-parameter backbone end-to-end, while Trials~9 and 11 train only a $134$-parameter head with the backbone frozen.\ Non-GNN baselines (Section~\ref{sec:non_gnn_baselines}) were run separately on an A100 (80~GB) runtime.

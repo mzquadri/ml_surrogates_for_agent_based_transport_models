@@ -2,89 +2,50 @@
 
 \chapter{Introduction}\label{chapter:introduction}
 
-Urban transportation networks are at once deeply familiar and poorly understood: millions of daily journeys produce emergent traffic patterns that resist simple analytical description~\cite{horni2016matsim}. When a city government considers closing a major arterial, reducing road capacity to encourage modal shift, or investing in new infrastructure, it faces a fundamental question: what will actually happen to traffic? Agent-based models (ABMs) have become the standard methodology for answering such questions, simulating the decisions of individual travellers to predict how policy interventions reshape flow across the network~\cite{bonabeau2002agent, railsback2019agent}.
+Urban traffic is hard to describe analytically.\ Millions of daily trips produce congestion patterns that emerge from the interaction of many individual choices, and a policy intervention -- closing an arterial, reducing road capacity, opening a new metro line -- reshapes those patterns through the responses of individual travellers.\ Agent-based simulators such as MATSim handle this kind of question by modelling each traveller's daily activity, mode and route choices, then iterating until the system converges to an approximate user equilibrium~\autocite{horni2016matsim,bonabeau2002agent,railsback2019agent}.\ The price of that fidelity is computational: a single Paris-scale scenario takes more than eight hours on modern hardware~\autocite{natterer2025ml}.\ For a planner who wants to compare a dozen variations of a road-pricing scheme, that cost is prohibitive.
 
-The computational demands of these simulations, however, create a real bottleneck in the policy evaluation process. Simulating a single scenario for a large metropolitan area like Paris can require eight or more hours on modern hardware---severely limiting the number of alternatives that planners can feasibly explore within project timelines~\cite{natterer2025ml}.
+Machine-learning surrogates promise to compress the loop from hours to seconds.\ \textcite{natterer2025ml} showed that Graph Neural Networks (GNNs) are particularly well suited to this task: they exploit the topology of the road network natively while learning per-segment volume responses to capacity changes.\ Their PointNetTransfGAT architecture is the model this thesis builds on.
 
-Machine learning surrogates offer a practical solution to this challenge. By training neural networks to approximate simulation outputs, scenario evaluation times can be reduced from hours to seconds~\cite{willard2022integrating}. Recent work by Natterer~et~al.~\cite{natterer2025ml} demonstrated that Graph Neural Networks (GNNs) are particularly well-suited for this task: they naturally capture the graph structure of road networks while learning complex relationships between policy interventions and traffic flow changes.
+Accuracy alone is not enough for decision support.\ A model trained on a limited set of scenarios will eventually face inputs unlike anything it has seen, and at that point its predictions can deteriorate without any external indication that something has changed.\ Without uncertainty quantification (UQ), planners cannot separate the reliable predictions from the unreliable ones, and a confident-but-wrong output can drive a poor infrastructure decision.\ This thesis addresses that gap by evaluating Monte Carlo Dropout, deep ensembles, conformal prediction, post-hoc regression $\sigma$-scaling, and several uncertainty-aware training variants on a GNN surrogate for policy-induced changes in traffic volume.\ The empirical work is deliberately constrained to one road network (Paris), one intervention type (capacity reduction), one GNN architecture family (PointNetTransfGAT), and one fixed $1{,}000$-scenario subset; Section~\ref{sec:threats_to_validity} enumerates the threats to validity that bound the resulting claims.
 
-Yet accuracy alone is not sufficient for deployment in decision support systems. When a surrogate model encounters scenarios that differ substantially from its training distribution, its predictions may become unreliable---and without uncertainty quantification (UQ), users have no principled way to identify these problematic cases. This limits the trustworthiness of surrogate-based planning tools.
+\paragraph{Research questions.}\ The investigation is organised around five research questions.
 
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=0.95\textwidth]{figures/fig_network_intro.pdf}
-\caption[Paris road network as directed graph for the GNN surrogate]{%
-    Directed line-graph representation of the Paris road network used by the GNN surrogate.
-    Each node represents one road segment with five input features (listed right);
-    coral-shaded nodes carry a non-zero \texttt{CAPACITY\_REDUCTION} due to the policy
-    intervention.  The per-node prediction target is
-    $\Delta v = v_{\mathrm{policy}} - v_{\mathrm{baseline}}$ (veh/h).
-    The Paris network contains 31{,}635 nodes.
-    Source:~\textcite{natterer2025ml}.}
-\label{fig:network_schematic}
-\end{figure}
-
-This thesis addresses that gap directly. We investigate uncertainty quantification methods for GNN-based traffic surrogates, conducting a systematic comparison of Monte Carlo (MC) Dropout against ensemble-based approaches and conformal prediction. The goal is to establish which UQ methods are most effective for graph-structured traffic prediction, and to provide practical guidance for deploying uncertainty-aware surrogates in urban planning. All experiments use 1,000 of 10,000 available MATSim scenarios (10\% subset).
-
-\section{Problem Statement}
-
-The deployment of GNN surrogates for traffic prediction presents a fundamental challenge: models must generalize to policy scenarios that may differ substantially from their training distribution. In classical supervised learning settings, this distribution shift manifests as degraded prediction accuracy. In decision support applications, however, the consequences are more severe---planners may unknowingly base critical infrastructure decisions on unreliable predictions.
-
-The research gap we address comprises three interconnected components:
-
-\begin{enumerate}
-    \item \textbf{Epistemic uncertainty in GNN surrogates:} While uncertainty quantification has been extensively studied in computer vision and natural language processing, its application to GNN-based traffic prediction remains largely unexplored. The graph structure of road networks introduces unique challenges, as uncertainty may propagate through connected road segments.
-    
-    \item \textbf{Method comparison:} MC Dropout and deep ensembles represent the two dominant paradigms for uncertainty quantification in deep learning~\cite{gal2016dropout, lakshminarayanan2017simple}. However, their comparative effectiveness for graph-structured traffic data has not been systematically evaluated.
-    
-    \item \textbf{Practical deployment guidance:} Urban planners require concrete recommendations about which UQ method to adopt, how to configure its parameters, and how to interpret the resulting uncertainty estimates in decision-making contexts.
+\begin{enumerate}[label=\textbf{RQ\arabic*.},leftmargin=*]
+ \item How effectively does MC Dropout rank uncertainty for a GNN traffic surrogate?
+ \item How does MC Dropout compare with ensemble-based UQ?
+ \item Does combining MC Dropout with seed-ensemble variance add benefit?
+ \item Can post-hoc calibration and conformal methods deliver reliable intervals without retraining the backbone?
+ \item Can uncertainty-aware training extensions improve native UQ while preserving accuracy?
 \end{enumerate}
 
-\section{Research Questions}
-
-This thesis addresses three closely related research questions:
-
-\begin{description}
-    \item[RQ1:] How effectively does MC Dropout capture epistemic uncertainty in GNN-based traffic surrogates, as measured by the correlation between predicted uncertainty and actual prediction error?
-    
-    \item[RQ2:] How does MC Dropout compare to ensemble-based uncertainty quantification---both variance across training runs and multi-model ensembles---in terms of uncertainty quality and computational efficiency?
-    
-    \item[RQ3:] Does combining uncertainty estimates from architecturally identical models provide benefits over single-model UQ methods, and what role does model diversity play in ensemble effectiveness?
-\end{description}
-
-\section{Contributions}
-
-The contributions of this thesis are as follows:
-
-\begin{enumerate}
-    \item \textbf{Systematic UQ evaluation:} We conduct the first comprehensive comparison of uncertainty quantification methods for GNN-based traffic surrogates, evaluating MC Dropout, ensemble variance, and multi-model ensembles on a large-scale Paris road network dataset with 3.16 million node-level predictions across 100 test scenarios.
-    
-    \item \textbf{Empirical findings on method effectiveness:} For Trial~8 (best model), MC Dropout achieves Spearman~$\rho = 0.4820$ between predicted uncertainty and absolute error (100 test graphs, 3,163,500 predictions). In a separate ensemble comparison (Experiment~A), MC Dropout achieves $\rho = 0.1600$ vs ensemble variance $\rho = 0.1035$ within a mismatched evaluation subset---a 55\% relative improvement in that context.
-    
-    \item \textbf{Negative result on homogeneous ensembles:} Ensemble methods built from architecturally identical models fail to improve prediction accuracy over the single best model, providing empirical evidence that architectural diversity is necessary for effective ensembling.
-    
-    \item \textbf{Deployment recommendations:} We provide concrete guidance for practitioners implementing uncertainty quantification in traffic GNN systems, including parameter choices ($S=30$ MC samples), model selection strategies, and frameworks for interpreting uncertainty estimates.
-\end{enumerate}
-
-\section{Thesis Structure}
-
-The remainder of this thesis is organized as follows:
-
-\textbf{Chapter~\ref{chapter:background}: Background and Related Work} establishes the theoretical foundations of this research. Section~\ref{sec:abm} introduces agent-based transport models with emphasis on the MATSim framework. Section~\ref{sec:gnn} presents the fundamentals of graph neural networks and their application to traffic prediction. Section~\ref{sec:uq} reviews uncertainty quantification methods in deep learning, including Bayesian approaches and ensemble methods.
-
-\textbf{Chapter~\ref{chapter:methodology}: Methodology} describes the technical approach adopted in this thesis. We present the PointNetTransfGAT architecture, detail our implementations of MC Dropout and ensemble-based UQ methods, and define the evaluation metrics used to assess uncertainty quality.
-
-\textbf{Chapter~\ref{chapter:experiments}: Experimental Setup} presents the Paris road network dataset, training protocol, and experimental design. We describe two complementary experiments: Experiment~A comparing MC Dropout against ensemble variance on a single model, and Experiment~B evaluating multi-model ensemble approaches.
-
-\textbf{Chapter~\ref{chapter:results}: Results} reports the findings from both experiments, including quantitative comparisons of UQ methods and analysis of the generalization gap observed between validation and test performance.
-
-\textbf{Chapter~\ref{chapter:discussion}: Discussion} interprets results in the context of prior work, addresses limitations of our study, and discusses implications for deploying uncertainty-aware traffic prediction systems.
-
-\textbf{Chapter~\ref{chapter:conclusion}: Conclusion} summarizes the key findings, revisits the research questions, and outlines directions for future work.
+Each is answered, with supporting evidence and the relevant limitation, in Section~\ref{sec:rq_answers}.
 
 \begin{figure}[htbp]
-\centering
-\includegraphics[width=\textwidth]{figures/fig11_thesis_workflow.pdf}
-\caption[Overall thesis pipeline: from MATSim scenarios to policy decisions]{Overall thesis pipeline. MATSim agent-based simulations (1,000 of 10,000 available scenarios, 10\% subset) are converted to line-graph representations and used to train eight GNN trials. The best model (T8, $R^2 = 0.5957$) is equipped with MC Dropout uncertainty ($\rho = 0.4820$) and conformal prediction intervals (90\%/95\% coverage guaranteed), feeding into an uncertainty-guided policy decision framework.}
-\label{fig:thesis_workflow}
+ \centering
+ \includegraphics[width=0.95\textwidth]{figures/new/fig31_network_intro.pdf}
+ \caption[Paris road network as a directed line graph used by the GNN surrogate]{%
+ The Paris road network represented as a directed line graph.\ Each road segment is a node, and edges connect adjacent segments.\ Each node carries five input features describing the segment's traffic state and physical properties.\ The full Paris network contains $31{,}635$ nodes; with 100 graphs in the test set, this gives $3{,}163{,}500$ individual node-level test predictions.\ Adapted from \textcite{natterer2025ml}.}
+ \label{fig:network_schematic}
 \end{figure}
+
+\section{Contributions}\label{sec:contributions}
+
+\begin{enumerate}
+ \item \textbf{A systematic UQ evaluation for a GNN traffic surrogate.}\ Six methods (MC Dropout, seed-ensemble variance, multi-model ensembles, deep ensembles, heteroscedastic regression, CQR) compared on a Paris road-network dataset with $3{,}163{,}500$ node-level test predictions across 100 scenarios.
+
+ \item \textbf{An empirical characterisation of MC Dropout for GNN traffic surrogates.}\ For Trial~8, the pooled (node-level) Spearman $\rho = 0.4820$ at $S = 30$ samples; the mean per-graph $\rho$ is $0.464$ with bootstrap 95\% CI $[0.460, 0.469]$.\ A formal $S$-convergence study confirms that $\rho$ has converged by $S = 30$ (the gain from $S = 30$ to $S = 50$ is only $+1.03\%$).
+
+ \item \textbf{Practical limits of single-architecture ensembles.}\ Five seeded MC Dropout runs raise $\rho$ to $0.4908$; seed ensemble variance gives $\rho = 0.4370$.\ A weighted multi-model ensemble of five trials reaches $\rho = 0.4333$ and $R^2 = 0.5656$, below the best single model.
+
+ \item \textbf{A layered post-hoc calibration framework.}\ Split conformal achieves $\mathrm{PICP}_{90} = 90.02\%$ and $\mathrm{PICP}_{95} = 95.01\%$.\ Regression $\sigma$-scaling with $T = 2.887$ reduces ECE from $0.356$ to $0.034$ ($-90.5\%$) and brings $1\sigma$ coverage from $32.7\%$ to $68.0\%$.\ Adaptive conformal narrows conditional coverage from $[59.0\%, 98.1\%]$ to $[83.7\%, 96.4\%]$.
+
+ \item \textbf{Selective prediction and error detection.}\ Retaining the most confident $50\%$ of predictions reduces MAE by $41.2\%$ to $2.32$ veh/h; AUROC for top-10\% error detection reaches $0.7548$.
+
+ \item \textbf{An empirical observation about freezing the backbone.}\ When the same MSE-trained backbone is reused with three different uncertainty-aware heads, the result depends on whether the backbone is frozen.\ Trial~9 (heteroscedastic head, frozen backbone) is partial-positive at $k_{95} = 2.84$ and $R^2 = 0.4991$; Trial~10 (CQR, backbone unfrozen) is a negative result at $R^2 = 0.4057$ with three of six gates failing; Trial~11, which uses the same CQR head as Trial~10 but freezes the backbone, passes all six gates with $R^2 = 0.5835$, $\mathrm{PICP}_{90} = 89.82\%$ and $\mathrm{PICP}_{95} = 94.91\%$.\ The T10/T11 pair shares head, loss, data, calibration protocol, and learning rate ($5\times10^{-4}$); their single design difference is the backbone-trainability flag.\ The observation is reported within the scope of this thesis and is not claimed as a general principle.
+
+ \item \textbf{A Deep Ensemble baseline.}\ Five independently seeded models reach $R^2 = 0.6841$ ($+14.8\%$ over T8) but a weaker UQ ranking ($\rho = 0.3997$, $k_{95} = 15.18$).\ The Deep Ensemble is the strongest GNN-based point predictor evaluated, while MC Dropout produces the stronger uncertainty ranking; this complementarity is discussed in Chapter~\ref{chapter:discussion}.\ XGBoost on the same five node features (Section~\ref{sec:non_gnn_baselines}) exceeds the Deep Ensemble on point accuracy at $R^2 = 0.7414$.
+\end{enumerate}
+
+\section{Thesis Structure}\label{sec:structure}
+
+The five research questions stated above guide the chapter sequence.\ Chapter~\ref{chapter:background} surveys the theoretical foundations.\ Chapter~\ref{chapter:methodology} presents the architecture and the UQ methods used in the thesis.\ Chapter~\ref{chapter:experiments} covers the dataset and the experimental design.\ Chapter~\ref{chapter:results} reports the empirical findings and closes with an illustrative decision framework.\ Chapter~\ref{chapter:discussion} answers the research questions, summarises the primary findings, discusses the freezing-backbone observation, and lists the limitations, threats to validity and future work.\ Chapter~\ref{chapter:conclusion} offers closing remarks, and Appendix~\ref{app:master_table} collects the verified master tables.

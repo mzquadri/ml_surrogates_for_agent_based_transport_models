@@ -1,0 +1,25 @@
+{
+  "model": "pointnet_transf_gat_bs32_5feat_seed42",
+  "timestamp": "2025-11-23 00:54:07",
+  "test_metrics": {
+    "mse": 29.111940383911133,
+    "rmse": 5.395548200499291,
+    "mae": 2.9715771675109863,
+    "mape": 193459077120.0,
+    "r2": 0.7859956622123718,
+    "pearson": 0.887547492980957,
+    "pearson_p": 0.0,
+    "spearman": 0.545169200571853,
+    "spearman_p": 0.0,
+    "explained_variance": 0.7860737442970276
+  },
+  "statistics": {
+    "n_samples": 1581750,
+    "pred_mean": 0.37203168869018555,
+    "pred_std": 9.875622749328613,
+    "target_mean": 0.4751870930194855,
+    "target_std": 11.663376808166504,
+    "residual_mean": 0.10315540432929993,
+    "residual_std": 5.394564151763916
+  }
+}
