@@ -6,8 +6,7 @@ from typing import Any
 
 import pandas as pd
 import streamlit as st
-
-from thesis_dashboard.analytics import load_prediction_arrays, sample_rows
+from analytics import load_prediction_arrays, sample_rows
 
 ROOT = Path(__file__).resolve().parents[1]
 BUNDLE_PATH = ROOT / "analysis_outputs" / "thesis_intelligence.json"
