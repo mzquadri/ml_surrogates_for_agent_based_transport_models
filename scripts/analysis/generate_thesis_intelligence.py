@@ -385,7 +385,7 @@ def summarize_local_test_loader() -> dict[str, Any]:
             "limitation": "Local ignored loader is unavailable; no graph-tensor EDA generated.",
         }
 
-    import torch
+    import torch  # pyright: ignore[reportMissingImports]
 
     graphs = torch.load(path, map_location="cpu")
     if not isinstance(graphs, list) or not graphs:
