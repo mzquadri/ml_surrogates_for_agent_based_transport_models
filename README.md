@@ -93,6 +93,13 @@ That license governs the upstream code kept and extended here — `scripts/data_
 
 The material added by this fork — the thesis text and figures, the trained model checkpoints, and the result artifacts — is **not** covered by that MIT grant. Reuse of those requires prior permission from the author and, where applicable, the original data and model owners.
 
+## Tooling
+
+AI coding assistants were used during this work for code review, refactoring, and
+repository maintenance. All research design, modelling decisions, analysis, and
+written content are the author's own, and every reported result was verified
+against the artifacts in this repository.
+
 ## Citation
 
 See [`CITATION.cff`](CITATION.cff) for citation metadata.
