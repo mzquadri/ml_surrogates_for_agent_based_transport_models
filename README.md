@@ -87,7 +87,11 @@ This thesis takes the trained models from the above work as given and contribute
 
 ## License
 
-This repository is published for academic review and portfolio purposes. Reuse of the thesis text, figures, trained models, and included research artifacts requires prior permission from the author and, where applicable, the original data and model owners.
+This repository is a fork of [`enatterer/ml_surrogates_for_agent_based_transport_models`](https://github.com/enatterer/ml_surrogates_for_agent_based_transport_models), released under the **MIT License, Copyright (c) 2024 Elena Natterer**.
+
+That license governs the upstream code kept and extended here — `scripts/data_preprocessing/`, `scripts/gnn/`, `scripts/training/`, `scripts/evaluation/help_functions.py`, `scripts/evaluation/plot_functions.py`, the upstream notebooks, and `traffic-gnn.yml`. Its terms, including the copyright and permission notice reproduced in [`LICENSE`](LICENSE), continue to apply to that code and to anything derived from it.
+
+The material added by this fork — the thesis text and figures, the trained model checkpoints, and the result artifacts — is **not** covered by that MIT grant. Reuse of those requires prior permission from the author and, where applicable, the original data and model owners.
 
 ## Citation
 

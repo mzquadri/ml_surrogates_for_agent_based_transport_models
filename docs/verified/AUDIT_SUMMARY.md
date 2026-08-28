@@ -10,13 +10,13 @@
 |---|---|---|
 | 1 | Monte Carlo Dropout | `code/scripts/gnn/heteroscedastic_mc_dropout.py`, `mc_dropout_full_100graphs_mc30.npz` |
 | 2 | Deep Ensemble (Trial D, 5 seeds) | `code/scripts/training/run_deep_ensemble.py`, 5 distinct `model.pth` checkpoints, `deep_ensemble_predictions.npz` |
-| 3 | Split conformal prediction (T8) | `colab_uq_master.ipynb` outputs in `conformal_standard.json` |
+| 3 | Split conformal prediction (T8) | `notebooks/colab_uq_master.ipynb` outputs in `conformal_standard.json` |
 | 4 | Adaptive (σ-scaled) conformal | `phase3_results/adaptive_conformal_decile.json` |
 | 5 | Post-hoc temperature scaling | `temperature_scaling_results.json` |
 | 6 | T9 heteroscedastic, frozen backbone | `code/scripts/gnn/models/point_net_transf_gat_frozen_heteroscedastic.py`, `code/scripts/gnn/losses/heteroscedastic_loss.py`, `train_heteroscedastic.py` |
 | 7 | T10/T11 CQR (pinball loss + conformal correction) | `code/scripts/gnn/losses/quantile_loss.py`, `train_cqr.py`, `train_cqr_frozen.py`, `point_net_transf_gat_frozen_cqr.py` |
 | 8 | Selective prediction | `phase3_results/selective_prediction_s30.json` |
-| 9 | Stratified UQ by \|Δv\| quartile | `code/scripts/misc/gen_batch7.py` |
+| 9 | Stratified UQ by \|Δv\| quartile | `scripts/archive/gen_batch7.py` |
 | 10 | AUROC error detection | `auroc_corrected.json`, `gen_batch2.py` |
 
 ## Result
