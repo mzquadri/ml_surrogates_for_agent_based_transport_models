@@ -12,6 +12,8 @@ zia80432
 
 # ── Experiment tracking ──
 **/wandb/
+mlflow.db
+mlruns/
 
 # ── Evaluation outputs ──
 scripts/evaluation/results/

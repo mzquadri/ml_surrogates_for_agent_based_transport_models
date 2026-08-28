@@ -18,7 +18,7 @@
 
 Agent-based transport simulations like MATSim are powerful but computationally expensive. GNN surrogates approximate them orders of magnitude faster, yet lack confidence estimates -- a critical gap for policy decisions.
 
-This thesis develops a post-hoc uncertainty quantification framework for a GNN surrogate trained on 10,000 MATSim simulations of the Paris Ile-de-France road network (31,635 road segments), combining MC Dropout, conformal prediction, calibration diagnostics, selective prediction, and error detection. No retraining is required.
+This thesis develops a post-hoc uncertainty quantification framework for a GNN surrogate trained on 1,000 MATSim simulations of the Paris Ile-de-France road network (31,635 road segments), combining MC Dropout, conformal prediction, calibration diagnostics, selective prediction, and error detection. No retraining is required.
 
 ---
 
@@ -34,7 +34,7 @@ This thesis develops a post-hoc uncertainty quantification framework for a GNN s
 | Selective prediction MAE reduction @50% | 41.2% | -- |
 | Error detection AUROC (top-10%) | 0.7548 | -- |
 
-All numbers verified against raw artifacts. See [`docs/verified/`](docs/verified/) for audit reports and JSON results, and `results/` for the canonical result set.
+Headline numbers are backed by versioned prediction and result artifacts. A new full-array audit also corrects a thesis claim: 27.6% of test targets are exactly zero, not 88.7% (the latter is the zero share of the `CAPACITY_REDUCTION` input feature). See [`analysis_outputs/THESIS_INTELLIGENCE_REPORT.md`](analysis_outputs/THESIS_INTELLIGENCE_REPORT.md) for findings and limitations.
 
 ---
 
@@ -45,33 +45,44 @@ thesis/latex_tum_official/   Thesis document (final LaTeX source + compiled PDF 
 models/                      Trained model checkpoints (16 trials, PyTorch .pth)
 scripts/gnn/                 GNN architectures (PointNet + Transformer + GAT, incl. heteroscedastic + CQR variants)
 scripts/evaluation/          UQ analysis and plotting scripts
+scripts/analysis/            Canonical safe aggregate regeneration pipeline
 scripts/training/            Model training pipeline (incl. deep ensemble and CQR training)
 scripts/data_preprocessing/  MATSim --> PyG graph conversion
 scripts/misc/                Figure generation and analysis helpers
 docs/                        Documentation and verified results
 results/                     Canonical result JSONs, pre-computed predictions (.npz), and per-trial metrics
-run_part{2,3,4}_*.py         Reproducibility verification scripts
+analysis_outputs/            Safe aggregate bundle, report, manifest, tables, and figures
+thesis_dashboard/            Local Traffic Policy Confidence Lab (Streamlit)
+tests/                       Analytics, aggregate-privacy, and Streamlit AppTest coverage
 environment-minimal.yml      Conda environment (cross-platform)
 ```
 
-> Included: all reported result JSONs, the 16 trained model checkpoints, and the key pre-computed prediction archives (.npz) that back the reported numbers. Excluded from version control: the raw MATSim outputs and the intermediate data loaders (~7.5 GB regenerable artifacts), the two prediction archives over GitHub's 100 MB per-file limit (`experiment_a_fixed_data.npz`, `feature_data.npz`), and the Colab-side training outputs.
+> Included: all reported result JSONs, the 16 trained model checkpoints, and the key pre-computed prediction archives (.npz) that back the reported numbers. Excluded from version control: confidential raw MATSim outputs and intermediate data loaders, two prediction archives over GitHub's 100 MB per-file limit (`experiment_a_fixed_data.npz`, `feature_data.npz`), and Colab-side training outputs. Raw-to-graph reproduction is therefore not possible from a fresh clone; prediction-to-analysis reproduction is the strongest supported path.
 
 ---
 
-## Reproducing Results
+## Local Evidence Lab
 
-```bash
-git clone https://github.com/mzquadri/ml_surrogates_for_agent_based_transport_models.git
-cd ml_surrogates_for_agent_based_transport_models
-conda env create -f environment-minimal.yml
-conda activate traffic-gnn
+The Streamlit dashboard consumes a schema-validated aggregate bundle. It binds to `127.0.0.1`, disables telemetry, and offers only aggregate downloads.
 
-python scripts/evaluation/run_part2_uq_analyses.py       # Selective prediction + error detection
-python scripts/evaluation/run_part3_calibration_audit.py # Calibration and conformal coverage
-python scripts/evaluation/run_part4_t7_crosscheck.py     # Trial 7 cross-check
+```powershell
+conda activate thesis-env
+python scripts/analysis/generate_thesis_intelligence.py
+streamlit run thesis_dashboard/app.py
 ```
 
-The scripts reproduce analyses from versioned prediction artifacts; they do not retrain the models or rerun MATSim simulations. The prediction archives are mirrored under `results/predictions/`; evaluation scripts look for them under the local `data/` tree, so place the extracted `data/` directory (or point the scripts' `data/` paths at `results/predictions/`) before running. See [`docs/verified/REPRODUCIBILITY_GAP_SUMMARY.md`](docs/verified/REPRODUCIBILITY_GAP_SUMMARY.md) for a precise account of included artifacts and known limitations.
+The default regeneration uses only tracked numeric NPZ files (`allow_pickle=False`) and JSON. On the audited workstation, `--include-local-graphs` additionally summarizes the trusted ignored T8 loader into aggregate statistics; never use that option with an untrusted `.pt` file.
+
+Run the quality suite with:
+
+```powershell
+python -m pytest -p no:cacheprovider tests
+ruff check thesis_dashboard scripts/analysis scripts/check_repository.py tests
+pyright
+python scripts/check_repository.py
+```
+
+Calibration outputs are protocol-versioned. The tracked 20/80 graph split and final-thesis 30/70 random node split are displayed separately and must not be pooled.
 
 To compile the thesis: `cd thesis/latex_tum_official && pdflatex main.tex && biber main && pdflatex main.tex && pdflatex main.tex`
 

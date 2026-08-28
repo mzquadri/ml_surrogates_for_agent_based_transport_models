@@ -135,7 +135,7 @@ The proper-scoring-rule diagnostics on the full T8 test set are: mean CRPS $= 3.
 \label{fig:selective}
 \end{figure}
 
-\paragraph{Error detection.}\label{sec:auroc_results}\ Treating $\sigma$ as a classifier of large errors gives an AUROC of $0.7548$ at the top-10\% threshold and $0.7324$ at the top-20\%, both computed on the full $3{,}163{,}500$-node test set.\ Both metrics replicate on Trial~7 ($0.7416$ and $0.7151$; see the footnote in Section~\ref{sec:mc_results}).\ One caveat for both AUROC and the selective-prediction MAE reduction is the high zero-mass in the target: $88.7\%$ of test nodes have $\Delta v = 0$, so a model that predicts near zero with low $\sigma$ is trivially correct for the bulk of the test set; the effect is that AUROC and MAE-on-retained-nodes both look stronger than they would on a balanced subset, and the policy-relevant Q4 stratum (Section~\ref{sec:stratified_results}) remains the more demanding regime.
+\paragraph{Error detection.}\label{sec:auroc_results}\ Treating $\sigma$ as a classifier of large errors gives an AUROC of $0.7548$ at the top-10\% threshold and $0.7324$ at the top-20\%, both computed on the full $3{,}163{,}500$-node test set.\ Both metrics replicate on Trial~7 ($0.7416$ and $0.7151$; see the footnote in Section~\ref{sec:mc_results}).\ One caveat for both AUROC and the selective-prediction MAE reduction is target imbalance: a full-array audit finds $872{,}540$ exact-zero $\Delta v$ targets ($27.6\%$), and many additional changes are small.\ Consequently, pooled AUROC and MAE-on-retained-nodes remain easier than evaluation in the policy-relevant Q4 stratum (Section~\ref{sec:stratified_results}), where errors are much larger.
 
 \section{Ensemble Experiments}\label{sec:ensemble_results}
 
@@ -293,7 +293,7 @@ Random Forest + split conformal & \textbf{8.737} & 89.98\% & \textbf{12.964} & 9
 \end{tabular}
 \end{table}
 
-\paragraph{Scope.}\ Tree baselines dominate point accuracy on this sparse target, as expected for tabular data with $88.7\%$ zero-mass response~\cite{grinsztajn2022tree,borisov2022deep}.\ The per-prediction UQ pipeline evaluated in this thesis -- MC Dropout, regression $\sigma$-scaling, the heteroscedastic and CQR heads of Trials~9--11 -- is not directly applicable to the default tree baselines because those methods rely on architectural dropout, soft probabilistic outputs, and a differentiable backbone.\ Tree-native UQ extensions (quantile regression forests, NGBoost) are plausible competitors and a natural follow-up; this thesis does not test them and therefore makes no claim about their relative quality.
+\paragraph{Scope.}\ Tree baselines dominate point accuracy on this imbalanced tabular target, which has $27.6\%$ exact-zero responses in the full test arrays and many small changes~\cite{grinsztajn2022tree,borisov2022deep}.\ The per-prediction UQ pipeline evaluated in this thesis -- MC Dropout, regression $\sigma$-scaling, the heteroscedastic and CQR heads of Trials~9--11 -- is not directly applicable to the default tree baselines because those methods rely on architectural dropout, soft probabilistic outputs, and a differentiable backbone.\ Tree-native UQ extensions (quantile regression forests, NGBoost) are plausible competitors and a natural follow-up; this thesis does not test them and therefore makes no claim about their relative quality.
 
 \section{An Illustrative Decision Framework}\label{sec:deployment}
 
