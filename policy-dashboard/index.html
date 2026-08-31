@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="A local decision dashboard for audited uncertainty results from the transport-surrogate thesis." />
+    <title>Traffic Policy Confidence Desk</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <header class="hero">
+        <p class="eyebrow">Local decision tool · audited thesis results</p>
+        <h1>Traffic Policy<br /><em>Confidence Desk</em></h1>
+        <p class="intro">Use uncertainty to decide which surrogate predictions can move forward and which should return to the full transport simulation.</p>
+        <div class="study-badge">Trial 8 · 100 held-out Paris scenarios · 3,163,500 road-link predictions</div>
+      </header>
+
+      <section class="decision-panel" aria-labelledby="decision-title">
+        <div>
+          <p class="section-label">Decision control</p>
+          <h2 id="decision-title">How cautious should this policy screen be?</h2>
+        </div>
+        <div class="slider-card">
+          <label for="retention">Automatically accept the most confident <output id="retention-value">50%</output> of predictions</label>
+          <input id="retention" type="range" min="0" max="12" step="1" value="4" />
+          <div class="range-labels"><span>10% · strict</span><span>100% · accept all</span></div>
+        </div>
+      </section>
+
+      <section class="outcome-grid" aria-live="polite">
+        <article class="outcome outcome-primary">
+          <p>Expected accepted error</p>
+          <strong><span id="mae">2.32</span> <small>veh/h MAE</small></strong>
+          <span id="reduction" class="positive">41.2% lower than accepting all predictions</span>
+        </article>
+        <article class="outcome">
+          <p>Auto-accepted links</p>
+          <strong id="accepted">1,581,750</strong>
+          <span id="accepted-share">50% of the held-out predictions</span>
+        </article>
+        <article class="outcome">
+          <p>Route for simulation review</p>
+          <strong id="reviewed">1,581,750</strong>
+          <span id="reviewed-share">50% of the held-out predictions</span>
+        </article>
+      </section>
+
+      <section class="content-grid">
+        <article class="chart-card">
+          <div class="card-heading">
+            <div><p class="section-label">Risk / coverage</p><h2>Less automation, lower error</h2></div>
+            <span class="legend"><i></i> selected rule</span>
+          </div>
+          <div class="chart-wrap"><svg id="risk-chart" viewBox="0 0 700 310" role="img" aria-label="Mean absolute error decreases as fewer, more confident predictions are retained"></svg></div>
+          <p class="chart-note">This screen ranks predictions by MC Dropout uncertainty. It does not claim that every accepted individual prediction is correct.</p>
+        </article>
+
+        <aside class="guardrail-card">
+          <p class="section-label">Reliability guardrail</p>
+          <h2>Use calibrated intervals</h2>
+          <div class="calibration-stat"><strong>2.70×</strong><span>sigma scale fitted on the validation split</span></div>
+          <p>Raw MC Dropout uncertainty was too narrow. Temperature scaling reduced expected calibration error from <b>26.9%</b> to <b>4.8%</b>.</p>
+          <div class="coverage"><span>90% conformal coverage</span><b>90.02%</b></div>
+          <div class="coverage"><span>95% conformal coverage</span><b>95.01%</b></div>
+          <p class="warning">For large speed changes, uncertainty is less predictive of error. Keep high-impact links in the human or simulator review path.</p>
+        </aside>
+      </section>
+
+      <section class="workflow" aria-labelledby="workflow-title">
+        <div><p class="section-label">Recommended workflow</p><h2 id="workflow-title">A practical accept / review loop</h2></div>
+        <ol>
+          <li><span>01</span><div><b>Predict</b><p>Run the GNN surrogate with MC Dropout.</p></div></li>
+          <li><span>02</span><div><b>Calibrate</b><p>Apply the validation-fitted uncertainty scale.</p></div></li>
+          <li><span>03</span><div><b>Route</b><p>Accept the low-uncertainty share selected above.</p></div></li>
+          <li><span>04</span><div><b>Verify</b><p>Send the remaining links to MATSim or expert review.</p></div></li>
+        </ol>
+      </section>
+
+      <footer>
+        <p>Source: `results/selective_prediction_s30.json`, `temperature_scaling_t8.json`, and `conformal_conditional_coverage_t8.json`.</p>
+        <p>All values are aggregate, local thesis artifacts. No raw MATSim data is loaded or transmitted.</p>
+      </footer>
+    </main>
+    <script src="app.js"></script>
+  </body>
+</html>
