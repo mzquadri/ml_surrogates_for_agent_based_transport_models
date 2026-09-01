@@ -1,0 +1,11 @@
+Metric,Your Model,Elena Benchmark,Difference
+R² Score,0.5699973106384277,0.76,-0.19000268936157227
+Best R² Epoch,714.0,-,-
+Pearson Correlation,0.7574055194854736,0.87,-0.11259448051452636
+Spearman Correlation,0.1929220209155574,0.85,-0.6570779790844425
+Validation Loss,51.001314665141855,24.95,26.051314665141856
+Best Val Loss Epoch,714.0,-,-
+Training Loss (Final),52.20225368499756,-,-
+Total Epochs,750.0,750,-
+Initial LR,1.32e-05,0.0005,-
+Final LR,5.0000002405e-06,5e-06,-

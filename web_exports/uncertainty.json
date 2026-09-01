@@ -1,0 +1,228 @@
+{
+  "error_detection": {
+    "definition": "A segment is positive when its deterministic absolute error exceeds the given percentile of the error distribution. The score being ranked is MC-dropout sigma. AUROC is therefore the probability that a randomly chosen large-error segment carries higher sigma than a randomly chosen ordinary one.",
+    "levels": [
+      {
+        "auprc": 0.31149038213320507,
+        "auroc": 0.7561329627321138,
+        "cutoff": 9.930460643768317,
+        "percentile": 90,
+        "positive_count": 316350,
+        "positive_fraction": 0.1
+      },
+      {
+        "auprc": 0.2149920291567497,
+        "auroc": 0.7764220672460014,
+        "cutoff": 14.491228818893429,
+        "percentile": 95,
+        "positive_count": 158175,
+        "positive_fraction": 0.05
+      },
+      {
+        "auprc": 0.10014368972248171,
+        "auroc": 0.8339441645032001,
+        "cutoff": 27.99754634857171,
+        "percentile": 99,
+        "positive_count": 31635,
+        "positive_fraction": 0.01
+      }
+    ],
+    "protocol": "Labels use deterministic absolute-error percentiles; scores use MC sigma."
+  },
+  "point_metrics": {
+    "mae": 3.9483171914823854,
+    "r2": 0.5855342127963146,
+    "rmse": 7.207628971064477
+  },
+  "provenance": {
+    "classification": "thesis-result",
+    "dataset_release": "train-data-v1",
+    "generated_by": "scripts/export_web_artifacts.py",
+    "metric_definition": "spearman_rho ranks MC-dropout sigma against absolute error. raw_gaussian_coverage_90/95 is the share of targets inside prediction +/- z * sigma at nominal 90/95 percent, before any calibration. k90/k95 are the multipliers sigma would need for that nominal coverage.",
+    "protocol": "Trial 8, MC dropout with 30 stochastic passes, 100-graph held-out test set",
+    "schema_version": 2,
+    "source_artifacts": [
+      "analysis_outputs/thesis_intelligence.json"
+    ],
+    "source_commit": "3ad2fb3fccb1885e2f34a1098170499b44af328a",
+    "source_repository": "https://github.com/mzquadri/ml-surrogates-thesis",
+    "units": "veh/h except correlations and coverages, which are unitless",
+    "upstream": {
+      "audit_source_commit": "fdb4ef0c9c736576ae34d5e331d8b66a7a6d877a",
+      "audit_source_repository": "https://github.com/mzquadri/ml_surrogates_for_agent_based_transport_models",
+      "submitted_artifact_commit": "4b95a3d8aca5929bb88b84bb7f7ae86c48e2f428",
+      "submitted_pdf_sha256": "0ac5309d060cda53d82a05cc837136fe853e7f9dcbabd2f4fb4b4282a39bc97e"
+    }
+  },
+  "uncertainty_error_bins": [
+    {
+      "count": 158175,
+      "x_max": 0.30168744921684265,
+      "x_mean": 0.1527304848569329,
+      "x_min": 0.045017439872026443,
+      "y_mean": 0.3110789710817744,
+      "y_median": 0.04243592917919159
+    },
+    {
+      "count": 158175,
+      "x_max": 0.43446651101112366,
+      "x_mean": 0.3796394105891735,
+      "x_min": 0.3016878068447113,
+      "y_mean": 1.7912699796900768,
+      "y_median": 0.7107717990875244
+    },
+    {
+      "count": 158175,
+      "x_max": 0.5109817981719971,
+      "x_mean": 0.47426839861407066,
+      "x_min": 0.43446671962738037,
+      "y_mean": 2.120290689688909,
+      "y_median": 0.9200454950332642
+    },
+    {
+      "count": 158175,
+      "x_max": 0.5752475261688232,
+      "x_mean": 0.5436636177065701,
+      "x_min": 0.5109836459159851,
+      "y_mean": 2.3065597260512214,
+      "y_median": 1.0612858533859253
+    },
+    {
+      "count": 158176,
+      "x_max": 0.6358091235160828,
+      "x_mean": 0.605618911723533,
+      "x_min": 0.5752478241920471,
+      "y_mean": 2.4451783489517545,
+      "y_median": 1.1513171792030334
+    },
+    {
+      "count": 158174,
+      "x_max": 0.6954126358032227,
+      "x_mean": 0.665631655947363,
+      "x_min": 0.635809600353241,
+      "y_mean": 2.5813629092188877,
+      "y_median": 1.2526190280914307
+    },
+    {
+      "count": 158175,
+      "x_max": 0.7565838694572449,
+      "x_mean": 0.725767239726172,
+      "x_min": 0.6954126954078674,
+      "y_mean": 2.7033264415301996,
+      "y_median": 1.3372472524642944
+    },
+    {
+      "count": 158175,
+      "x_max": 0.8212293386459351,
+      "x_mean": 0.7886040525917233,
+      "x_min": 0.7565844655036926,
+      "y_mean": 2.832500757587669,
+      "y_median": 1.4272030591964722
+    },
+    {
+      "count": 158175,
+      "x_max": 0.8911073803901672,
+      "x_mean": 0.8555134256940817,
+      "x_min": 0.8212294578552246,
+      "y_mean": 2.9916193603818044,
+      "y_median": 1.5520007610321045
+    },
+    {
+      "count": 158175,
+      "x_max": 0.9678756594657898,
+      "x_mean": 0.9288220510777467,
+      "x_min": 0.8911083936691284,
+      "y_mean": 3.1269871272814145,
+      "y_median": 1.655601978302002
+    },
+    {
+      "count": 158175,
+      "x_max": 1.0541203022003174,
+      "x_mean": 1.010200902261835,
+      "x_min": 0.9678761959075928,
+      "y_mean": 3.325641960933259,
+      "y_median": 1.8007014989852905
+    },
+    {
+      "count": 158175,
+      "x_max": 1.152929663658142,
+      "x_mean": 1.1022431681516782,
+      "x_min": 1.054120659828186,
+      "y_mean": 3.4733738636257874,
+      "y_median": 1.930840253829956
+    },
+    {
+      "count": 158175,
+      "x_max": 1.2691727876663208,
+      "x_mean": 1.2092057652132044,
+      "x_min": 1.1529332399368286,
+      "y_mean": 3.7006663016840675,
+      "y_median": 2.111362934112549
+    },
+    {
+      "count": 158175,
+      "x_max": 1.4089502096176147,
+      "x_mean": 1.3368504492456885,
+      "x_min": 1.2691729068756104,
+      "y_mean": 3.9601893452826418,
+      "y_median": 2.316190242767334
+    },
+    {
+      "count": 158175,
+      "x_max": 1.5851187705993652,
+      "x_mean": 1.493520978192347,
+      "x_min": 1.4089510440826416,
+      "y_mean": 4.258696035615355,
+      "y_median": 2.592625141143799
+    },
+    {
+      "count": 158175,
+      "x_max": 1.8156940937042236,
+      "x_mean": 1.694746856657046,
+      "x_min": 1.5851191282272339,
+      "y_mean": 4.685781556960028,
+      "y_median": 2.9745330810546875
+    },
+    {
+      "count": 158175,
+      "x_max": 2.138132333755493,
+      "x_mean": 1.9666237146805037,
+      "x_min": 1.815699577331543,
+      "y_mean": 5.257359337515495,
+      "y_median": 3.5205917358398438
+    },
+    {
+      "count": 158175,
+      "x_max": 2.6514711380004883,
+      "x_mean": 2.371533055229362,
+      "x_min": 2.1381354331970215,
+      "y_mean": 6.203733231763146,
+      "y_median": 4.3464250564575195
+    },
+    {
+      "count": 158175,
+      "x_max": 3.722654342651367,
+      "x_mean": 3.1029727628179424,
+      "x_min": 2.6514718532562256,
+      "y_mean": 8.056452270306742,
+      "y_median": 5.881691932678223
+    },
+    {
+      "count": 158175,
+      "x_max": 42.27603530883789,
+      "x_mean": 5.970292929885549,
+      "x_min": 3.7226598262786865,
+      "y_mean": 12.834276475644756,
+      "y_median": 9.326852798461914
+    }
+  ],
+  "uncertainty_metrics": {
+    "k90": 7.730280321305445,
+    "k95": 11.642328713598829,
+    "mean_uncertainty": 1.368922472572763,
+    "raw_gaussian_coverage_90": 0.4855666192508298,
+    "raw_gaussian_coverage_95": 0.5483063063063063,
+    "spearman_rho": 0.48181793745636337,
+    "std_uncertainty": 1.381599748362057
+  }
+}

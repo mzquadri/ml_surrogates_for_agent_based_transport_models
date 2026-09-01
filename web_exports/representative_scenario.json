@@ -1,0 +1,43 @@
+{
+  "figures": [
+    "network_scenario.webp",
+    "network_response.webp"
+  ],
+  "projection": {
+    "display_projection": "local equirectangular about the network centroid, longitude scaled by cos(mean latitude)",
+    "model_input_crs": "EPSG:4326 (WGS84), raw degrees",
+    "note": "The projection is applied for figures only and never fed back to the model."
+  },
+  "provenance": {
+    "classification": "post-thesis-data-audit",
+    "dataset_release": "train-data-v1",
+    "generated_by": "scripts/export_web_artifacts.py",
+    "metric_definition": "A single scenario selected by a deterministic rule, summarised for display.",
+    "schema_version": 2,
+    "source_artifacts": [
+      "train-data-v1/datalist_batch_6.pt"
+    ],
+    "source_commit": "3ad2fb3fccb1885e2f34a1098170499b44af328a",
+    "source_repository": "https://github.com/mzquadri/ml-surrogates-thesis",
+    "units": "veh/h"
+  },
+  "response": {
+    "max_abs": 206.23809814453125,
+    "mean_abs": 4.2216013036704805,
+    "pct_zero": 27.507507507507505
+  },
+  "scenario": {
+    "batch_file": "datalist_batch_6.pt",
+    "corpus_median_intervened_links": 3317.5,
+    "index": 279,
+    "intervened_fraction_pct": 10.488383119962068,
+    "intervened_links": 3318,
+    "mean_abs_response_elsewhere": 3.039701037808648,
+    "mean_abs_response_intervened": 14.308361348399085,
+    "median_reduction_veh_h": -600.0,
+    "position_in_batch": 29,
+    "selection_rule": "scenario whose intervened-link count is nearest the corpus median; ties broken by lowest scenario index",
+    "total_reduction_veh_h": -2644200.0
+  },
+  "segments": 31635
+}

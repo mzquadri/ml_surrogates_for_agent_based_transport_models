@@ -1,0 +1,12 @@
+{
+  "include": [
+    "thesis_dashboard",
+    "scripts/analysis",
+    "scripts/check_repository.py",
+    "tests",
+    "scripts/analyse_train_data.py",
+    "scripts/export_web_artifacts.py"
+  ],
+  "pythonVersion": "3.10",
+  "typeCheckingMode": "standard"
+}

@@ -1,0 +1,198 @@
+{
+  "curve": [
+    {
+      "accepted": 316350,
+      "mae": 1.051174475128593,
+      "reduction_pct": 73.376645691074,
+      "retention": 10,
+      "reviewed": 2847150,
+      "rmse": 2.796865275659397,
+      "uncertainty_threshold": 0.43446651101112366
+    },
+    {
+      "accepted": 474525,
+      "mae": 1.4075465465754011,
+      "reduction_pct": 64.35072264174045,
+      "retention": 15,
+      "reviewed": 2688975,
+      "rmse": 3.2242715103682587,
+      "uncertainty_threshold": 0.5109817981719971
+    },
+    {
+      "accepted": 632700,
+      "mae": 1.6322998416020127,
+      "reduction_pct": 58.65834069452844,
+      "retention": 20,
+      "reviewed": 2530800,
+      "rmse": 3.48839690060654,
+      "uncertainty_threshold": 0.5752475261688232
+    },
+    {
+      "accepted": 790875,
+      "mae": 1.7948621542105556,
+      "reduction_pct": 54.54108504548295,
+      "retention": 25,
+      "reviewed": 2372625,
+      "rmse": 3.692584065320513,
+      "uncertainty_threshold": 0.6358091235160828
+    },
+    {
+      "accepted": 949050,
+      "mae": 1.925956627252738,
+      "reduction_pct": 51.220823103889465,
+      "retention": 30,
+      "reviewed": 2214450,
+      "rmse": 3.8566118057111693,
+      "uncertainty_threshold": 0.6954126358032227
+    },
+    {
+      "accepted": 1107225,
+      "mae": 2.037009457842397,
+      "reduction_pct": 48.408160766901176,
+      "retention": 35,
+      "reviewed": 2056275,
+      "rmse": 4.0091516375746306,
+      "uncertainty_threshold": 0.7565838694572449
+    },
+    {
+      "accepted": 1265400,
+      "mae": 2.1364458702882514,
+      "reduction_pct": 45.88971030754179,
+      "retention": 40,
+      "reviewed": 1898100,
+      "rmse": 4.137545666728763,
+      "uncertainty_threshold": 0.8212293386459351
+    },
+    {
+      "accepted": 1423575,
+      "mae": 2.2314651469040974,
+      "reduction_pct": 43.48313373307535,
+      "retention": 45,
+      "reviewed": 1739925,
+      "rmse": 4.266289396426655,
+      "uncertainty_threshold": 0.8911073803901672
+    },
+    {
+      "accepted": 1581750,
+      "mae": 2.3210173449608664,
+      "reduction_pct": 41.215023201075596,
+      "retention": 50,
+      "reviewed": 1581750,
+      "rmse": 4.387674976140793,
+      "uncertainty_threshold": 0.9678756594657898
+    },
+    {
+      "accepted": 1739925,
+      "mae": 2.4123468554743117,
+      "reduction_pct": 38.901898239624465,
+      "retention": 55,
+      "reviewed": 1423575,
+      "rmse": 4.515188869884049,
+      "uncertainty_threshold": 1.0541203022003174
+    },
+    {
+      "accepted": 1898100,
+      "mae": 2.5007657727809733,
+      "reduction_pct": 36.662490587741644,
+      "retention": 60,
+      "reviewed": 1265400,
+      "rmse": 4.6370880805194865,
+      "uncertainty_threshold": 1.152929663658142
+    },
+    {
+      "accepted": 2056275,
+      "mae": 2.59306581347163,
+      "reduction_pct": 34.32478476993721,
+      "retention": 65,
+      "reviewed": 1107225,
+      "rmse": 4.767817579877549,
+      "uncertainty_threshold": 1.2691727876663208
+    },
+    {
+      "accepted": 2214450,
+      "mae": 2.6907174943693413,
+      "reduction_pct": 31.851536645182364,
+      "retention": 70,
+      "reviewed": 949050,
+      "rmse": 4.905540409832326,
+      "uncertainty_threshold": 1.4089502096176147
+    },
+    {
+      "accepted": 2372625,
+      "mae": 2.7952493971309003,
+      "reduction_pct": 29.204031450132096,
+      "retention": 75,
+      "reviewed": 790875,
+      "rmse": 5.049481597742782,
+      "uncertainty_threshold": 1.5851187705993652
+    },
+    {
+      "accepted": 2530800,
+      "mae": 2.913407657115977,
+      "reduction_pct": 26.21140815634059,
+      "retention": 80,
+      "reviewed": 632700,
+      "rmse": 5.216003752662076,
+      "uncertainty_threshold": 1.8156940937042236
+    },
+    {
+      "accepted": 2688975,
+      "mae": 3.0512871677246096,
+      "reduction_pct": 22.71929990054805,
+      "retention": 85,
+      "reviewed": 474525,
+      "rmse": 5.414071725630546,
+      "uncertainty_threshold": 2.138132333755493
+    },
+    {
+      "accepted": 2847150,
+      "mae": 3.2264230601722557,
+      "reduction_pct": 18.283590104347724,
+      "retention": 90,
+      "reviewed": 316350,
+      "rmse": 5.67961746574567,
+      "uncertainty_threshold": 2.6514711380004883
+    },
+    {
+      "accepted": 3005325,
+      "mae": 3.480635123944374,
+      "reduction_pct": 11.845098680190524,
+      "retention": 95,
+      "reviewed": 158175,
+      "rmse": 6.121004758935145,
+      "uncertainty_threshold": 3.722654342651367
+    },
+    {
+      "accepted": 3163500,
+      "mae": 3.94831719148239,
+      "reduction_pct": 0.0,
+      "retention": 100,
+      "reviewed": 0,
+      "rmse": 7.207628971065062,
+      "uncertainty_threshold": 42.27603530883789
+    }
+  ],
+  "model": "MC Dropout (30 stochastic passes)",
+  "provenance": {
+    "classification": "thesis-result",
+    "dataset_release": "train-data-v1",
+    "generated_by": "scripts/export_web_artifacts.py",
+    "metric_definition": "Predictions are ranked by MC-dropout sigma. At each retained fraction the least-uncertain share is kept and MAE is recomputed on it; the remainder is routed to review.",
+    "protocol": "Trial 8, MC dropout with 30 stochastic passes, 100-graph held-out test set",
+    "schema_version": 2,
+    "source_artifacts": [
+      "analysis_outputs/thesis_intelligence.json"
+    ],
+    "source_commit": "3ad2fb3fccb1885e2f34a1098170499b44af328a",
+    "source_repository": "https://github.com/mzquadri/ml-surrogates-thesis",
+    "units": "veh/h",
+    "upstream": {
+      "audit_source_commit": "fdb4ef0c9c736576ae34d5e331d8b66a7a6d877a",
+      "audit_source_repository": "https://github.com/mzquadri/ml_surrogates_for_agent_based_transport_models",
+      "submitted_artifact_commit": "4b95a3d8aca5929bb88b84bb7f7ae86c48e2f428",
+      "submitted_pdf_sha256": "0ac5309d060cda53d82a05cc837136fe853e7f9dcbabd2f4fb4b4282a39bc97e"
+    }
+  },
+  "row_count": 3163500,
+  "scope": "full cached 100-graph test set"
+}

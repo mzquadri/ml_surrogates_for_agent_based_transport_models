@@ -1,0 +1,46 @@
+{
+  "verification_status": "VERIFIED",
+  "note": "float32 loading + chunked computation; tolerance relaxed to 0.1 for float32 precision",
+  "checks": {
+    "90pct": {
+      "gaussian": {
+        "v2": 49.6848,
+        "main": 49.6848,
+        "diff": 4.2e-05,
+        "match": true
+      },
+      "conformal_absolute": {
+        "v2": 35.7739,
+        "main": 35.7739,
+        "diff": 2.3e-05,
+        "match": true
+      },
+      "conformal_sigma_scaled": {
+        "v2": 32.326,
+        "main": 32.326,
+        "diff": 3e-06,
+        "match": true
+      }
+    },
+    "95pct": {
+      "gaussian": {
+        "v2": 87.2727,
+        "main": 87.2727,
+        "diff": 5e-06,
+        "match": true
+      },
+      "conformal_absolute": {
+        "v2": 47.6456,
+        "main": 47.6456,
+        "diff": 6e-06,
+        "match": true
+      },
+      "conformal_sigma_scaled": {
+        "v2": 43.633,
+        "main": 43.633,
+        "diff": 3.7e-05,
+        "match": true
+      }
+    }
+  }
+}

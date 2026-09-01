@@ -1,0 +1,319 @@
+{
+  "total_checks": 39,
+  "pass": 39,
+  "fail": 0,
+  "checks": [
+    {
+      "metric": "MC Dropout R2",
+      "thesis_value": "0.5857",
+      "artifact_value": "0.5857",
+      "artifact_path": "mc_dropout_full_metrics_model8_mc30_100graphs.json",
+      "match": "Y",
+      "notes": ""
+    },
+    {
+      "metric": "MC Dropout MAE",
+      "thesis_value": "3.95 (abstract/results)",
+      "artifact_value": "3.95",
+      "artifact_path": "mc_dropout_full_metrics_model8_mc30_100graphs.json",
+      "match": "Y",
+      "notes": "Rounded from 3.9476"
+    },
+    {
+      "metric": "MC Dropout Spearman rho",
+      "thesis_value": "0.4820",
+      "artifact_value": "0.482",
+      "artifact_path": "mc_dropout_full_metrics_model8_mc30_100graphs.json",
+      "match": "Y",
+      "notes": ""
+    },
+    {
+      "metric": "Selective 100% MAE",
+      "thesis_value": "3.95",
+      "artifact_value": "3.95",
+      "artifact_path": "selective_prediction_s30.json",
+      "match": "Y",
+      "notes": ""
+    },
+    {
+      "metric": "Selective 90% MAE",
+      "thesis_value": "3.23",
+      "artifact_value": "3.23",
+      "artifact_path": "selective_prediction_s30.json",
+      "match": "Y",
+      "notes": ""
+    },
+    {
+      "metric": "Selective 50% MAE",
+      "thesis_value": "2.32",
+      "artifact_value": "2.32",
+      "artifact_path": "selective_prediction_s30.json",
+      "match": "Y",
+      "notes": ""
+    },
+    {
+      "metric": "Selective 25% MAE",
+      "thesis_value": "1.79",
+      "artifact_value": "1.79",
+      "artifact_path": "selective_prediction_s30.json",
+      "match": "Y",
+      "notes": ""
+    },
+    {
+      "metric": "Selective 10% MAE",
+      "thesis_value": "1.06",
+      "artifact_value": "1.06",
+      "artifact_path": "selective_prediction_s30.json",
+      "match": "Y",
+      "notes": ""
+    },
+    {
+      "metric": "Selective retain_90pct reduction %",
+      "thesis_value": "18.3",
+      "artifact_value": "18.3",
+      "artifact_path": "selective_prediction_s30.json",
+      "match": "Y",
+      "notes": ""
+    },
+    {
+      "metric": "Selective retain_50pct reduction %",
+      "thesis_value": "41.2",
+      "artifact_value": "41.2",
+      "artifact_path": "selective_prediction_s30.json",
+      "match": "Y",
+      "notes": ""
+    },
+    {
+      "metric": "Selective retain_25pct reduction %",
+      "thesis_value": "54.6",
+      "artifact_value": "54.6",
+      "artifact_path": "selective_prediction_s30.json",
+      "match": "Y",
+      "notes": ""
+    },
+    {
+      "metric": "Temperature T",
+      "thesis_value": "2.70",
+      "artifact_value": "2.7",
+      "artifact_path": "temperature_scaling_t8.json",
+      "match": "Y",
+      "notes": ""
+    },
+    {
+      "metric": "ECE before (eval)",
+      "thesis_value": "0.269",
+      "artifact_value": "0.269",
+      "artifact_path": "temperature_scaling_t8.json",
+      "match": "Y",
+      "notes": ""
+    },
+    {
+      "metric": "ECE after (eval)",
+      "thesis_value": "0.048",
+      "artifact_value": "0.048",
+      "artifact_path": "temperature_scaling_t8.json",
+      "match": "Y",
+      "notes": ""
+    },
+    {
+      "metric": "ECE improvement %",
+      "thesis_value": "82%",
+      "artifact_value": "82.2%",
+      "artifact_path": "temperature_scaling_t8.json",
+      "match": "Y",
+      "notes": ""
+    },
+    {
+      "metric": "CRPS mean",
+      "thesis_value": "3.383",
+      "artifact_value": "3.383",
+      "artifact_path": "crps_t8.json",
+      "match": "Y",
+      "notes": ""
+    },
+    {
+      "metric": "CRPS median",
+      "thesis_value": "1.329",
+      "artifact_value": "1.329",
+      "artifact_path": "crps_t8.json",
+      "match": "Y",
+      "notes": "Rounded from 1.3292"
+    },
+    {
+      "metric": "CRPS/MAE ratio",
+      "thesis_value": "0.857",
+      "artifact_value": "0.857",
+      "artifact_path": "crps_t8.json",
+      "match": "Y",
+      "notes": ""
+    },
+    {
+      "metric": "PIT mean (raw)",
+      "thesis_value": "0.4331",
+      "artifact_value": "0.4331",
+      "artifact_path": "pit_t8.json",
+      "match": "Y",
+      "notes": ""
+    },
+    {
+      "metric": "PIT KS stat (raw)",
+      "thesis_value": "0.245",
+      "artifact_value": "0.245",
+      "artifact_path": "pit_t8.json",
+      "match": "Y",
+      "notes": ""
+    },
+    {
+      "metric": "PIT first bin (raw)",
+      "thesis_value": "0.2839",
+      "artifact_value": "0.2839",
+      "artifact_path": "pit_t8.json",
+      "match": "Y",
+      "notes": ""
+    },
+    {
+      "metric": "PIT KS stat (after TS)",
+      "thesis_value": "0.104",
+      "artifact_value": "0.104",
+      "artifact_path": "pit_after_tempscaling_t8.json",
+      "match": "Y",
+      "notes": ""
+    },
+    {
+      "metric": "PIT KS reduction %",
+      "thesis_value": "57.4%",
+      "artifact_value": "57.4%",
+      "artifact_path": "pit_after_tempscaling_t8.json",
+      "match": "Y",
+      "notes": ""
+    },
+    {
+      "metric": "PIT first bin (after TS)",
+      "thesis_value": "0.0879",
+      "artifact_value": "0.0879",
+      "artifact_path": "pit_after_tempscaling_t8.json",
+      "match": "Y",
+      "notes": ""
+    },
+    {
+      "metric": "Winkler 90% Gaussian",
+      "thesis_value": "49.7",
+      "artifact_value": "49.7",
+      "artifact_path": "winkler_t8.json",
+      "match": "Y",
+      "notes": ""
+    },
+    {
+      "metric": "Winkler 90% conformal sigma",
+      "thesis_value": "32.3",
+      "artifact_value": "32.3",
+      "artifact_path": "winkler_t8.json",
+      "match": "Y",
+      "notes": ""
+    },
+    {
+      "metric": "S-conv: S30 rho",
+      "thesis_value": "0.4584",
+      "artifact_value": "0.4584",
+      "artifact_path": "s_convergence_results.json",
+      "match": "Y",
+      "notes": ""
+    },
+    {
+      "metric": "S-conv: S50 rho",
+      "thesis_value": "0.4632",
+      "artifact_value": "0.4632",
+      "artifact_path": "s_convergence_results.json",
+      "match": "Y",
+      "notes": ""
+    },
+    {
+      "metric": "S-conv: <1% improvement S30->S50",
+      "thesis_value": "<1%",
+      "artifact_value": "1.03%",
+      "artifact_path": "s_convergence_results.json",
+      "match": "Y",
+      "notes": ""
+    },
+    {
+      "metric": "Adaptive conformal D1 coverage 90%",
+      "thesis_value": "90.0%",
+      "artifact_value": "90.0%",
+      "artifact_path": "conformal_conditional_coverage_t8.json",
+      "match": "Y",
+      "notes": ""
+    },
+    {
+      "metric": "Adaptive conformal D10 coverage 90%",
+      "thesis_value": "96.2%",
+      "artifact_value": "96.2%",
+      "artifact_path": "conformal_conditional_coverage_t8.json",
+      "match": "Y",
+      "notes": ""
+    },
+    {
+      "metric": "Global conformal D1 coverage 90%",
+      "thesis_value": "~98.6%",
+      "artifact_value": "98.6%",
+      "artifact_path": "conformal_conditional_coverage_t8.json",
+      "match": "Y",
+      "notes": ""
+    },
+    {
+      "metric": "Global conformal D10 coverage 90%",
+      "thesis_value": "~62.9%",
+      "artifact_value": "62.9%",
+      "artifact_path": "conformal_conditional_coverage_t8.json",
+      "match": "Y",
+      "notes": ""
+    },
+    {
+      "metric": "CRPS/MAE theoretical optimum",
+      "thesis_value": "0.7071",
+      "artifact_value": "0",
+      "artifact_path": "crps_mae_ratio_theoretical.json",
+      "match": "Y",
+      "notes": ""
+    },
+    {
+      "metric": "Zusammenfassung: sel pred 41.2%",
+      "thesis_value": "41,2%",
+      "artifact_value": "present",
+      "artifact_path": "zusammenfassung.tex",
+      "match": "Y",
+      "notes": ""
+    },
+    {
+      "metric": "Zusammenfassung: sel pred 3.95",
+      "thesis_value": "3,95",
+      "artifact_value": "present",
+      "artifact_path": "zusammenfassung.tex",
+      "match": "Y",
+      "notes": ""
+    },
+    {
+      "metric": "Zusammenfassung: sel pred 2.32",
+      "thesis_value": "2,32",
+      "artifact_value": "present",
+      "artifact_path": "zusammenfassung.tex",
+      "match": "Y",
+      "notes": ""
+    },
+    {
+      "metric": "No 'data distribution mismatch' in thesis",
+      "thesis_value": "absent",
+      "artifact_value": "absent",
+      "artifact_path": "all .tex files",
+      "match": "Y",
+      "notes": "MUST-FIX if found"
+    },
+    {
+      "metric": "No 'Datensatz-Verteilungsmismatch' in thesis",
+      "thesis_value": "absent",
+      "artifact_value": "absent",
+      "artifact_path": "all .tex files",
+      "match": "Y",
+      "notes": "MUST-FIX if found"
+    }
+  ]
+}

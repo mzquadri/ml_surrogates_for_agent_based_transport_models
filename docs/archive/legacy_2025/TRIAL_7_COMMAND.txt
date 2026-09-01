@@ -1,0 +1,64 @@
+================================================================================
+TRIAL 7: Higher Learning Rate (0.0006)
+================================================================================
+
+Hypothesis: 
+- Trial 5's lr=0.0005 might be slightly conservative
+- Increasing by 20% could help model converge to better optimum
+- Longer patience (50) to allow exploration
+
+Changes from Trial 5:
+- Learning Rate: 0.0005 → 0.0006 (+20%)
+- Early Stopping Patience: 40 → 50 epochs (+25%)
+
+Expected Outcome:
+- Best case: R² improves to 0.56-0.57
+- Worst case: Slightly worse due to overshooting (~0.54)
+
+================================================================================
+TRAINING COMMAND (Copy to Google Colab):
+================================================================================
+
+!python /content/drive/MyDrive/Zamin-thesis/ml_surrogates_for_agent_based_transport_models-main/scripts/training/run_models.py \
+  --gnn_arch point_net_transf_gat \
+  --project_name TR-C_Benchmarks \
+  --unique_model_description point_net_transf_gat_7th_trial_higher_lr \
+  --in_channels 5 \
+  --use_all_features False \
+  --num_epochs 750 \
+  --lr 0.0006 \
+  --early_stopping_patience 50 \
+  --use_dropout True \
+  --dropout 0.3 \
+  --use_weighted_loss False \
+  --batch_size 8 \
+  --gradient_accumulation_steps 3
+
+================================================================================
+MONITORING:
+================================================================================
+
+Watch for:
+1. Validation loss convergence speed vs Trial 5
+2. Best validation R² (target: >0.55)
+3. Early stopping trigger point
+4. Training stability (no spikes)
+
+Trial 5 baseline:
+- Best val loss: 53.61
+- Val R²: 0.55
+- Stopped at: ~550 epochs
+- Test R²: 0.5553
+
+================================================================================
+EXPECTED RESULTS LOCATION:
+================================================================================
+
+Model: /content/drive/MyDrive/Zamin-thesis/ml_surrogates_for_agent_based_transport_models-main/data/TR-C_Benchmarks/point_net_transf_gat_7th_trial_higher_lr/
+
+Files to check:
+- trained_model/model.pth
+- data_created_during_training/test_dl.pt
+- wandb logs
+
+================================================================================

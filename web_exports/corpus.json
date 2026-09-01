@@ -1,0 +1,52 @@
+{
+  "graph_edges_per_graph": [
+    59851
+  ],
+  "graph_semantics": {
+    "coordinate_reference_system": "EPSG:4326 (WGS84), set explicitly in process_simulations_for_gnn.py",
+    "graph_edge": "an adjacency between two road segments that meet at a junction",
+    "graph_node": "one road segment (link) of the Paris network",
+    "pos_0": "segment start point",
+    "pos_1": "segment end point",
+    "pos_2": "segment midpoint, stored but unused by the forward pass",
+    "representation": "dual line graph",
+    "source": "code/scripts/data_preprocessing/process_simulations_for_gnn.py",
+    "x_row": "feature vector of one road segment",
+    "y_row": "Delta v for one road segment"
+  },
+  "graphs": 1000,
+  "isolated_note": "The line-graph transform yields fewer graph nodes than stored feature rows, leaving a contiguous tail of segments with no incident edge. Their target is exactly zero in every scanned scenario.",
+  "isolated_segments_per_graph": [
+    76
+  ],
+  "node_observations": 31635000,
+  "provenance": {
+    "classification": "post-thesis-data-audit",
+    "dataset_release": "train-data-v1",
+    "generated_by": "scripts/export_web_artifacts.py",
+    "metric_definition": "Shape of the released training corpus.",
+    "schema_version": 2,
+    "source_artifacts": [
+      "train-data-v1/datalist_batch_1..20.pt"
+    ],
+    "source_commit": "3ad2fb3fccb1885e2f34a1098170499b44af328a",
+    "source_repository": "https://github.com/mzquadri/ml-surrogates-thesis"
+  },
+  "segments_per_graph": [
+    31635
+  ],
+  "target": {
+    "change_type": "absolute",
+    "expression": "vol_car(policy scenario) - vol_car(base case)",
+    "max": 180.0,
+    "mean": 0.4189325682757594,
+    "min": -237.38095092773438,
+    "name": "policy-induced change in road-segment car volume",
+    "pct_zero": 27.619045361150626,
+    "sign_convention": "positive means more car volume under the policy than in the base case",
+    "source": "code/scripts/data_preprocessing/help_functions.py:compute_target_tensor_only_edge_features",
+    "std": 10.709925753710563,
+    "symbol": "Delta v",
+    "unit": "veh/h"
+  }
+}

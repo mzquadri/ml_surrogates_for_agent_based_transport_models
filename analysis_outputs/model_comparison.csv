@@ -1,0 +1,6 @@
+model,r2,mae,rmse,coverage_90,coverage_95,gate,protocol
+T7 deterministic,0.5471095442771912,4.060104846954346,7.534329891204834,,,,reported held-out test metrics
+T8 deterministic,0.5957479476928711,3.957288980484009,7.118265151977539,,,,reported held-out test metrics
+Deep Ensemble,0.6840807795524597,3.4853219985961914,6.292686462402344,,,,recomputed and reported held-out test metrics
+T10 CQR midpoint,0.40566354990005493,4.130488872528076,8.631062507629395,0.8947349454717876,0.9177926347400032,FAIL,reported CQR test metrics; no cached test arrays
+T11 frozen CQR midpoint,0.5835253000259399,4.3015241622924805,7.2250752449035645,0.8982241188556978,0.949078552236447,PASS,reported CQR test metrics; no cached test arrays

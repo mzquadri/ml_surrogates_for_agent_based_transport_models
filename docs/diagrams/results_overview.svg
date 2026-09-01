@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 430" font-family="Segoe UI, Helvetica, Arial, sans-serif">
+  <text x="500" y="32" text-anchor="middle" font-size="16" font-weight="600" fill="#111827">Prediction accuracy across models (test R-squared)</text>
+
+  <!-- axis baseline -->
+  <line x1="270" y1="60" x2="270" y2="370" stroke="#9ca3af" stroke-width="1"/>
+
+  <!-- XGBoost -->
+  <text x="262" y="82" text-anchor="end" font-size="12" fill="#374151">XGBoost (baseline)</text>
+  <rect x="270" y="68" width="612" height="22" rx="3" fill="#9ca3af"/>
+  <text x="890" y="84" font-size="12" font-weight="600" fill="#374151">0.741</text>
+
+  <!-- Deep Ensemble -->
+  <text x="262" y="122" text-anchor="end" font-size="12" fill="#374151">Deep Ensemble (5 x GNN)</text>
+  <rect x="270" y="108" width="565" height="22" rx="3" fill="#0d9488"/>
+  <text x="843" y="124" font-size="12" font-weight="600" fill="#134e4a">0.684</text>
+
+  <!-- Random Forest -->
+  <text x="262" y="162" text-anchor="end" font-size="12" fill="#374151">Random Forest (baseline)</text>
+  <rect x="270" y="148" width="546" height="22" rx="3" fill="#9ca3af"/>
+  <text x="824" y="164" font-size="12" font-weight="600" fill="#374151">0.661</text>
+
+  <!-- Trial 8 -->
+  <text x="262" y="202" text-anchor="end" font-size="12" fill="#374151">Trial 8: PointNetTransfGAT</text>
+  <rect x="270" y="188" width="492" height="22" rx="3" fill="#2563eb"/>
+  <text x="770" y="204" font-size="12" font-weight="600" fill="#1e3a8a">0.596</text>
+
+  <!-- Trial 11 -->
+  <text x="262" y="242" text-anchor="end" font-size="12" fill="#374151">Trial 11: CQR, frozen backbone</text>
+  <rect x="270" y="228" width="482" height="22" rx="3" fill="#60a5fa"/>
+  <text x="760" y="244" font-size="12" font-weight="600" fill="#1e3a8a">0.584</text>
+
+  <!-- Trial 9 -->
+  <text x="262" y="282" text-anchor="end" font-size="12" fill="#374151">Trial 9: heteroscedastic</text>
+  <rect x="270" y="268" width="412" height="22" rx="3" fill="#d97706"/>
+  <text x="690" y="284" font-size="12" font-weight="600" fill="#92400e">0.499</text>
+
+  <!-- MLP -->
+  <text x="262" y="322" text-anchor="end" font-size="12" fill="#374151">MLP (baseline)</text>
+  <rect x="270" y="308" width="407" height="22" rx="3" fill="#9ca3af"/>
+  <text x="685" y="324" font-size="12" font-weight="600" fill="#374151">0.493</text>
+
+  <!-- Trial 10 -->
+  <text x="262" y="362" text-anchor="end" font-size="12" fill="#374151">Trial 10: CQR, unfrozen</text>
+  <rect x="270" y="348" width="335" height="22" rx="3" fill="#d97706"/>
+  <text x="613" y="364" font-size="12" font-weight="600" fill="#92400e">0.406</text>
+
+  <text x="500" y="404" text-anchor="middle" font-size="11" fill="#6b7280">Held-out test set: 100 scenarios, 3,163,500 road segments. Amber variants failed pre-registered acceptance gates and are reported for transparency.</text>
+</svg>

@@ -1,0 +1,1695 @@
+
+======================================================================
+PAGE 1
+======================================================================
+Machine Learning Surrogates for Agent-Based Models
+in Transportation Policy Analysis
+Elena Natterera,∗, Saini Rohan Raoa, Alejandro Tejada Lapuertab,c, Roman Engelhardta, Sebastian
+H¨ orld, Klaus Bogenbergera
+aChair of Traffic Engineering and Control, Technical University of Munich, Germany, Munich, Germany
+bTUM School of Computation, Information & Technology, Technical University of Munich, Garching, Germany
+cComputational Health Center, Helmholtz Munich, Neuherberg, Germany
+dInstitut de Recherche Technologique SystemX, Palaiseau, France
+Abstract
+Effective traffic policies are crucial for managing congestion and reducing emissions. Agent-based
+transportation models (ABMs) offer a detailed analysis of how these policies affect travel behaviour at
+a granular level. However, computational constraints limit the number of scenarios that can be tested
+with ABMs and therefore their ability to find optimal policy settings.
+In this proof-of-concept study, we propose a machine learning (ML)-based surrogate model to effi-
+ciently explore this vast solution space. Leveraging a Graph Neural Network (GNN), the model predicts
+the effects of traffic policies on the road network at the link level.
+We implement our approach in a large-scale MATSim simulation of Paris, France, covering over
+30,000 road segments and 10,000 simulations, applying a policy involving capacity reduction on main
+roads. The ML surrogate model achieves an overall R2of 0.76, with significantly lower Mean Squared
+Error and Mean Absolute Error than naive baselines. On primary roads where the policy applies, it
+reaches an R2of 0.95. This study therefore shows that GNNs can act as surrogates for complex agent-
+based transportation models with the potential to enable large-scale policy optimization, helping urban
+planners explore a broader range of interventions more efficiently.
+Keywords: Graph Neural Networks, Agent-based simulations, Optimization-Based Transportation
+Policies, Surrogate Models, Street Capacity Reduction
+1. Introduction
+Cities around the world face growing challenges in terms of congestion and air pollution, exacerbated
+by rapid urbanization and population growth. Addressing these issues requires effective policies that
+reduce car dependency while maintaining flexibility for residents.
+Urban planners have a wide range of policy interventions at their disposal, including congestion charg-
+ing, parking and traffic control measures, the establishment of limited traffic zones or rededicating space
+allocated for cars. In recent years, additional mobility options such as shared mobility and micromobility
+have emerged, expanding the set of possible policy measures.
+However, designing effective policies is highly complex. Urban planners must not only decide which
+policies to introduce but also determine the optimal level at which they should be implemented and,
+for most measures, their optimal spatial extent. The number of possible policy combinations grows
+exponentially, leading to an immense solution space. This multi-dimensional space is too vast to be
+explored manually based on experience alone. In practice, stakeholders often limit the solution space
+to a few scenarios, which in all likelihood will not include the optimal solution, and in the worst case
+might not even be close to it. Therefore, a more structured approach is needed to narrow down the most
+promising solutions.
+Agent-based simulations are commonly employed to assess how potential policy measures impact
+the broader transportation system. While these models provide detailed and realistic assessments of
+the effect of policies in terms of congestion, emissions, and travel times per mode, their computational
+∗Corresponding author. E-mail address: elena.natterer@tum.de, Work Address : Arcisstr. 21, 80333 Munich, Germany,
+Phone : +49 89 28922438
+Preprint submitted to Elsevier March 15, 2025
+This preprint research paper has not been peer reviewed. Electronic copy available at: https://ssrn.com/abstract=5182100Preprint not peer reviewed
+======================================================================
+PAGE 2
+======================================================================
+intensity severely limits the number of scenarios that can be tested in practice.
+Agent-based models can be understood as functions that map policy interventions to their corre-
+sponding effects - both at the link level, such as changes in traffic volumes on specific street segments,
+and at the system level, including emissions, mode shifts, and travel times.
+Machine learning (ML) has emerged as a powerful tool for approximating complex functions when
+trained on sufficient data. A key milestone in its application to transportation was the study by
+Sroczy´ nski and Czy˙ zewski (2023), which demonstrated that ML models can replicate traffic patterns
+with accuracy comparable to microscopic simulations. While not directly related to this work, such
+advances highlight the potential of ML to approximate intricate relationships in transportation systems.
+If machine learning could effectively approximate agent-based models, it could serve as the foundation
+for fast and scalable surrogates. Even if their predictions were not perfectly aligned with full agent-
+based simulations, the ability to rapidly filter out ineffective policy setups and thus being able to focus
+computational resources on the most promising solutions would be a major advantage. Furthermore,
+such an approach could reveal novel policy combinations that human planners might not have initially
+considered. Once trained, such a surrogate model could predict the impacts of policies within seconds,
+enabling efficient scenario exploration and large-scale optimization.
+Graph Neural Networks (GNNs) are machine learning models specifically designed to handle graph-
+structured data. GNNs have gained increasing attention in the transportation domain due to their ability
+to capture spatial dependencies, making them well-suited for modeling complex network dynamics. As
+such, intersections or street segments can be represented as nodes, while edges capture relationships such
+as connectivity or proximity. Their ability to capture spatial dependencies within urban networks makes
+them an intuitive choice for predicting the impact of policy interventions on link-level.
+In this paper, we present a surrogate model for agent-based transport simulations, leveraging a Graph
+Neural Network to approximate the effects of policy interventions. We evaluate its performance using
+the large-scale MATSim simulation of Paris, France, applying the policy “50% capacity reduction on
+main roads”. Importantly, the developed method is not limited to this specific policy or location; it can
+be applied to any policy intervention in any city.
+Our results show that the surrogate model can accurately predict changes in traffic volume per street
+segment resulting from the policy, demonstrating the feasibility of using Graph Neural Networks as
+surrogates for agent-based models in transport planning. This approach enables efficient solution-space
+exploration, allowing (1) planners to systematically narrow down policy options and identify the most
+effective interventions and (2) providing an efficient methodology for objective evaluation in optimization-
+based approaches.
+This paper is structured as follows: Section 2 reviews the relevant literature, followed by Section
+3, which introduces the used methodology. Section 4 provides an in-depth explanation of the surrogate
+model, while Section 5 outlines the methodology for assessing its accuracy. In Section 6, we introduce the
+case study based on a MATSim simulation of Paris, France, to validate the proposed approach. Finally,
+Section 7 presents the results, and Section 8 concludes with key insights, methodological limitations, and
+directions for future research.
+2. Background
+2.1. Agent-Based Models for Transport Policy Evaluation
+Agent-based models (ABMs) have become a widely adopted approach for analyzing transportation
+systems due to their ability to simulate individual decision-making processes and interactions at a fine-
+grained level (Kagho et al., 2020). Unlike macroscopic and mesoscopic models, which aggregate traveler
+behavior, ABMs explicitly model each agent (e.g., travelers, vehicles) and their adaptive choices, allowing
+for a more detailed representation of network dynamics and behavioral responses to policies, as shown
+e.g. by Horni et al. (2016) and Macal and North (2010).
+Agent-based models have been widely applied to assess various transportation policies, including
+congestion pricing (Ben-Dor et al., 2024), parking fee schemes (Balac et al., 2017), the impact of speed
+limits on street safety and emissions (Lu et al., 2023), and to evaluate low-traffic zones (Yin et al., 2024;
+M¨ uller et al., 2023).
+ABMs are particularly well-suited for analyzing the impact of emerging mobility solutions and their
+integration into existing transportation systems. As urban mobility continues to evolve, there is an
+2
+This preprint research paper has not been peer reviewed. Electronic copy available at: https://ssrn.com/abstract=5182100Preprint not peer reviewed
+======================================================================
+PAGE 3
+======================================================================
+urgent need for innovative transport solutions that not only improve efficiency and sustainability but
+also integrate seamlessly with current infrastructure.
+The integration of emerging transport modes and mobility schemes into existing transportation sys-
+tems presents both challenges and opportunities for policymakers and planners. Understanding travel
+behavior and demand in these evolving systems is essential for designing adaptive infrastructure and
+policies that can accommodate technological advancements and urban mobility transitions. Modern
+travelers’ decisions are influenced by spatial, societal, and economic factors, adding complexity to the
+prediction of travel behavior in changing environments. Recent studies emphasize the need to analyze
+how emerging transport modes - such as ridesharing, electric vehicles, and autonomous vehicles - interact
+with existing systems. These interactions can be competitive or complementary, depending on regional
+and national contexts (Bastarianto et al., 2023).
+Agent-based models provide a powerful approach to studying these interactions. They can be used to
+assess the integration of new transport modes with existing systems and to evaluate sustainable mobility
+transitions, such as shared mobility services (H¨ orl et al., 2021), electric vehicle adoption (Marmaras
+et al., 2017), and demand-responsive transit (Auld et al., 2016).
+By simulating traveler behavior and mobility trends, ABMs enable researchers and policymakers to
+explore potential impacts and identify strategies for optimizing urban mobility. Despite these advantages,
+the increasing complexity of ABMs also poses computational challenges, especially when scaling to large
+urban regions. As the number of agents and interactions increases, computational costs rise rapidly,
+making real-time policy testing difficult (Balmer et al., 2008).
+2.2. Computational Challenges of Agent-Based Models
+The disadvantage of agent-based simulations is a high run-time of usually several hours, limiting the
+amount of scenarios that can be tested. Large-scale ABMs simulate thousands to millions of agents,
+each with their own decision-making processes. This requires significant memory and processing power,
+with computational demands growing rapidly as more agents and decision rules are incorporated. Since
+many ABMs do not parallelize efficiently, execution times often increase non-linearly, making real-time
+scenario testing infeasible (Auld et al., 2016; Bastarianto et al., 2023).
+Improving the scalabilitiy and efficiency of agent-based traffic simulations is an open research ques-
+tion. For the MATSim simulator, Laudan et al. (2025) compare local parallelization with distributed
+computing approaches, but show limitations in acceleration. Furthermore, MATSim is a highly modu-
+lar framework that is used by numerous domain experts from the transport field that often only have
+basic programming knowledge. This is a main reason why MATSim is still implemented in Java which
+is comparably slow with respect to other programming languages, but allows for quick adaptation and
+extension with new components. An interesting approach, therefore, remains to provide the framework
+with a high degree of implementation flexibility and find ways to approximate the high-level model out-
+comes. Smilovitskiy et al. (2025) present a GPU-accelerated transport model for the Isle of Wight using
+the FLAME-GPU framework. By comparing it with traditional non-GPU simulations like SUMO, the
+study demonstrates significant performance gains, enabling the simulation of larger vehicle populations
+and more detailed traffic interactions. However, the computational gains do not fully eliminate scal-
+ability issues, particularly for real-time or city-scale applications. Despite leveraging GPU hardware,
+simulations of large-scale networks still require extensive resources, and the dependency on specialized
+hardware limits accessibility. Furthermore, GPU-accelerated simulations often focus on the specific task
+of traffic assignment, but do not cover other aspects such as multimodality or mode choice behavior. An
+example where such elements are taken into account is presented by Saprykin et al. (2019). However,
+the rigid programming requirements for the GPU interaction limit modularization and easy adaptation
+and extension of the software by domain experts with basic programming knowledge as explained above.
+Manley et al. (2014) introduce a hybrid agent-based modeling framework that balances behavioral re-
+alism with computational efficiency by integrating detailed driver behavior with a simplified collective
+traffic flow model. They demonstrate how this approach enables scalable simulations of urban traffic
+dynamics while improving computational performance compared to traditional agent-based methods.
+However, they still face trade-offs between behavioral realism and scalability. The challenge lies in en-
+suring that large-scale simulations maintain sufficient fidelity in representing individual decision-making
+and emergent traffic phenomena.
+One widely-used alternative to speed up agent-based models for practical applications, is down-
+sampling the population size. For example, Llorca and Moeckel (2019) analyzed the effects of population
+scaling in agent-based transport models, investigating how different scale factors impact model runtime,
+travel times, and link volumes. The authors conclude that scaling down agent populations reduces
+3
+This preprint research paper has not been peer reviewed. Electronic copy available at: https://ssrn.com/abstract=5182100Preprint not peer reviewed
+======================================================================
+PAGE 4
+======================================================================
+runtimes but must be done carefully to avoid distortions in travel times. For the Munich metropolitan
+area they found that a 5% sample produces travel time distributions similar to a full-scale simulation
+(100% sample) while being 50 times faster. Further, they find that the choice of scale factor depends on
+the analysis level: aggregate studies may tolerate smaller samples, while detailed corridor or small-area
+analyses may require full populations.
+However, downsampling the population size in agent-based transport models increases the inherent
+stochasticity due to the random selection of agents, which lead to variability in simulation outcomes.
+This variability arises because different subsamples may not accurately represent the full population’s
+travel behaviors, affecting demand distribution, route choices, congestion levels, and travel times. Such
+stochastic effects are particularly pronounced with smaller sampling rates, where statistics can substan-
+tially deviate from those of full-scale models. (Ben-Dor et al., 2021)
+Concluding, the goal of fully scalable agent-based models remains out of reach, as current research
+has yet to make them feasible for large-scale applications. In practice, population downsampling is
+used to reduce computational demands, but even with this approach, testing a single policy can take
+days. Consequently, the demand for more computationally efficient alternatives of agent-based models
+has driven interest in machine learning-based surrogates, which could approximate agent-based model
+outcomes while preserving key behavioral dynamics, enabling faster policy evaluation and optimization.
+2.3. Machine Learning Surrogates for Traffic Simulations
+Machine learning surrogates for traffic simulations learn the relationships between a simulations’ input
+parameters (characteristics of the different street segments, due to its nature or due to the introduced
+policy) and output variables (traffic flow metrics on street segment level) from data generated by the
+traffic simulation. Once trained, the surrogate model can rapidly predict the outcomes of various policy
+scenarios without the need for computationally intensive simulations.
+Table 1 provides an overview for machine learning surrogates for traffic simulations: Liu et al. (2020)
+propose a machine learning and particle swarm optimization (PSO) approach to efficiently calibrate
+microscopic traffic simulation parameters. Four machine learning models (Decision Tree, SVM, Gaus-
+sian Process Regression, and ANN) are tested to predict simulation outputs, with ANNs achieving the
+best accuracy. The ANN-based surrogate model is then embedded in PSO to optimize parameters,
+demonstrating superior efficiency and effectiveness when applied to TransModeler with field data from
+Shanghai. While effective, the authors recognize some limitations: They used a Multilayer Perceptron
+(MLP) for the artificial neural network but suggest that future studies explore Convolutional Neural
+Networks (CNNs) or Recurrent Neural Networks (RNNs) for better performance.
+Cervellera et al. (2021) investigate the use of a deep learning architecture with low-discrepancy
+sampling for surrogate modeling of traffic simulations. The approach leverages deep neural networks for
+their strong approximation capabilities and low-discrepancy sequences to efficiently cover the input space.
+Applied to the SUMO microsimulator, this method outperforms traditional surrogate models, such as
+Gaussian processes, in high-dimensional optimization tasks like traffic demand calibration and traffic
+light optimization. The authors highlight the need for a deeper theoretical analysis of their approach
+in the surrogate modeling framework and suggest broader testing across different applications beyond
+traffic simulation.
+Graph Neural Networks have gained increasing attention in the transportation domain due to their
+ability to capture spatial dependencies, making them well-suited for modeling complex network dynamics.
+As a class of deep learning models designed for graph-structured data, GNNs represent entities such as
+intersections or street segments as nodes, while edges encode relationships like connectivity or proximity.
+Their architecture enables the effective modeling of both local and global spatial dependencies, which
+has led to successful applications in various traffic-related tasks. For example, Jiang and Luo (2024)
+provide a comprehensive review of GNNs in traffic forecasting.
+Despite their potential, the use of GNNs as surrogates for traffic simulations remains largely un-
+explored. To the best of the author’s knowledge, only Narayanan et al. (2024) have investigated this
+application: In their study, they examine the feasibility of GNNs as surrogate models for the four-step
+model. They introduce a formal definition of a GNN-based surrogate and propose an augmented data
+generation process using small networks (15–80 nodes) for training. The authors evaluate different GNN
+architectures at the link level through classification and regression tasks. The classification task involves
+predicting traffic flow categories: 0–10 veh/h (no transport usage), 10–500 veh/h (low transport usage),
+and more than 500 veh/h (medium/high transport usage). The regression task focuses on estimating
+exact traffic flow values. While the results are promising, the study is constrained by its small scale and
+exclusive focus on the four-step model.
+4
+This preprint research paper has not been peer reviewed. Electronic copy available at: https://ssrn.com/abstract=5182100Preprint not peer reviewed
+======================================================================
+PAGE 5
+======================================================================
+Authors Model Use Case ML Method Data
+SourcesEvaluation
+MetricsKey findings
+Liu, Zou, Ni,
+Gao, Zhang
+(Liu et al.,
+2020)Trans -
+Modeler
+(micro-
+scopic
+model)Traffic simu-
+lation calibra-
+tionDecision trees,
+Support Vec-
+tor Machines,
+Gaussian
+Process Re-
+gression,
+Artificial Neu-
+ral Networks
+(ANN), Par-
+ticle Swarm
+Optimization
+(PSO)Field data,
+simulated
+outputsPrediction
+accuracy,
+computational
+efficiencyANNs yielded the best
+prediction accuracy;
+ML+PSO methodology
+improved computational
+efficiency and effective-
+ness.
+Cervellera,
+Maccio,
+Rebora
+(Cervellera
+et al., 2021)SUMO Origin-
+destination
+(OD) demand
+calibration,
+traffic light
+optimization,
+and strategic
+mobility plan-
+ning.Deep Neu-
+ral Networks
+(DNNs),
+trained
+using low-
+discrepancy
+sampling
+(Sobol’ se-
+quences)Data gener-
+ated using
+SUMO, with
+OD flow val-
+ues as inputs
+and simulated
+traffic flows
+as outputs.
+Medium-sized
+urban net-
+work.1) Estimation
+accuracy of
+traffic flow
+at measure-
+ment points
+(MAE), 2)
+Distribution
+preservation
+comparing
+predicted
+and true flow
+distributions
+(MMD), 3)
+Surrogate
+model effec-
+tiveness in
+OD demand
+calibration.1) Deep learning-based
+surrogates outperform
+Gaussian Processes
+in high-dimensional
+traffic simulations, 2)
+Low-discrepancy sam-
+pling (Sobol’ sequences)
+improves training effi-
+ciency, accuracy, and
+reduces variance, 3)
+The surrogate better
+preserves traffic flow
+distributions, making
+it suitable for demand
+calibration, 4) Combin-
+ing deep learning with
+low-discrepancy sam-
+pling enhances efficiency
+without sacrificing accu-
+racy.
+Narayanan,
+Makarov,
+Antoniou
+(Narayanan
+et al., 2024)4-step
+modelReplicating
+traffic flows
+from simula-
+tionsGNN Synthetic
+transport
+simulation
+data, networks
+consisting of
+15-80 nodesAccuracy (F1
+Score, MAE
+and R2) and
+computational
+efficiencyProof-of-concept that a
+GNN can replicate traf-
+fic flows learned from the
+4-step model.
+This study Generic
+ABMPredicting
+the effects of
+transportation
+policies by
+approximating
+the outcomes
+of agent-based
+simulationsGNN Simulated
+ABM outputs
+from a large-
+scale network
+comprising
+over 30,000
+nodesAccuracy
+(MSE, MAE,
+R2, Pearson
+and Spearman
+Correlation),
+Impact of
+Simulation
+Stochasticity
+on the ErrorProof-of-concept that
+GNNs can learn the
+effect of transport poli-
+cies from agent-based
+models
+Table 1 – Summary of Machine Learning Surrogates for Transport Simulations, sorted by year
+In our study, the surrogate model effectively captures the complexity of agent-based simulations.
+Additionally, we evaluate our approach on large-scale networks - specifically Paris, France, with 30,000
+street segments. Finally, given that agent-based simulations inherently involve stochasticity due to the
+probabilistic nature of agent interactions, we examine its impact on model error - an aspect that has not
+been explored in previous studies.
+2.4. Contribution of this study
+In this work, we demonstrate that machine learning-based surrogate models can accurately replicate
+the outcomes of complex agent-based traffic simulations, effectively capturing the relationship between
+transportation policies and their impact on traffic volume at the link level.
+Our findings highlight the potential of GNN-based surrogates for systematically exploring the vast
+solution space of traffic policy combinations and their extents, and it lays the foundation for large-scale
+policy optimization. The contribution of this study is three-fold:
+1. Firstly, and at the core of this study, is the Proof of Concept of a machine-learning based surrogate
+model for agent-based transport simulations . By using a graph neural network architecture, we are
+able to predict the effects of policy interventions on a link level with high accuracy.
+2. Secondly, we examine the impact of simulation stochasticity on surrogate model error . Agent-based
+models inhibit randomness, due to the probabilistic nature of agent-based interactions. In trans-
+portation, downsampling the population is a common strategy to reduce computational costs, but
+5
+This preprint research paper has not been peer reviewed. Electronic copy available at: https://ssrn.com/abstract=5182100Preprint not peer reviewed
+======================================================================
+PAGE 6
+======================================================================
+increases stochastic variability. When the training data is generated from a downsampled pop-
+ulation, the added randomness effectively acts as noise, potentially reducing the accuracy of the
+surrogate model. To better interpret the results, we analyze how the stochastic variability affects
+surrogate accuracy. This provides insights into the model’s strengths and limitations, informing its
+applicability across different levels of downsampling.
+3. Finally, we validate our methodology on a large-scale case study . The GNN surrogate is tested
+using MATSim with 1% downsampled data on the Paris network, encompassing over 30,000 streets.
+This demonstrates the effectiveness of the machine learning surrogate in capturing transportation
+dynamics.
+3. Methodological Approach
+Figure 1 gives an overview of the general methodology: The framework integrates an ABM with a
+GNN to predict changes in traffic volume at the link level under different policy scenarios. The process
+begins with an ABM that simulates travel behavior based on three key components: the street network,
+which represents the street infrastructure; travel modes, which define different transportation options;
+and a synthetic population, representing individual travelers and their mobility choices.
+Two types of scenarios are considered: a base case (defined in Section 3.1), which captures existing
+traffic conditions such as baseline traffic volume ¯ veand positional attributes without any intervention,
+andpolicy scenarios , where the introduced policy leads to adapted traffic volumes.
+To efficiently process this information, the street network is transformed into a dual graph , where
+street segments are represented as nodes, and their connectivity is defined by edges. A GNN-based
+surrogate model is then applied to capture relationships between the network and the applied policy, as
+described in Section 4. Finally, the trained GNN predicts the change in traffic volume at the link level
+under active policy conditions.
+The relevant variables for the analysis are listed in table 2.
+Symbol Description
+E Set of edges in the street network, single edges denoted e∈E
+R Set of random seeds for which we perform simulation runs, random seeds denoted {r1, r2, ...}
+P Set of policies that may be implemented on edge level, policies denoted {p1, p2, ...}
+vr
+e Traffic volume on edge ein simulation run r, without policy intervention
+ve Average traffic volume on edge e, without policy intervention
+yr
+e,p Simulated change in traffic volume on edge e∈Ein simulation run rdue to policy p.
+ye,p Single realization of ye,p: Simulated change in traffic volume on edge e∈Edue to policy p
+for one simulation run.
+ye,p Average simulated change of traffic volumes on edge e∈Edue to policy p:ye,p=1
+RP
+Ryr
+e,p
+yp Mean of the simulated change of traffic volumes over all edges e∈Edue to policy p:
+yp=1
+EP
+Eye,p=1
+E1
+RP
+EP
+Ryr
+e,p
+ˆye,p Predicted (GNN surrogate) change in traffic volume on edge e∈Edue to policy p.
+Table 2 – Symbols used in this analysis
+3.1. Base case
+Thebase case represents a simulation scenario of the agent-based model without any policy interven-
+tion, serving as the reference point for predicting changes in traffic volume. It is generated by running
+multiple simulations with different random seeds and averaging the results at street level.
+Consider the simulation, without any policy intervention, repeated with |R|different random seeds.
+Each simulation repetition produces a traffic volume vr
+e, where r= 1,2, . . . ,|R|. For a single edge e∈E,
+the base traffic volume for edge eis then defined by ve:
+ve=1
+|R||R|X
+r=1vr
+e, (1)
+6
+This preprint research paper has not been peer reviewed. Electronic copy available at: https://ssrn.com/abstract=5182100Preprint not peer reviewed
+======================================================================
+PAGE 7
+======================================================================
+Figure 1 – Overview over the Methodology
+7
+This preprint research paper has not been peer reviewed. Electronic copy available at: https://ssrn.com/abstract=5182100Preprint not peer reviewed
+======================================================================
+PAGE 8
+======================================================================
+With this, we can directly define the variance of the base case traffic volume for edge e∈Eas:
+σ2
+e,b=1
+|R||R|X
+r=1(vr
+e−ve), (2)
+which quantifies the dispersion of traffic volume across independent simulation runs with different random
+seeds. In Section 5.3 we state an assumption under which this variance can be used for quantifying the
+aleatoric variance of our surrogate model.
+3.2. Problem Statement
+We aim to develop a machine learning-based surrogate model that estimates traffic volumes in re-
+sponse to policy interventions, using data from agent-based simulations. Specifically, the model learns
+how each intervention affects traffic on individual roads within the network.
+Mathematically speaking, our objective is to learn a function Fthat maps a set of input simulation
+parameters Psimto the corresponding simulation output S:
+F(Psim)→S. (3)
+This defines a regression problem where the goal is to approximate Fsuch that it captures the
+relationship between the input parameters and the resulting traffic volume changes. Let Fpdenote F
+under policy intervention p, mapping input features to traffic volume changes under p. The goal is to
+learn the function:
+Fp:R|E|×n→R|E|, (4)
+which maps a set of nstreet characteristics per edge to the predicted change in traffic volume ˆ ye,p
+caused by a given policy intervention p. The impact of a policy intervention on a street is measured by
+the change in its traffic volume relative to the base case: For each edge e∈E, we predict the traffic
+volume change under intervention pcompared to the base case.
+To train the model, we use the Mean Squared Error (MSE) loss function, which quantifies the
+difference between predicted and actual values. Let xedenote street characteristics for street e:
+L(Fp) =1
+|E|X
+e∈E(F(xe)−ye,p)2(5)
+=1
+|E|X
+e∈E 
+ˆye,p−1
+|R|X
+r∈Ryr
+e,p!2
+. (6)
+In an ideal setting, minimizing this loss would require |R|simulation runs per policy intervention to
+compute the expected change in traffic volume. This distinction is crucial: the observed traffic volume
+change in a single run, yr
+e,p, differs from the expected change averaged over multiple runs with different
+random seeds, ye,p. Ideally, the surrogate model would predict ye,pto account for randomness in the
+simulation.
+However, due to computational constraints, each policy intervention is simulated only once ( |R|= 1),
+so the predicted value ˆ ye,papproximates ye,prather than the expected mean. Consequently, we train our
+model using this single realization, minimizing:
+L(F) =1
+|E|X
+e∈E 
+ˆye,p−yr
+e,p2. (7)
+where yr
+e,pis the observed traffic volume change for a simulation run with random seed r. As a
+result, the surrogate model approximates a single realization rather than the expected value, inherently
+incorporating the stochasticity present in the data. Since we always work with a single realization, we
+denote yr
+e,pasye,phereafter.
+The objective is to find the optimal function F∗that minimizes this loss:
+F∗= arg min
+FL(F). (8)
+8
+This preprint research paper has not been peer reviewed. Electronic copy available at: https://ssrn.com/abstract=5182100Preprint not peer reviewed
+======================================================================
+PAGE 9
+======================================================================
+To develop an effective surrogate model, we first define the input and output parameters of the
+machine learning-based surrogate (see Section 4). The evaluation metrics are described in Section 5.1
+and 5.2. Given the high computational cost of full-scale simulations, we train the model on downsampled
+population data, which increases the variance of traffic volumes across simulation runs with different
+random seeds. Since the model predicts a single realization of the stochastic simulation rather than the
+expected value ye,p, it inherently reflects the randomness in the data and cannot reduce stochasticity
+beyond what is already present. We further analyze this in Section 5.3, highlighting the role of base case
+variance in error estimation.
+4. The Graph Neural Network Surrogate Model
+As a theoretical basis for our surrogate model, we propose using Graph Neural Networks. These are
+machine learning models that deal with graph-structured data. Street networks of cities form a natural
+graph, where edges represent streets and nodes represent intersections. In our case, where the goal is to
+predict features on street level, GNNs are the intuitive choice. Because most GNNs are optimized for
+node-based predictions, we transform the street network graphs into dual graphs, where nodes correspond
+to street segments and edges capture the connections between segments. This transformation allows the
+GNN to operate at the level of street segments rather than intersections, making it well-suited for learning
+spatial dependencies and traffic dynamics. To provide a clear understanding, we first explain the model’s
+inputs and outputs, followed by a detailed description of its architecture.
+4.1. Input and Output
+The input Psimfor the model is the dual graph containing the following attributes, for each street
+e∈E, where |E|corresponds to the number of nodes in each of the transformed dual graphs:
+1.Static features provide fixed attributes such as base traffic volume ve, capacity and speed limit in
+the base case, and street segment length.
+2.Variable features represent attributes modified by implemented policies, such as reductions in
+capacity or speed.
+3.Positional features capture the spatial information of each street, including the coordinates of its
+start and endpoint.
+We denote the number of static, variable, and positional features, respectively, as ds,dv, and dp.
+The output Scaptures the impact of the implemented policy at the street level, such as changes in
+traffic volume relative to the base case, represented by ˆ ye,pfor each street e.
+4.2. Architecture
+The architecture of the GNN, shown in Figure 2, consists of multiple stages and supports a flexible
+number of features.
+•PointNet Convolution: The model begins with two PointNet Convolution (Charles et al., 2017)
+layers. The first PointNet layer processes an input feature set of dimension ( dp+ds+dv), mapping
+it to a higher-dimensional space using a local Multi-Layer Perceptron (MLP) with 256 hidden
+units. A global MLP follows, further transforming the feature representations with 512 hidden
+units in successive layers. The second PointNet layer expands the input dimensions to 512 + dp,
+integrating the coordinates for the end position of the street segment, and follows a similar MLP-
+based transformation.
+•Transformer Convolution: Two layers of Transformer Convolutions (Shi et al., 2021) follow, lever-
+aging self-attention mechanisms to dynamically assign importance to neighboring segments. The
+first Transformer layer operates with 64-dimensional embeddings (using four attention heads), while
+the second layer increases the embedding size to 128, again using four attention heads. This enables
+the model to capture long-range dependencies within the street network.
+•GAT Convolution: The final stage consists of a two-layer Graph Attention Network (GAT) module
+(Veliˇ ckovi´ c et al., 2017). The first GAT layer projects embeddings into a 64-dimensional space using
+attention-weighted aggregation. The final layer then reduces the feature space to a single output
+dimension, completing the model’s predictions.
+9
+This preprint research paper has not been peer reviewed. Electronic copy available at: https://ssrn.com/abstract=5182100Preprint not peer reviewed
+======================================================================
+PAGE 10
+======================================================================
+Figure 2 – Architecture of the Graph Neural Network
+All layers (except for the ones in GAT module) use ReLU activations to introduce non-linearity.
+Kaiming and Xavier weight initialization methods are applied to ensure stable weight scaling, reducing
+the risk of vanishing or exploding gradients and improving training stability. The combination of Point-
+Net, Transformer, and GAT convolutions enables the model to effectively capture both local segment
+interactions and global dependencies in the transport system, making it well-suited for learning from
+street network data.1
+5. Methodology for Evaluating Surrogate Model Accuracy
+While the model is trained by optimizing the MSE between simulated and predicted traffic volume
+changes, additional metrics are used to provide a more comprehensive assessment of its accuracy and
+robustness.
+This section outlines our approach to evaluating the performance of the surrogate model on the link
+level. First, we introduce the evaluation metrics beyond MSE that are used for a thorough performance
+analysis. We also explain that model performance is assessed on the entire test set, with accuracy
+analyzed separately for different street types to identify variations (Section 5.1). Next, we describe the
+benchmarking methodology used to compare model performance against a naive baseline (Section 5.2).
+Finally, since agent-based simulations inherently introduce stochasticity, understanding its impact is
+crucial for a meaningful evaluation of the results. To better interpret the results, we examine the extent
+to which model error is influenced by simulation stochasticity (Section 5.3).
+5.1. Evaluation Metrics
+The test set consists of multiple scenarios, where each scenario corresponds to applying a policy p
+to a specific combination of districts. To evaluate model performance across different street types, we
+define aggregated evaluation metrics computed over the entire test set for each street type. Let Sbe the
+set of scenarios in the test set, and let Tbe the set of street types. Define Etas the set of edges in the
+test set that belong to street type t. The total number of such edges is given by |Et|=|S| × |T|.
+Aggregated Base Case Quantities
+Themean base case traffic volume for street type tis given by:
+¯vt=1
+|Et|X
+e∈Etve, (9)
+where verepresents the base case traffic volume for edge e(Section 3.1).
+1The code for the GNN surrogate can be found on https://github.com/enatterer/gnn predicting effects oftraffic policies
+10
+This preprint research paper has not been peer reviewed. Electronic copy available at: https://ssrn.com/abstract=5182100Preprint not peer reviewed
+======================================================================
+PAGE 11
+======================================================================
+Thebase case variance of traffic volumes , or simply base case variance , for street type tis defined as:
+σ2
+t,b=1
+|Et|X
+e∈Etσ2
+e,b, (10)
+where σ2
+e,bis the variance of traffic volumes for edge e, as defined in Equation 2.
+Aggregated Evaluation metrics
+To evaluate model performance at the road-type level, we define the following quantities: The average
+change in simulated traffic volume for street type tunder policy pis:
+¯yt,p=1
+|Et|X
+e∈Etye,p, (11)
+where ye,pis the simulated traffic volume change for edge eunder policy p. The variance for street type
+tunder policy pis:
+σ2
+t=X
+e∈Et(ye,p−¯yt,p)2. (12)
+We use the following metrics for assessing model performance:
+1.Mean Squared Error (MSE)
+The MSE serves as the primary loss function during training. Although it is a standard regression
+metric, its squared term disproportionately penalizes large errors, making it more sensitive to
+outliers. The MSE for street type tunder policy pis defined as:
+MSE t,p=1
+|Et|X
+e∈Et(ˆye,p−ye,p)2. (13)
+2.Mean Absolute Error (MAE)
+To complement MSE, we report the Mean Absolute Error, which is more interpretable in practical
+applications as it represents the average absolute error in the same units as the input (veh/day).
+Additionally, MAE is more robust to outliers than MSE, as it treats all errors equally rather than
+amplifying large deviations. This makes it particularly useful in cases where occasional extreme
+values might otherwise dominate the error metric. The MAE for street type tunder policy pis
+computed as:
+MAE t,p=1
+|Et|X
+e∈Et|ˆye,p−ye,p|. (14)
+3.Coefficient of Determination ( R2)
+Another standard regression metric is the coefficient of determination ( R2).R2measures the
+proportion of variance in the true values ye,pthat is explained by the model’s predictions ˆ ye,p,
+providing a standardized evaluation of predictive accuracy. R2is defined as:
+R2
+t,p= 1−P
+e∈Et(ye,p−ˆye,p)2
+P
+e∈Et(ye,p−ye,p)2, (15)
+where ye,pis the mean of the observed values ye,p. An R2value of 1 indicates a perfect fit, while an
+R2of 0 suggests that the model performs no better than simply predicting the mean ¯ yt,p. Negative
+values imply that the model introduces more error than a naive mean-based predictor.
+Unlike MSE and MAE, R2offers a relative measure of fit, which can be useful for comparing the
+prediction of the model on different street types with different variance. However, it can be sensi-
+tive to outliers and may be less reliable for highly skewed data distributions.
+4.Correlation Metrics: Pearson and Spearman
+To further assess the model’s performance, we compute the Pearson and Spearman correlation
+coefficients. Pearson correlation measures the strength of the linear relationship between actual and
+predicted values, indicating how well the predictions align in a linear sense. Spearman correlation,
+in contrast, evaluates the rank-based relationship, making it more robust to non-linear patterns.
+These correlation metrics complement MSE, MAE, and R2, offering additional insights into the
+quality of the predictions.
+11
+This preprint research paper has not been peer reviewed. Electronic copy available at: https://ssrn.com/abstract=5182100Preprint not peer reviewed
+======================================================================
+PAGE 12
+======================================================================
+5.2. Benchmarking Model Performance with Naive Baselines
+Since no established baseline exists for this problem, we introduce a simple mean-based baseline to
+assess model performance. This baseline assumes that the predicted change in traffic volume for each
+edge is equal to the average observed change in traffic volume across all edges in the test set.
+To evaluate model improvement over this baseline, we compare it across different metrics. For R2, the
+baseline value is always 0, as a mean-based predictor does not explain any variance beyond predicting the
+average. For Pearson and Spearman correlation , the naive baseline assumes no predictive power, meaning
+that model predictions have no meaningful monotonic or linear relationship with the true values. As a
+result, the expected baseline values for both correlation coefficients are also 0.
+While R2and correlation metrics are naturally bounded between 0 and 1, MAE does not have an
+inherent scale for comparison. To address this, we introduce a normalized MAE that expresses the error
+relative to the naive baseline. This ensures comparability across different evaluation metrics and allows
+for an intuitive interpretation of model performance:
+1−MAE
+Naive MAE. (16)
+This transformation ensures that the normalized MAE ranges from 0 to 1, where 1 represents perfect
+predictions (zero error), and 0 indicates no improvement over the naive mean-based predictor. Applying
+the same normalization to MSE would result in a formulation that is mathematically identical to R2
+(Equation 15). Therefore, we do not report a normalized MSE separately.
+By benchmarking against these naive baselines, we provide a clear and interpretable assessment of
+how much our surrogate model improves over a simple mean-based prediction.
+5.3. The Impact of Simulation Stochasticity on Surrogate Model Accuracy
+Agent-based models inhibit randomness. When running the same simulation under identical condi-
+tions, but with different random seeds, the outputs vary due to the probabilistic nature of agent-based
+interactions. Further, machine learning surrogates for ABMs rely on training data from downsampled
+populations, as using the full population is impractical due to the extensive computational resources
+required, increasing stochastic variability in the simulation outputs.
+Stochastic variability acts as noise and affects the accuracy of surrogate models: In ML terms, this
+is called aleatoric uncertainty . Unlike epistemic uncertainty , which stems from incomplete knowledge
+and can be reduced with more data or improved modeling, aleatoric uncertainty reflects variability that
+cannot be eliminated with the given data, only quantified.
+Given an optimal function F∗as stated in Equation 8, we seek to understand which role the aleatoric
+uncertainty, that stems from the agent-based simulation stochasticity, plays in the MSE.
+MSE(ˆ ye,p, ye,p) =E
+(ye,p−ˆye,p)2
+(17)
+=E
+(ye,p−ye,p+ye,p−E[ˆye,p] +E[ˆye,p]−ˆye,p)2
+(18)
+=E
+(ye,p−ye,p)2+ 2(ye,p−ye,p)(ye,p−E[ˆye,p]) (19)
++ 2(ye,p−ye,p)(E[ˆye,p]−ˆye,p) (20)
++ (ye,p−E[ˆye,p])2+ 2(ye,p−E[ˆye,p])(E[ˆye,p]−ˆye,p) (21)
++(E[ˆye,p]−ˆye,p)2
+. (22)
+E[ye,p−ye,p] = 0 by definition of expectation. Further, E[(ye,p−ye,p)(E[ˆye,p]−ˆye,p)] = 0,
+since ye,p−ye,p, representing the error due to randomness in the simulation, is independent of ˆ ye,p.
+The independence arises because ˆ ye,pis learned solely from ye,p. Thus, the cross terms vanish, leaving:
+E
+(ye,p−ˆye,p)2
+=E
+(ye,p−ye,p)2
+| {z }
+Aleatoric Variance+ (ye,p−E[ˆye,p])2
+| {z }
+Bias2+E[(E[ˆye,p]−ˆye,p)2]| {z }
+Surrogate Model Variance. (23)
+Each term represents a distinct source of error; while bias and variance measure how well the surrogate
+model fits the data (too much bias leads to underfitting, while too much variance leads to overfitting),
+the aleatoric variance represents the source of error that cannot be mitigated by improving the model
+architecture or training process.
+12
+This preprint research paper has not been peer reviewed. Electronic copy available at: https://ssrn.com/abstract=5182100Preprint not peer reviewed
+======================================================================
+PAGE 13
+======================================================================
+Given a policy intervention pand|R|independent simulation runs with different random seeds, the
+aleatoric variance quantifies the stochastic fluctuations in traffic volume for each edge e:
+σ2
+e,p=1
+|R|RX
+r=1(yr
+e,p−ye,p)2, (24)
+where yr
+e,pis the simulated traffic volume change on edge ein run r, and ye,pis its mean across all
+runs. Computing σ2
+e,prequires multiple simulations per scenario, which is computationally prohibitive.
+Now, recall the variance in the base case (Equation 2):
+σ2
+e=1
+|R|RX
+r=1(vr
+e−ve)2,
+These computations have already been performed, as multiple runs have been performed for accurately
+estimating the traffic volumes in the base case.
+Assumption. For moderately restrictive policies, edge-level variance remains largely unaffected. Thus,
+one can approximate the variance of an edge eunder policy pusing the base case variance: σ2
+e,p≈σ2
+e,b.
+5.4. Estimating the impact of simulation stochasticity on the MSE
+Model’s performance is bounded by the aleatoric uncertainty. Hence, when interpreting the results,
+it is important to estimate the impact of the simulation stochasticity in the model performance. If our
+Assumption in Section 5.3 holds, it follows straight away from Equation 23:
+MSE( F∗(xe))≥σ2
+e,b (25)
+Thus, the aleatoric component of the surrogate model’s error could be pre-computed using the base
+case variance, allowing to establish a theoretical lower bound on MSE due to simulation stochasticity
+alone. Then, one could assess the impact on the surrogate model and determine how much of the model
+error is fundamentally unavoidable, depending on the factor of downsampling of the simulation, which
+directly impacts the simulation stochasticity, used in training data.
+This would mark a key distinction for machine learning surrogates of ABM: unlike many machine
+learning applications where input uncertainty is difficult to quantify, here the source of aleatoric uncer-
+tainty is well-defined. We examine how simulation stochasticity, quantified as σ2
+e,b, relates to model error
+in our case study, as discussed in Section 7.4.
+The irreducible noise in Equation 23 arises because the expected value ye,p=1
+|R|P
+Ryr
+e,pis typically
+not computed due to the high computational cost of running each policy multiple times. Instead, the
+base case variance σ2
+e,bis readily available, as multiple simulation runs with different random seeds are
+already required as input for the model.
+Ifye,pwere available, the mean squared error MSE(ˆ ye,p,ye,p) would be:
+MSE(ˆ ye,p,ye,p) =E
+(ye,p−ˆye,p)2
+(26)
+= (ye,p−E[ˆye,p])2
+| {z }
+Bias2+E[(ˆye,p−E[ˆye,p])2]| {z }
+Surrogate Model Variance. (27)
+Thus, if ye,pwere available for every policy intervention p, the aleatoric variance would be zero. A more
+in-depth analysis of this phenomen can be found in Appendix A.
+6. Case Study
+To evaluate the effectiveness of our surrogate model, we test it on the large-scale MATSim model
+of Paris, France. The model is based on a synthetic population of the ˆIle-de-France region surrounding
+Paris (H¨ orl and Balac, 2021) which describes households, persons with their sociodemographic attributes
+and their daily activity sequences including information on when and where (by coordinate) the activities
+(home, work, shopping, ...) are performed. The process is open-source and entirely based on open data,
+which makes it fully replicable. In our case, 1% of households from the population of 12 million people
+are selected for performance reasons. The downsampled synthetic population is then simulated using
+MATSim for a baseline case of the entire region around Paris, and then cut so that only the agents
+13
+This preprint research paper has not been peer reviewed. Electronic copy available at: https://ssrn.com/abstract=5182100Preprint not peer reviewed
+======================================================================
+PAGE 14
+======================================================================
+Figure 3 – Workflow of the case study
+interacting with the city area and its surrounding high-capacity ring street ( boulevard p´ eriph´ erique ) are
+retained. The MATSim model simulates a typical workday, and we aggregate the traffic volumes at
+the link level over the entire day. As a result, traffic volume is expressed in units of vehicles per day
+(veh/day).
+Figure 3 provides an overview of the GNN surrogate model designed to predict traffic volume changes
+resulting from capacity reduction policies. The process begins with link-level inputs: policy scenarios ,
+simulated in MATSim, corresponding to combinations of districts where capacity reductions have been
+applied (see Section 6.1); the base case , representing the network without interventions and providing
+static features such as baseline volume, capacity, speed limits, and link length and positional features ,
+capturing the start and end coordinates of each link (see Section 3.1). For each simulated policy scenario,
+we compute the difference in traffic volume at the link level between the simulated policy scenario and
+the base case, establishing the target variable representing traffic volume changes due to the policy
+intervention. The GNN surrogate model is trained on these inputs, with the dataset split into training,
+validation, and test sets. It optimizes performance using the MSE loss function.
+We first explain the simulation setup, then the data preparation, and finally, the training process of
+the surrogate model.
+6.1. Simulation Setup
+We begin by generating 10,000 scenarios, each of which has the policy “50% Capacity Reduction”
+(p) being applied to different combinations of districts. The tested policy penforces a 50% capacity
+reduction on all primary, secondary, and tertiary roads within the selected districts in a scenario. The
+street network consists of approximately 35,000 street segments, with primary, secondary, and tertiary
+roads (as classified by OpenStreetMap) constituting about 15,000 of these.
+Parallelly, we compute the MATSim base case (see Section 3.1) by averaging the traffic volume
+per street segment across 50 independent runs with different random seeds. The base case serves as a
+reference point for quantifying the changes in traffic volume, due to the introduced policy.
+Paris is divided into 20 districts (“Arrondissements”). To generate district combinations, we follow a
+two-step process. First, we determine the size of each combination, i.e., the number of districts included.
+14
+This preprint research paper has not been peer reviewed. Electronic copy available at: https://ssrn.com/abstract=5182100Preprint not peer reviewed
+======================================================================
+PAGE 15
+======================================================================
+If chosen randomly, there are
+20X
+i=020
+i
+= 1,048,576
+possible combinations. The selection of district combinations follows a binomial distribution, X∼
+Binomial(20 ,0.5), with a mean of 10 and a standard deviation of approximately 2.24.
+To ensure the model accurately captures the localized effects of policy interventions, we focus on a
+smaller set of districts. Inspired by real-world transformations in Paris, where efforts have prioritized
+active mobility by expanding bike lanes and reallocating street space (Natterer et al., 2024), capacity
+reduction policies have been primarily implemented in Arrondissements 1 - 4, representing the “core” of
+the city. Therefore, we aim to generate district combinations with around four districts. To construct a
+diverse dataset, we generate 10,000 combinations using two different sampling strategies:
+1. Randomly sample 5,000 combinations with a set length following a normal distribution with mean
+4 and standard deviation 1.
+2. Randomly sample 5,000 combinations with a set length following an exponential distribution with
+mean 4.
+We run simulations for the selected combinations, resulting in 8,308 successfully completed runs. Each
+simulation took approximately one hour to complete on a high-performance cluster using 12 cores. The
+completed simulations are then used for training and testing the surrogate model.
+6.2. Data prepration
+The resulting simulations are first made compatible with the GNN by turning it into the Psimfor-
+mat (as described in Section 4.1). The corresponding dual graph has 31 ,635 street segments (nodes),
+and 59 ,851 edges (representing intersections). As illustrated in the top half of Figure 2, to analyze
+policy effects, we subtract the base case traffic volume from the intervention case (resulting from policy
+simulations), generating yr
+e,p, which acts as the ground truth for the GNN surrogate. At the network
+level, yr
+e,pcan be visualized as a difference plot, highlighting changes in traffic volume. Red areas in-
+dicate an increase in traffic volume compared to the base case, while blue areas represent a decrease,
+both driven by the policy intervention. Results presented in this format are shown in Figures 8, 9, and 10.
+As illustrated in Figures 2 and 3, each street segment is characterized by three types of features:
+static, variable, and positional. The selected features include:
+1.Static features ( ds):
+•Traffic volume base case ( ve)
+•Capacity base case
+•Speed limit
+•Length
+2.Variable features ( dv):
+•Capacity reduction
+3.Positional features ( dp):
+•xandycoordinates of start and end position
+Therefore, in our setup, ds= 4, dv= 1, and dp= 2, resulting in an input feature dimension of 7
+for the first PointNet convolution layer in the GNN surrogate. Initially, we considered a broader set of
+features, including categorical attributes such as street types and allowed transport modes. However,
+ablation tests revealed that the model did not effectively learn from these additional features, leading us
+to focus on the selected subset. For the second PointNet convolution layer, the input dimension equals
+514 (incorporating end position). See Section 4.2 for more details.
+As a preprocessing step, all the features, being continuous, are normalized using a standard scaler,
+ensuring they have zero mean and unit variance. This helps maintain numerical consistency across
+features and improves model convergence. Finally, the processed data is split into training, testing, and
+validation sets with a ratio of (80, 15, 5), yielding 6,646 scenarios for training, 1,246 for validation, and
+416 for testing.
+15
+This preprint research paper has not been peer reviewed. Electronic copy available at: https://ssrn.com/abstract=5182100Preprint not peer reviewed
+======================================================================
+PAGE 16
+======================================================================
+6.3. Training process of the surrogate model
+The GNN surrogate model is trained to predict changes in traffic volume on each street segment
+resulting from a policy intervention, relative to the base case. Its generalization ability is evaluated
+on unseen district combinations. The model is optimized using Mean Squared Error (MSE), ensuring
+accurate predictions while capturing network-wide traffic dynamics. As a baseline for performance,
+we use the Na¨ ıve MSE. Additionally, we log Spearman and Pearson correlation metrics to assess the
+consistency of the predictions.
+The GNN-Surrogate was implemented in PyTorch Geometric and trained for 750 epochs, with early
+stopping triggered if validation performance did not improve for 40 consecutive epochs (approximately
+5% of total training). To stabilize learning, a linear warm-up phase was applied for the first 5% of
+the total epochs ( ∼37.5 epochs), gradually increasing the learning rate before reaching the peak value
+of 5×10−4. The training process then followed a cosine decay learning rate schedule, progressively
+reducing the learning rate to 5 ×10−6by the end to enhance convergence. Gradient clipping was applied
+to prevent exploding gradients. The optimizer used was AdamW, with a weight decay of 1 ×10−4, acting
+as a regularizer to mitigate overfitting.
+During the training process, the model’s performance was evaluated using the validation loss, R2, and
+correlation metrics (Pearson and Spearman coefficients). The learning curves are illustrated in Figures 4
+and 5. The first figure shows that both training and validation loss (red and blue, respectively) decrease
+over time, while R2(green) increases, indicating improved predictive accuracy. Training stabilizes after
+approximately 700 epochs, with validation loss plateauing and correlation metrics reaching their peak.
+The second figure highlights the steady increase of both Pearson (brown) and Spearman (purple) corre-
+lations throughout training, demonstrating that the model progressively learns meaningful relationships
+in the data.
+Training was conducted on a single NVIDIA H100 GPU, taking approximately 23 hours to converge.
+After training, a single forward pass through the GNN takes less than a second, compared to the 1-hour
+computation time required to obtain results from the (downsampled) simulation.
+Figure 4 – Validation loss, training loss and R2
+7. Results
+7.1. Overall performance
+The trained surrogate model can predict the effects of policy interventions in randomly selected dis-
+trict combinations within milliseconds. It achieves an overall accuracy of R2= 0.76 and a MSE of 24.95
+on the test set, significantly outperforming a naive baseline prediction (Naive MSE = 103 .47). The base
+case variance is 8.88, which would serve as an estimation for a lower bound for MSE, representing the
+aleatoric variance - if Assumption 5.3 holds. The model achieves a MAE of 2.74 (Naive MAE = 3 .96),
+16
+This preprint research paper has not been peer reviewed. Electronic copy available at: https://ssrn.com/abstract=5182100Preprint not peer reviewed
+======================================================================
+PAGE 17
+======================================================================
+Figure 5 – Spearman and Pearson Correlation over the training process
+and strong predictive correlations, with a Spearman correlation of 0.47 and a Pearson correlation of 0.87.
+In this section, we first evaluate the model’s performance across different metrics and street types
+(Section 7.2), with a particular focus on the differences in predictions for roads with and without capacity
+reductions (Section 7.3). Further, we investigate the relationship between simulation stochasticity and
+model error in Section 7.4, as motivated in Section 5.3. Section 7.5 analyzes performance consistency
+across multiple evaluation metrics. Finally, we analyze results at the network level (Section 7.6): we first
+present results for three randomly selected test scenarios to provide a general overview, then we overlay
+results from all test scenarios to assess the overall error distribution across the network.
+7.2. Overall Performance Across Street Types
+To evaluate the model’s performance across the test set, we analyze key aggregated performance
+metrics for different street types, as shown in Table 3. The table presents for each street type, the
+number of roads that it consists of (Count), the average traffic volume counted throughout a day in the
+base case vt(as calculated in Section 3.1), the average variance in the base case σ2
+t,b(Eq. 2), the variance
+across street types σ2
+t(Eq. 12), the MSE per street type (Eq. 13), the MAE per street type (Eq. 14)
+andR2(Eq. 15). The table is sorted by its traffic volume in the base case vt. Since only a single policy
+pwas tested, the subscript pis omitted in this section for clarity.
+Street Type t Count vt σ2
+t,b σ2
+t MSE tMAE tR2t
+All Roads 31,635 52.21 8.88 103.42 24.95 2.74 0.76
+Trunk 1,011 505.16 18.87 209.05 105.28 6.22 0.51
+Primary 6,112 117.79 20.23 405.80 59.11 4.87 0.86
+Secondary 4,715 51.99 13.13 82.17 29.10 3.52 0.65
+Tertiary 4,130 36.54 11.05 47.47 19.87 3.00 0.58
+Residential 12,474 13.49 4.44 16.88 11.88 2.03 0.31
+Living Streets 774 4.82 1.20 4.40 3.67 1.18 0.17
+Table 3 – Model Performance Metrics by Street Type (aggregated over the test set, as defined in Section 5.1)
+The street network consists of approximately 35,000 street segments, with primary, secondary, and
+tertiary roads constituting about 15,000 of these. Residential roads make up the largest category (nearly
+13,000 roads), whereas living streets are the least common, with only 774 street segments. The policy of
+“50% Capacity Reduction” has been implemented in all primary, secondary, and tertiary roads if in the
+relevant scenario. The average traffic volume varies significantly depending on the street type. Trunk
+17
+This preprint research paper has not been peer reviewed. Electronic copy available at: https://ssrn.com/abstract=5182100Preprint not peer reviewed
+======================================================================
+PAGE 18
+======================================================================
+roads exhibit the highest base volume, with an average of 505.16 vehicles per day, while living streets
+have the lowest, averaging just 4.82 vehicles per day. We make the following key observations:
+1.Higher traffic volume in the base case leads to greater model accuracy : Across all street types,
+higher base case traffic volumes are strongly associated with higher absolute errors in terms of
+MSE and MAE.
+2.σ2
+t,bandσ2
+tare highly correlated, with a Pearson correlation of 0 .85. They do, however, measure
+different aspects of variability:
+•σ2
+t,bquantifies variance within simulation runs across multiple random seeds for the base case.
+•σ2
+tcaptures variance across all roads of a given type, reflecting differences in traffic volume
+changes between roads.
+3.σ2
+t,bandσ2
+tgenerally correlate with higher base traffic volume and accuracy, except for trunk roads :
+For most street types, greater traffic volume corresponds to higher variance across multiple simula-
+tion runs and across all streets of a given type, leading to improved predictive accuracy. However,
+trunk roads deviate from this trend.
+4.Trunk roads form an exception to the variance-accuracy relationship : Despite having the highest
+base traffic volume - approximately five times that of primary roads - trunk roads exhibit lower
+variance ( σ2
+t,b, and σ2
+t) than primary roads.
+•σ2
+t,bbeing lower for trunk than for primary roads means that trunk roads remain stable
+across different simulation runs with random seeds. For example, in Paris, the motorway ring
+street around the city, the Boulevard P´ eriph´ erique, consists of trunk street segments. Since
+this street is less affected by route-choice variability compared to other roads, such as primary
+roads, traffic volume remains relatively consistent, with minimal stochastic fluctuations during
+simulation runs.
+•The relatively low σ2
+tfor trunk roads suggests that trunk roads indicates that traffic patterns
+among trunk roads are more uniform compared to primary roads. This suggests that individual
+trunk roads exhibit similar traffic behavior, whereas primary roads show greater variability.
+•Additionally, the low σ2
+tcontributes to the relatively low R2. Since R2measures the proportion
+of variance explained by the model, lower variance inherently results in lower R2values - even
+for roads with high traffic volumes. The phenomen of lower variance leading to lower R2
+values, and a seeming contradiction between absolute error metrics (MSE/MAE) and R2is
+further explored in the next section (Section 7.3), where we examine the distinction between
+roads with and without capacity reduction.
+5.Poor performance on low-volume roads : In terms of R2, the model performs worst on roads with
+comparatively smaller traffic volumes, such as residential ( R2= 0.31) and living streets ( R2= 0.17),
+indicating that these street types exhibit the least predictable traffic patterns.
+7.3. Impact of Capacity Reduction on Model Performance
+Table 4 presents the model’s performance across different street types, distinguishing between roads
+with and without capacity reduction. Since reductions apply only to Primary, Secondary, and Tertiary
+roads, the analysis is limited to these categories.
+The number of observations ( Count ) represents the total street segments evaluated across all test
+scenarios. For instance, the 594,435 observations for primary roads with capacity reduction indicate the
+total number of primary street segments affected at least once across scenarios. Overall, the dataset
+includes 1.4 million street segments with capacity reduction and 4.3 million without.
+A consistent pattern emerges across all street types: roads with capacity reduction exhibit higher
+R2, Pearson, and Spearman correlation values, but also show higher MSE and MAE. This apparent
+contradiction between error metrics warrants further investigation. Looking closer, we observe also
+patterns in the characteristics of the two types:
+1. Roads with capacity reduction exhibit significantly higher variance, with primary roads, for exam-
+ple, showing a variance of 1,250.88 compared to just 90.63 for those without. Across all categories,
+variance for roads with capacity reduction is approximately eleven times greater than for roads
+18
+This preprint research paper has not been peer reviewed. Electronic copy available at: https://ssrn.com/abstract=5182100Preprint not peer reviewed
+======================================================================
+PAGE 19
+======================================================================
+Street Type t Count σ2
+t,b σ2
+t MSE tMAE tR2tPearson Sp.
+P/S/T, Cap. Red. 1,444,212 86.03 626.97 42.01 4.54 0.93 0.91 0.82
+P/S/T, No Cap. Red. 4,349,420 70.58 56.20 35.65 3.58 0.37 0.58 0.51
+Primary, Cap. Red. 594,435 134.29 1250.88 61.28 5.47 0.95 0.94 0.85
+Primary, No Cap. Red. 1,721,021 112.78 90.63 55.09 4.45 0.39 0.61 0.54
+Secondary, Cap. Red. 430,234 63.16 208.84 32.42 4.21 0.85 0.90 0.82
+Secondary, No Cap. Red. 1,423,878 49.35 42.01 27.59 3.24 0.34 0.58 0.51
+Tertiary, Cap. Red. 419,543 41.12 107.42 24.55 3.56 0.77 0.87 0.79
+Tertiary, No Cap. Red. 1,204,521 35.38 23.66 17.42 2.73 0.26 0.54 0.48
+•“P/S/T” stands for “Primary, Secondary, and Tertiary” roads.
+•“Cap. Red.” refers to roads affected by capacity reduction policies, while “No Cap. Red.” refers
+to roads unaffected by these policies across the test set.
+•“Pearson” denotes the Pearson correlation, and “Sp.” refers to the Spearman correlation.
+Table 4 – Model Performance Metrics by Street Type, with and without Capacity Reduction
+without. This increased variance naturally inflates R2values, as variance in the target variable
+directly affects its computation:
+R2
+t= 1−MSE t
+σ2
+t
+The higher variance is expected, as roads with capacity reduction experience more extreme fluctu-
+ations in traffic across scenarios. Some street segments are directly affected in one scenario (where
+their capacity is reduced) but only indirectly influenced in another (where no reduction occurs).
+This alternation between scenarios leads to a wider spread in observed traffic volume changes,
+explaining the high variance. Consequently, while R2may indicate strong model performance, it
+can be misleading when variance is high, as absolute errors remain significant despite the improved
+relative fit.
+2. Roads with capacity reduction systematically exhibit higher base case variance ( σ2
+t,b) compared to
+those without. Investigating this, we find a difference arises from a sampling bias, as detailed in
+Appendix B. Specifically, our selection method tends to choose districts with higher base case traffic
+volumes, which in turn have higher variance. Thus, the observed base case variance differences stem
+from a sampling artifact rather than a causal effect of capacity reduction, influenced by district
+selection frequencies and their base volumes.
+The first observation explains the high R2values observed for roads with capacity reduction. Together
+with the Pearson and Spearman correlations, these results confirm that the model performs better on
+roads with capacity reduction than on those without. Furthermore, if Assumption 5.3 holds, then the
+higher base case variance should also result in a higher MSE (see Section 5.4). This aligns with our
+findings and provides a clear explanation for the observed differences. Consequently, we conclude that
+the elevated MAE and MSE values for roads with capacity reduction are a direct consequence of sampling
+bias and increased base case variance.
+Our analysis further shows that base case variance accounts for a stable proportion of MSE across
+different policy scenarios, reinforcing Assumption 5.3. This suggests that stochasticity in the base sce-
+nario remains a strong predictor of variance under capacity reduction policies. However, to fully validate
+this assumption, we must empirically examine whether edge-level variance remains stable across policy
+interventions. This leads to the next section, where we investigate the relationship between simulation
+stochasticity and model error.
+7.4. Relationship of Simulation Stochasticity and Model Error
+In Section 5.3, we introduced an assumption, which states that for moderately restrictive policies,
+edge-level variance remains largely unaffected, suggesting to approximate the variance under policy p
+using the base case variance: σ2
+e,b≈σ2
+e. Here, we empirically investigate the validity of this assumption.
+19
+This preprint research paper has not been peer reviewed. Electronic copy available at: https://ssrn.com/abstract=5182100Preprint not peer reviewed
+======================================================================
+PAGE 20
+======================================================================
+7.4.1. Implications for Model Error
+If the assumption in Section 5.3 holds, we would expect a strong relationship between base case
+variance and model error across different scenarios.
+Street Type t σ2
+t,b MSE tShare of σ2
+t,bin MSE t
+All Roads 8.88 23.35 38.03%
+Trunk 18.87 85.78 22.00%
+Primary 20.23 58.56 34.55%
+Primary, Cap. Red. 24.09 72.98 33.01%
+Primary, No Cap. Red. 19.24 54.35 35.40%
+Secondary 13.13 27.54 47.69%
+Secondary, Cap. Red. 16.11 33.99 47.39%
+Secondary, No Cap. Red. 12.42 25.89 47.96%
+Tertiary 11.05 18.92 58.43%
+Tertiary, Cap. Red. 12.50 24.54 50.95%
+Tertiary, No Cap. Red. 10.70 17.38 61.58%
+Residential 4.44 10.65 41.69%
+Living Streets 1.20 3.34 35.93%
+Table 5 – Base Case Variance and it’s contribution to MSE
+Table 5 examines the contribution of base case variance to MSE across street types. The proportion
+of MSE explained by base case variance is highest for tertiary roads without capacity reduction (61.58%)
+and lowest for trunk roads (22.00%). This suggests that for tertiary roads, most of the model’s error is
+attributable to inherent traffic variability, whereas for trunk roads, a larger portion of the error stems
+from other factors, such as complex traffic interactions or model limitations. Note that if this proportion
+were 100%, provided that the assumption holds, the MSE could be entirely explained by base case
+variance, meaning no further model improvements would be possible. Thus, the surrogate model is often
+performing close to its theoretical limit, constrained by the uncertainty in the training data.
+Generally, secondary and tertiary roads have higher proportions of base case variance in MSE, while
+trunk and primary roads with capacity reduction have lower shares, suggesting greater prediction chal-
+lenges in these areas.
+An important observation is that within each street type, the share of base case variance in MSE
+remains relatively stable, regardless of whether capacity reduction is applied. For example, primary
+roads have a share of 33.01% with capacity reduction and 35.40% without, while secondary roads remain
+around 47.39% and 47.96%, respectively. However, tertiary roads show a larger difference (50.95% vs.
+61.58%). This suggests that:
+1. Base case variance ( σ2
+t,b), derived from the base scenario alone, remains a strong predictor of
+stochasticity even when capacity reduction is introduced. This supports our assumption that edge-
+level variance remains largely stable under moderate policy interventions.
+2. While absolute values of MSE and variance increase with capacity reduction, their ratio remains
+relatively stable. This indicates that increased prediction error (MSE) under capacity reduction is
+largely proportional to the inherent stochasticity of each street type rather than additional obstacles
+for the model.
+3. The characteristic ratio of variance to MSE varies across street types but follows a predictable
+pattern - around 34% for primary roads, 48% for secondary roads, and 55% for tertiary roads.
+This suggests that each street type has an intrinsic relationship between inherent stochasticity and
+prediction error, though the degree of stability varies depending on the street type, and not so
+much on the policy intervention.
+Figure 6 illustrates the relationship between model error and simulation stochasticity across different
+street types. Simulation stochasticity, measured as variance of the base case, is shown on the x-axis,
+while model error, represented by MSE, is displayed on the y-axis. Each dot corresponds to a street type,
+positioned according to its variance and MSE, with the blue dashed line representing the best-fitting
+regression line. The grey dashed line denotes the lower bound on the MSE, as established in Section 5.3.
+20
+This preprint research paper has not been peer reviewed. Electronic copy available at: https://ssrn.com/abstract=5182100Preprint not peer reviewed
+======================================================================
+PAGE 21
+======================================================================
+Figure 6 – Relationship between base case variance and MSE across street types. The strong correlation (r = 0.80) suggests
+that base case variance is a reliable predictor of model error across different policy scenarios.
+The strong correlation between MSE and base case variance confirms that simulation stochasticity
+is a major driver of model error. Most street types align well with the expected relationship between
+the MSE and the simulation stochasticity, except for trunk roads, which exhibit disproportionately high
+MSE relative to their variance. This discrepancy is likely due to their higher traffic volumes but lower
+fluctuation compared to other street types.
+We conclude that in our use case, the base case variance can serve as a reliable estimator for prediction
+uncertainty. This assumption holds also because policy interventions affect only a limited subset of roads
+in each scenario. While up to 14,947 roads (namely primary, secondary, and tertiary roads) of the 31,635
+roads are eligible for capacity reduction, in practice, only about 3,000 roads (roughly 10% of the total
+network) are modified per scenario, assuming an even distribution across four districts on average. While
+some deviations are expected, our findings suggest that base case variance provides a reliable and easily
+obtainable approximation of aleatoric variance arising from simulation stochasticity in surrogate models
+for agent-based models.
+7.5. Evaluation Across Multiple Metrics
+Figure 7 presents a radar plot that visualizes model performance across different street categories
+using all presented evaluation metrics, sorted by their R2value. To facilitate a fair comparison across
+metrics, MAE values are normalized using their respective naive baseline values, constraining them
+between 0 and 1, where higher values indicate better performance (see Section 5.2). For clarity, the
+radar plot groups roads with capacity reduction and those without together. Each street type exhibits a
+distinctive polygonal trace, forming a diamond-like shape with relatively consistent scores across metrics.
+The radial grid lines at 0.2 intervals highlight substantial performance differences, with deviations of up
+to 0.3 - 0.4 between the best- and worst-performing categories.
+The radar plot shows that the trends observed in Section 7.2 and Section 7.3, corresponding to Table
+3 and Table 4, remain consistent across evaluation metrics:
+1.General Hierarchy of Street Types : The ranking of street types in terms of accuracy remains con-
+sistent across multiple error metrics. Specifically, primary roads demonstrate the highest accuracy
+across all metrics, while Secondary roads achieve best in all but Spearman correlation. Tertiary
+roads rank next for R2and Pearson correlation, whereas Trunk roads outperform them in MAE
+21
+This preprint research paper has not been peer reviewed. Electronic copy available at: https://ssrn.com/abstract=5182100Preprint not peer reviewed
+======================================================================
+PAGE 22
+======================================================================
+Figure 7 – Radar plot comparing model performance metrics across different street types, sorted by R2value.
+and Spearman correlation. This ranking is consistently followed by residential streets, with living
+streets exhibiting the lowest performance across all metrics.
+2.Impact of Capacity Reductions: The trend observed in Table 4 is also reflected across additional
+evaluation metrics: Primary, Secondary, and Tertiary roads with capacity reductions consistently
+outperform their counterparts without capacity reductions across all metrics.
+Thus, the generally consistent diamond shapes across metrics suggest that the model’s performance is
+stable across different evaluation criteria. This indicates that variations in accuracy stem from inherent
+differences between street types rather than inconsistencies in the evaluation metrics.
+7.6. Network-Level Evaluation: Visual Analysis and Interpretation
+To extend our analysis from link-level to network-level performance, we examine both specific test
+cases and aggregate patterns.
+7.6.1. Individual Test Case Analysis
+We first present three randomly selected test cases from our test set in Figures 8, 9, and 10. These
+figures compare the outputs of MATSim (top) with our surrogate model predictions (bottom), showing
+changes in traffic volume relative to the base case (see Section 3.1). The color scale ranges from blue
+(50% decrease) to red (50% increase) in traffic volume.
+For Test Case 1, we observe a MSE of 2 .21 and R2= 0.57, compared to a naive baseline MSE of
+35.86. Test Cases 2 and 3, while showing higher MSE (4 .16 and 3 .68 respectively), achieve better R2
+scores (0 .81 and 0 .79) due to their substantially higher baseline MSE (152 .91 and 125 .33). This pattern
+indicates that while Test Cases 2 and 3 present more challenging prediction tasks with higher variance
+in the target variable, the model more effectively captures the underlying patterns relative to the mean
+prediction.
+The model demonstrates strong performance in predicting traffic reductions due to capacity reduction
+policies, visible as blue segments in the plots. However, sometimes the model sometimes struggles to
+accurately represent evasive behavior: when comparing the top of the figure (MATSim output) with
+the bottom of the figure (surrogate model output), red street segments appear in the surrogate model’s
+output that are absent in the MATSim results.
+This suggests that the model sometimes falsely detects evasive behavior when none has actually
+occurred. Addressing this issue would likely require additional training data to improve the model’s
+ability to differentiate between genuine evasive maneuvers and regular traffic patterns.
+22
+This preprint research paper has not been peer reviewed. Electronic copy available at: https://ssrn.com/abstract=5182100Preprint not peer reviewed
+======================================================================
+PAGE 23
+======================================================================
+These findings align with our quantitative analysis showing generally higher accuracy for roads with
+capacity reduction and higher traffic volumes, across all evaluation metrics (Section 7.5).
+Figure 8 – Test case 1: Simulated (top) vs. predicted (bottom) change in traffic volume.
+7.6.2. Aggregate Pattern Analysis
+To assess the spatial distribution of prediction errors across Paris, we computed and visualized two
+complementary maps: one showing absolute differences and the other showing relative differences be-
+tween predicted and actual traffic volumes (Figures 11 and 12). For computing this, we first computed
+difference plots for each test scenario by calculating the discrepancy between MATSim-simulated and
+model-predicted traffic volume changes at the edge level. As illustrated in Figures 8, 9, and 10, we then
+aggregated these differences across all test cases to compute the average prediction error δefor each edge
+e∈E, providing comprehensive assessment of model performance across the entire test set:
+δe=X
+s∈S|ye,p,s−ˆye,p,s|
+ye,p,s(28)
+The absolute differences map visualizes raw prediction errors in vehicle counts, with discrete thresh-
+olds at 5, 10, and 20 vehicles to highlight varying levels of prediction accuracy. Meanwhile, the relative
+differences map normalizes errors by the base traffic volume of each street segment, using 10%, 50%, and
+100% thresholds to account for differences in traffic scale across various street types and locations.
+23
+This preprint research paper has not been peer reviewed. Electronic copy available at: https://ssrn.com/abstract=5182100Preprint not peer reviewed
+======================================================================
+PAGE 24
+======================================================================
+Figure 9 – Test case 2: Simulated (top) vs. predicted (bottom) change in traffic volume.
+This dual visualization approach reveals an interesting spatial pattern: while absolute errors are
+higher in central areas (decreasing from 3.41 to 1.71 vehicles from center to periphery), relative errors
+show an inverse relationship, increasing from 20.2% in the center to 36.8% in peripheral areas. This
+pattern can be attributed to the higher and more stable traffic volumes in central areas compared to the
+more variable traffic patterns in peripheral zones, where even smaller absolute errors can translate into
+larger percentage deviations.
+In both representations (relative and absolute), it is evident that the model achieves high accuracy
+on the main street network. This aligns with the results in Section 7.6, indicating that roads with higher
+traffic volumes show generally higher accuracy (across all metrics, see Section 7.5).
+8. Conclusion
+This study explores the use of machine learning as surrogate models for large-scale agent-based
+transport simulations. The applied graph neural network can succesfully learn the effects of capacity
+reduction policies on urban traffic patterns and captures changes in traffic volume on link level. In a
+case study using the MATSim model of Paris, the key findings were as follows:
+•Surrogate Model Performance: The GNN-based model accurately predicts traffic changes due
+to capacity reduction policies, achieving an R2of 0.76 and strong correlation metrics on the overall
+24
+This preprint research paper has not been peer reviewed. Electronic copy available at: https://ssrn.com/abstract=5182100Preprint not peer reviewed
+======================================================================
+PAGE 25
+======================================================================
+Figure 10 – Test case 3: Simulated (top) vs. predicted (bottom) change in traffic volume.
+test set. While absolute errors remain, the model outperforms naive baselines and captures spatial
+dependencies effectively.
+•Variance and Model Error: The variance in the base case proves to be a strong predictor of
+model error. The share of base case variance in the Mean Squared Error remains stable across
+street types, confirming that simulation stochasticity is a dominant factor influencing surrogate
+model errors.
+8.1. Limitations and Future Work
+Despite the strong performance of the surrogate model, several limitations remain that should be
+addressed in future research.
+•Computational Cost and Limited Transferability
+While the trained GNN surrogate enables rapid policy evaluation, its initial training process is
+computationally intensive. In our case, 10,000 full-scale ABM simulations - each requiring approx-
+imately one hour on a high-performance computing cluster - were necessary before deployment.
+This substantial preprocessing effort limits adaptability, as the model must be retrained for each
+new city or policy setting. Furthermore, its applicability is restricted to cities where an agent-
+based simulation exists, making it less feasible for cities without pre-existing ABMs or with limited
+25
+This preprint research paper has not been peer reviewed. Electronic copy available at: https://ssrn.com/abstract=5182100Preprint not peer reviewed
+======================================================================
+PAGE 26
+======================================================================
+Figure 11 – Absolute difference (MAE) between predicted and actual over all roads, over all observations in the test set
+Figure 12 – Relative difference (MAE) between predicted and actual over all roads, over all observations in the test set
+26
+This preprint research paper has not been peer reviewed. Electronic copy available at: https://ssrn.com/abstract=5182100Preprint not peer reviewed
+======================================================================
+PAGE 27
+======================================================================
+computational resources. Future work should explore inductive graph learning and domain adap-
+tation techniques to enhance generalizability across different urban settings without requiring full
+retraining.
+•Neglect of Physical Traffic Principles
+The surrogate model relies on learned representations rather than explicitly incorporating physical
+traffic flow constraints. While this allows flexibility and efficiency, it may overlook fundamental
+principles such as flow conservation, congestion spillover, capacity saturation, and queue propaga-
+tion. Future research should explore hybrid approaches that integrate physics-based constraints
+with data-driven learning to enhance robustness.
+•Impact of Population Scaling
+To balance computational efficiency and practical applicability, we trained the model using sim-
+ulations scaled to 1% of households. While this approach enables feasible training, it introduces
+limitations. Smaller samples may distort travel time distributions and underrepresent certain travel
+behaviors, potentially affecting prediction accuracy. Studies suggest that a 5% or 10% scaling fac-
+tor would improve fidelity, though at a higher computational cost. Future work should explore
+strategies to mitigate these effects, such as bias correction techniques or hybrid approaches that
+combine multiple scaling factors.
+•Interpretability and Transparency
+Interpreting ML-based surrogate models remains a challenge, particularly in policy-sensitive ap-
+plications. While GNNs effectively capture complex spatial dependencies, their decision-making
+processes lack transparency, making it difficult for policymakers to validate predictions. Enhanc-
+ing model explainability through interpretable GNN architectures or post-hoc analysis techniques
+could improve trust and adoption.
+Addressing these challenges will improve the adaptability and reliability of GNN-based surrogate
+models, ensuring their broader applicability in transport policy evaluation.
+Despite its current limitations, the surrogate model’s rapid evaluation capabilities could enable a
+range of applications in the long run. First, it could facilitate simulation-based optimization, allowing
+policymakers to efficiently explore large solution spaces and identify optimal policy setups. Second, its
+speed makes real-time control applications viable, enabling swift scenario evaluations in time-sensitive
+decision-making contexts. These capabilities can then help planners to systematically refine policy
+options to identify the most effective interventions and also provide a computationally efficient framework
+for objective evaluation in optimization-based approaches.
+9. Acknowledgments
+This work was supported by the German Federal Ministry of Transport and Digital Infrastructure
+for providing funding through the project “MINGA” with grant number 45AOV1001K. We remain
+responsible for all findings and opinions presented in the paper. We are grateful to Florian Dandl for
+insightful discussions on the methodology and to Ramandeep Singh for her valuable feedback. The
+authors gratefully acknowledge the Leibniz Supercomputing Centre for funding this project by providing
+computing time on its SuperMUC-NG-Cluster and LRZ AI Systems.
+10. Author contributions
+The authors confirm their contributions to the paper as follows: E. Natterer, A. Tejada Lapuerta,
+R. Engelhardt, S. H¨ orl, and K. Bogenberger conceived and designed the study; Conzeptualization: E.
+Natterer, A. Tejada Lapuerta, R. Engelhardt; Methodology and Formal analysis: E. Natterer; Data
+curation, Software, Visualization: E. Natterer, S. R. Rao; Funding acquisition: K. Bogenberger. All
+authors reviewed the results and approved the final version of the manuscript.
+11. Declaration of generative AI and AI-assisted technologies in the writing process
+During the preparation of this work the authors used Chat-GPT 4.0 in order to help with the writing
+process. Additionally, they used perplexity.ai andanswerthis.io during the literature review. After using
+these tools, the authors reviewed and edited the content as needed and take full responsibility for the
+content of the published article.
+27
+This preprint research paper has not been peer reviewed. Electronic copy available at: https://ssrn.com/abstract=5182100Preprint not peer reviewed
+======================================================================
+PAGE 28
+======================================================================
+References
+Auld, J., Hope, M., Ley, H., Sokolov, V., Xu, B., Zhang, K., 2016. Polaris: Agent-based mod-
+eling framework development and implementation for integrated travel demand and network and
+operations simulations. Transportation Research Part C: Emerging Technologies 64, 101–116.
+URL: https://www.sciencedirect.com/science/article/abs/pii/S0968090X15002703 , doi: 10.
+1016/j.trc.2015.07.017 .
+Balac, M., Ciari, F., Axhausen, K.W., 2017. Modeling the impact of parking price policy on free-floating
+carsharing: Case study for Zurich, Switzerland. Transportation Research Part C: Emerging Technolo-
+gies 77, 207–225. URL: https://linkinghub.elsevier.com/retrieve/pii/S0968090X17300372 ,
+doi:10.1016/j.trc.2017.01.022 .
+Balmer, M., Meister, K., Rieser, M., Nagel, K., Axhausen, K.W., 2008. Agent-based simulation of
+travel demand: Structure and computational performance of matsim-t. Arbeitsberichte Verkehrs-
+und Raumplanung 504. URL: https://www.research-collection.ethz.ch/bitstream/handle/
+20.500.11850/9455/eth-30519-01.pdf , doi: 10.3929/ethz-a-005626451 .
+Bastarianto, F.F., Hancock, T.O., Choudhury, C.F., Manley, E., 2023. Agent-based models in ur-
+ban transportation: review, challenges, and opportunities. European Transport Research Re-
+view 15, 19. URL: https://etrr.springeropen.com/articles/10.1186/s12544-023-00590-5 ,
+doi:10.1186/s12544-023-00590-5 .
+Ben-Dor, G., Ben-Elia, E., Benenson, I., 2021. Population downscaling in multi-agent transporta-
+tion simulations: A review and case study. Simulation Modelling Practice and Theory 108, 102233.
+URL: https://www.sciencedirect.com/science/article/pii/S1569190X20301684 , doi: 10.1016/
+j.simpat.2020.102233 .
+Ben-Dor, G., Ogulenko, A., Klein, I., Ben-Elia, E., Benenson, I., 2024. Simulation-based policy evaluation
+of monetary car driving disincentives in Jerusalem. Transportation Research Part A: Policy and Prac-
+tice 183, 104061. URL: https://linkinghub.elsevier.com/retrieve/pii/S0965856424001095 ,
+doi:10.1016/j.tra.2024.104061 .
+Cervellera, C., Macci` o, D., Rebora, F., 2021. Deep learning and low-discrepancy sampling for surrogate
+modeling with an application to urban traffic simulation, in: 2021 International Joint Conference
+on Neural Networks (IJCNN), pp. 1–8. URL: https://ieeexplore.ieee.org/abstract/document/
+9533357 , doi: 10.1109/IJCNN52387.2021.9533357 .
+Charles, R.Q., Su, H., Kaichun, M., Guibas, L.J., 2017. PointNet: Deep Learning on Point Sets for
+3D Classification and Segmentation. IEEE Conference on Computer Vision and Pattern Recognition
+(CVPR) , 77–85URL: https://openaccess.thecvf.com/content_cvpr_2017/html/Qi_PointNet_
+Deep_Learning_CVPR_2017_paper.html , doi: 10.1109/CVPR.2017.16 .
+Horni, A., Nagel, K., Axhausen, K.W., 2016. The Multi-Agent Transport Simulation MATSim. Ubiquity
+Press. URL: http://library.oapen.org/handle/20.500.12657/32162 , doi: 10.5334/baw .
+H¨ orl, S., Balac, M., 2021. Synthetic population and travel demand for Paris and ˆIle-de-France
+based on open and publicly available data. Transportation Research Part C: Emerging Technolo-
+gies 130, 103291. URL: https://linkinghub.elsevier.com/retrieve/pii/S0968090X21003016 ,
+doi:10.1016/j.trc.2021.103291 .
+H¨ orl, S., Becker, F., Axhausen, K.W., 2021. Simulation of price, customer behaviour and system
+impact for a cost-covering automated taxi system in Zurich. Transportation Research Part C:
+Emerging Technologies 123, 102974. URL: https://www.sciencedirect.com/science/article/
+pii/S0968090X21000115 , doi: 10.1016/j.trc.2021.102974 .
+Jiang, W., Luo, J., 2024. Graph Neural Network for Traffic Forecasting: A Survey. Expert Systems with
+Applications 207, 117921. URL: https://doi.org/10.1016/j.eswa.2022.117921 , doi: 10.1016/j.
+eswa.2022.117921 .
+Kagho, G.O., Balac, M., Axhausen, K.W., 2020. Agent-Based Models in Transport Planning: Cur-
+rent State, Issues, and Expectations. Procedia Computer Science 170, 726–732. URL: https://
+www.sciencedirect.com/science/article/pii/S187705092030627X , doi: 10.1016/j.procs.2020.
+03.164 .
+28
+This preprint research paper has not been peer reviewed. Electronic copy available at: https://ssrn.com/abstract=5182100Preprint not peer reviewed
+======================================================================
+PAGE 29
+======================================================================
+Laudan, J., Heinrich, P., Nagel, K., 2025. High-Performance Mobility Simulation: Implementation
+of a Parallel Distributed Message-Passing Algorithm for MATSim. Information 16, 116. URL:
+https://www.mdpi.com/2078-2489/16/2/116 , doi: 10.3390/info16020116 . number: 2 Publisher:
+Multidisciplinary Digital Publishing Institute.
+Liu, Y., Zou, B., Ni, A., Gao, L., Zhang, C., 2020. Calibrating microscopic traffic simulators
+using machine learning and particle swarm optimization. Transportation letters URL: https:
+//www.semanticscholar.org/paper/5b0ecad46ffd3550fa9428fc9f87cc2d80fb4978 , doi: 10.1080/
+19427867.2020.1728037 .
+Llorca, C., Moeckel, R., 2019. Effects of scaling down the population for agent-based traffic simula-
+tions. Procedia Computer Science 151, 782–787. URL: https://www.sciencedirect.com/science/
+article/pii/S1877050919305691 , doi: 10.1016/j.procs.2019.04.106 .
+Lu, Q.L., Qurashi, M., Antoniou, C., 2023. Simulation-Based Policy Analysis: The Case
+of Urban Speed Limits. Transportation Research Part A: Policy and Practice 175, 103754.
+URL: https://www.sciencedirect.com/science/article/abs/pii/S096585642300174X , doi: 10.
+1016/j.tra.2023.103754 .
+Macal, C.M., North, M.J., 2010. Tutorial on agent-based modeling and simulation. Journal of Simulation
+4, 151–162. URL: https://ieeexplore.ieee.org/document/1574234 , doi: 10.1057/jos.2010.3 .
+Manley, E., Cheng, T., Penn, A., Emmonds, A., 2014. A framework for simulating large-scale
+complex urban traffic dynamics through hybrid agent-based modelling. Computers, Environment
+and Urban Systems 44, 27–36. URL: https://www.sciencedirect.com/science/article/pii/
+S0198971513001129 , doi: 10.1016/j.compenvurbsys.2013.11.003 .
+Marmaras, C., Xydas, E., Cipcigan, L., 2017. Simulation of electric vehicle driver behaviour in road
+transport and electric power networks. Transportation Research Part C: Emerging Technologies
+80, 239–256. URL: https://www.sciencedirect.com/science/article/pii/S0968090X17301341 ,
+doi:10.1016/j.trc.2017.05.004 .
+M¨ uller, J., Straub, M., Stubenschrott, M., Graser, A., 2023. Simulation of a full-scale
+implementation of Superblocks in Vienna: 15th ITS European Congress. Proceedings of
+the 15th ITS European Congress URL: https://publications.ait.ac.at/en/publications/
+simulation-of-a-full-scale-implementation-of-superblocks-in-vienn .
+Narayanan, S., Makarov, N., Antoniou, C., 2024. Graph neural networks as strategic trans-
+port modelling alternative - a proof of concept for a surrogate. IET Intelligent Transport Sys-
+tems 1-19. URL: https://ietresearch.onlinelibrary.wiley.com/doi/abs/10.1049/itr2.12551 ,
+doi:10.1049/itr2.12551 .
+Natterer, E., Loder, A., Bogenberger, K., 2024. Effects of the plan v´ elo i and ii on vehicular flow in
+paris - an empirical analysis. Arbeitsberichte Mobility Policy 1. URL: https://mediatum.ub.tum.
+de/node?id=1742750 , doi: 10.48550/arXiv.2408.09836 .
+Saprykin, A., Chokani, N., Abhari, R.S., 2019. Gemsim: A gpu-accelerated multi-modal mobil-
+ity simulator for large-scale scenarios. Simulation Modelling Practice and Theory 94, 199–214.
+URL: https://www.sciencedirect.com/science/article/pii/S1569190X19300267 , doi: 10.1016/
+j.simpat.2019.03.002 .
+Shi, Y., Huang, Z., feng, S., Zhong, H., Wang, W., Sun, Y., 2021. Masked label prediction: Unified
+message passing model for semi-supervised classification. URL: https://openreview.net/forum?
+id=B9t708KMr9d , doi: 10.48550/arXiv.2009.03509 .
+Smilovitskiy, M., Olmez, S., Richmond, P., Chisholm, R., Heywood, P., Cabrejas, A., van den Berghe,
+S., Kobayashi, S., 2025. Overcoming computational complexity: A scalable agent-based model of
+traffic activity using flame-gpu, in: Mathieu, P., De la Prieta, F. (Eds.), Advances in Practical Ap-
+plications of Agents, Multi-Agent Systems, and Digital Twins: The PAAMS Collection, Springer
+Nature Switzerland, Cham. pp. 240–251. URL: https://link.springer.com/chapter/10.1007/
+978-3-031-70415-4_21 , doi: 10.1007/978-3-031-70415-4_21 .
+29
+This preprint research paper has not been peer reviewed. Electronic copy available at: https://ssrn.com/abstract=5182100Preprint not peer reviewed
+======================================================================
+PAGE 30
+======================================================================
+Sroczy´ nski, A., Czy˙ zewski, A., 2023. Road traffic can be predicted by machine learning equally effectively
+as by complex microscopic model. Scientific Reports 13, 14523. URL: https://doi.org/10.1038/
+s41598-023-41902-y , doi: 10.1038/s41598-023-41902-y .
+Veliˇ ckovi´ c, P., Cucurull, G., Casanova, A., Romero, A., Li` o, P., Bengio, Y., 2017. Graph attention
+networks. URL: https://arxiv.org/abs/1710.10903 , doi: 10.48550/arXiv.1710.10903 .
+Yin, B., Diallo, A.O., Seregina, T., Coulombel, N., Liu, L., 2024. Evaluation of Low-Traffic Neigh-
+borhoods and Scale Effects: The Paris Case Study. Transportation Research Record 2678, 88–101.
+URL: https://doi.org/10.1177/03611981231170130 , doi: 10.1177/03611981231170130 . publisher:
+SAGE Publications Inc.
+30
+This preprint research paper has not been peer reviewed. Electronic copy available at: https://ssrn.com/abstract=5182100Preprint not peer reviewed
+======================================================================
+PAGE 31
+======================================================================
+Appendix A. Bias-Variance Decomposition
+Appendix A.1. Definitions
+Simulation Output
+The change in traffic volume on each edge ein the network is stochastic due to randomness in the
+simulation. We model the true simulated change in traffic volume as:
+ye= ∆be+ϵe, (A.1)
+where:
+•∆be=bpolicy
+e−bbase
+erepresents the deterministic change in traffic volume caused by the policy.
+This is a fixed value representing the average impact of the policy on edge e.
+•ϵeis the random simulation noise , representing the variability in the simulation output. This
+variability can be assumed to be the same for the base case and when introduced a policy, because
+the simulation remains stochastic under the policy.
+Machine Learning Model Prediction
+The machine learning model attempts to predict ye, producing:
+ˆye=ye+ ˆϵe. (A.2)
+We assume the prediction error is structured as:
+ˆϵe=ϵe+ϵ′
+e, (A.3)
+where:
+•ϵeis the original simulation noise.
+•ϵ′
+eis the additional error introduced by the model. Note that this error is deterministic , as any
+output of a machine learning model.
+Mean Squared Error (MSE)
+The Mean Squared Error (MSE) is defined as:
+MSE( y,ˆy) =1
+|E|X
+e∈E(ye−ˆye)2. (A.4)
+Substituting ˆ ye=ye+ ˆϵe, and ˆ ϵe=ϵe+ϵ′
+e, the squared error simplifies to ( ϵ′
+e−ϵe)2and thus
+MSE( y,ˆy) =1
+|E|X
+e∈E(ϵ′
+e−ϵe)2. (A.5)
+Appendix A.2. Introducing the Random Variable
+When evaluating our machine learning surrogate, our goal is to predict, for each edge e∈E, the
+simulated change in traffic volume, ye, using the model prediction ˆ ye. We measure this using the squared
+error between the simulated values yand the predicted values ˆ yfor all edges e∈E. Because yeincludes
+a stochastic component ϵe, it varies between simulation repetitions. Hence, also the squared error varies.
+To summarize the model’s performance in a consistent way, we model yeas a random variable.
+We define Yeas the random variable representing the simulated change in traffic volume for edge
+e∈E, and ˆYeas the random variable representing the predicted change in traffic volume for edge e∈E.
+Then, we can model Yas the random vector Y= (Ye1, Ye2, ...Y e|E|), and similarly ˆY= (ˆYe1,ˆYe2, ...ˆYe|E|).
+Since we’re now dealing with random variables, we can take the expected value of them. The expected
+value represents the average performance of the model across many potential outcomes. This ensures
+that our evaluation is fair and robust, as it accounts for the full range of variability in the simulation.
+By using the expected value, we evaluate how well the model performs on average over all possible
+realizations of the simulation. Thus, overall, we’re interested in a lower bound of the following term:
+E[MSE( Y,ˆY)] =1
+|E|X
+e∈EE[MSE( Ye,ˆYe)] (A.6)
+31
+This preprint research paper has not been peer reviewed. Electronic copy available at: https://ssrn.com/abstract=5182100Preprint not peer reviewed
+======================================================================
+PAGE 32
+======================================================================
+where the equality follows straight away by the linearity of the expected value.
+Therefore, let’s focus on finding a lower bound for E[MSE( Ye,ˆYe)]. Note that Ye, just like ye, consists
+of a deterministic and a random part:
+Ye= ∆be+ϵe. (A.7)
+The deterministic change ∆ beis constant, and ϵeis the stochastic noise, which captures the random
+variability around the deterministic change. WLOG, we assume ϵefollows a normal distribution:
+ϵe∼ N(0, σ2
+e). (A.8)
+Similarly, the machine learning model’s prediction is:
+ˆYe=Ye+ ˆϵe (A.9)
+where again ˆ ϵe=ϵe+ϵ′.ϵ′is a constant and thus has variance 0.
+Thus,
+E[MSE( Ye,ˆYe)] =E[(Ye−ˆYe)2] (A.10)
+=E[(ϵe+ϵ′
+e)2] (A.11)
+=E[ϵ2
+e] +E[(ϵ′
+e)2] + 2E[ϵeϵ′] (A.12)
+=E[ϵ2
+e] +ϵ′
+e2+ 2ϵ′E[ϵe] (A.13)
+=σ2
+e+ϵ′
+e2(A.14)
+where Equation A.13 follows from Equation A.8 and that ϵ′is a constant.
+Appendix A.3. Lower bound for the Mean Squared Error (MSE) in terms of the variance
+From the computations above and plugging it into Equation A.6 we arrive at:
+E[MSE( Y,ˆY)] =1
+|E|X
+e∈Eσ2
+e+ϵ′
+e2. (A.15)
+This represents the best achievable error . Even with perfect predictions of the deterministic component,
+the random variability in the simulation sets a limit on how low the error can go. That means, Equation
+A.15 holds even if the model perfectly predicts the simulation output ye= ˆyefor all edges e∈E.
+Therefore, in general,
+E[MSE( Y,ˆY)]≥1
+|E|X
+e∈Eσ2
+e+ϵ′
+e2. (A.16)
+Appendix B. Analysis of Base Case Volume Patterns and Sampling Bias
+Our analysis reveals a systematic pattern: roads that receive capacity reductions show higher base
+case volumes and variances compared to roads that never receive reductions. This pattern appears
+consistently across all road types (primary, secondary, and tertiary) and emerges despite our random
+district selection process. Here, we explain the underlying mechanisms that create this sampling bias.
+Appendix B.1. The Pattern We Observe
+For all road types, we consistently observe higher base case variance ( σ2
+t,b) in roads with capacity
+reduction:
+•Primary roads: σ2
+t,b= 134 .29 vs 112 .78
+•Secondary roads: σ2
+t,b= 63.16 vs 49 .35
+•Tertiary roads: σ2
+t,b= 41.12 vs 35 .38
+32
+This preprint research paper has not been peer reviewed. Electronic copy available at: https://ssrn.com/abstract=5182100Preprint not peer reviewed
+======================================================================
+PAGE 33
+======================================================================
+Appendix B.2. District Selection Process
+Our methodology involves:
+•We had 8,308 different scenarios available
+•In each scenario, we randomly select about four districts
+•All roads in a selected district with road type “primary”, “secondary” and “tertiary” receive ca-
+pacity reduction
+•A road is labeled as “with capacity reduction” if its district is selected in any scenario
+•A road is labeled as “without capacity reduction” if its district is never selected
+Appendix B.3. Analysis of District Characteristics
+Our analysis of district-level data reveals several key patterns:
+Appendix B.3.1. Volume Distribution Within Districts
+•Districts show highly skewed volume distributions (mean skewness = 3.64)
+•On average, only 27% of roads in a district have volumes above the district mean
+•Volume distributions vary significantly between districts
+Appendix B.3.2. Selection Frequency Patterns
+When we rank districts by how often they are selected, we find clear patterns:
+•Districts selected most frequently (top 25% by selection frequency):
+–Lower mean volumes (47.44)
+–Lower standard deviation (70.63)
+–More balanced distribution (skewness = 2.08)
+–Higher proportion of high-volume roads (30%)
+•Districts selected least frequently (bottom 25% by selection frequency):
+–Higher mean volumes (60.37)
+–Higher standard deviation (158.44)
+–Highly skewed distribution (skewness = 5.76)
+–Lower proportion of high-volume roads (21%)
+Appendix B.4. Key Statistical Relationships
+Our analysis reveals two important correlations:
+•Strong negative correlation (-0.762) between district volume skewness and selection frequency
+•Positive correlation (0.605) between proportion of high-volume roads and selection frequency
+Appendix B.5. How the Sampling Bias Emerges
+The sampling bias develops through the following sequence:
+1.Initial District Selection:
+•Districts with more balanced volume distributions tend to be selected more frequently
+•These districts have a higher proportion of high-volume roads
+•When selected, all roads in the district receive capacity reduction
+2.Cumulative Effect Over Many Scenarios:
+•Roads from more balanced districts are more likely to receive capacity reduction
+•These districts contribute more high-volume roads to the ”with capacity reduction” group
+•This systematically increases both the average volume and variance in the capacity reduction
+group
+33
+This preprint research paper has not been peer reviewed. Electronic copy available at: https://ssrn.com/abstract=5182100Preprint not peer reviewed
+======================================================================
+PAGE 34
+======================================================================
+Appendix B.6. Conclusion
+The higher base case volumes and variances we observe in roads with capacity reduction are not a
+direct result of the capacity reductions themselves. Instead, they emerge from how our random selection
+process interacts with the underlying patterns of traffic volumes in different districts. The key insight is
+that districts with more balanced volume distributions are selected more frequently, and these districts
+tend to have a higher proportion of high-volume roads. This leads to their roads being overrepresented in
+the ”with capacity reduction” group, creating the observed pattern in base case volumes and variances.
+34
+This preprint research paper has not been peer reviewed. Electronic copy available at: https://ssrn.com/abstract=5182100Preprint not peer reviewed

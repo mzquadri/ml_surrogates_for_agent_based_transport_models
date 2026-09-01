@@ -1,0 +1,31 @@
+{
+  "standalone": {
+    "pred_mean": 0.2918848991394043,
+    "pred_std": 7.964132308959961,
+    "unc_mean": 1.368701696395874,
+    "unc_std": 1.3830671310424805,
+    "target_mean": 0.43897169828414917,
+    "target_std": 11.19561767578125,
+    "r2_recomputed": 0.5856615602970123,
+    "spearman": 0.4819531921120836
+  },
+  "experiment_a": {
+    "pred_mean": 0.2771298885345459,
+    "pred_std": 0.14924094080924988,
+    "mc_unc_mean": 0.1303856372833252,
+    "mc_unc_std": 0.06797420233488083,
+    "ens_var_mean": 0.020559703931212425,
+    "target_mean": 0.43897169828414917,
+    "target_std": 11.19561767578125,
+    "r2_recomputed": 0.0027863383293151855,
+    "spearman": 0.16000600629590372
+  },
+  "comparison": {
+    "targets_identical": true,
+    "predictions_close": false,
+    "pred_ratio_mean": 0.18987226486206055,
+    "pred_ratio_median": 2.4412682056427,
+    "unc_ratio_mean": 10.266852378845215,
+    "unc_ratio_median": 8.314397811889648
+  }
+}

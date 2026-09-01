@@ -1,0 +1,21 @@
+{
+  "metric": "PIT after Temperature Scaling \u2014 VERIFICATION",
+  "n_nodes": 3163500,
+  "temperature": 2.7025,
+  "raw": {
+    "pit_mean": 0.4331,
+    "pit_std": 0.3991,
+    "pit_median": 0.3211,
+    "ks_stat": 0.244533,
+    "first_bin_density": 0.2839,
+    "last_bin_density": 0.2305
+  },
+  "scaled": {
+    "pit_mean": 0.4712,
+    "pit_std": 0.3023,
+    "pit_median": 0.4317,
+    "ks_stat": 0.104209,
+    "first_bin_density": 0.0879,
+    "last_bin_density": 0.1172
+  }
+}

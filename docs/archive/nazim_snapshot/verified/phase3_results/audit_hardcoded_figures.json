@@ -1,0 +1,493 @@
+{
+  "total_checks": 54,
+  "pass": 46,
+  "fail": 8,
+  "checks": [
+    {
+      "figure": "Fig 5.1",
+      "check": "T8 R2",
+      "hardcoded": 0.5957,
+      "json_source": 0.5957480552094567,
+      "diff": 4.8e-05,
+      "status": "PASS",
+      "note": "det_metrics_100g"
+    },
+    {
+      "figure": "Fig 5.1",
+      "check": "T8 MAE",
+      "hardcoded": 3.96,
+      "json_source": 3.9572880456998263,
+      "diff": 0.002712,
+      "status": "PASS",
+      "note": "det_metrics_100g"
+    },
+    {
+      "figure": "Fig 5.1",
+      "check": "T8 RMSE",
+      "hardcoded": 7.12,
+      "json_source": 7.11826476832191,
+      "diff": 0.001735,
+      "status": "PASS",
+      "note": "det_metrics_100g"
+    },
+    {
+      "figure": "Fig 5.1",
+      "check": "T7 R2",
+      "hardcoded": 0.5471,
+      "json_source": 0.5471093654632568,
+      "diff": 9e-06,
+      "status": "PASS",
+      "note": "exp_b_fixed individual T7"
+    },
+    {
+      "figure": "Fig 5.1",
+      "check": "T7 MAE",
+      "hardcoded": 4.06,
+      "json_source": 4.060105323791504,
+      "diff": 0.000105,
+      "status": "PASS",
+      "note": "exp_b_fixed individual T7"
+    },
+    {
+      "figure": "Fig 5.1",
+      "check": "T7 RMSE",
+      "hardcoded": 7.53,
+      "json_source": 7.534331321716309,
+      "diff": 0.004331,
+      "status": "PASS",
+      "note": "exp_b_fixed individual T7"
+    },
+    {
+      "figure": "Fig 5.1",
+      "check": "T2 R2",
+      "hardcoded": 0.5117,
+      "json_source": 0.5115713775157928,
+      "diff": 0.000129,
+      "status": "PASS",
+      "note": "exp_b_fixed individual T2"
+    },
+    {
+      "figure": "Fig 5.1",
+      "check": "T2 MAE",
+      "hardcoded": 4.33,
+      "json_source": 4.1476240158081055,
+      "diff": 0.182376,
+      "status": "FAIL",
+      "note": "exp_b_fixed individual T2"
+    },
+    {
+      "figure": "Fig 5.1",
+      "check": "T2 RMSE",
+      "hardcoded": 8.15,
+      "json_source": 7.8243560791015625,
+      "diff": 0.325644,
+      "status": "FAIL",
+      "note": "exp_b_fixed individual T2"
+    },
+    {
+      "figure": "Fig 5.1",
+      "check": "T5 R2",
+      "hardcoded": 0.5553,
+      "json_source": 0.5552196502685547,
+      "diff": 8e-05,
+      "status": "PASS",
+      "note": "exp_b_fixed individual T5"
+    },
+    {
+      "figure": "Fig 5.1",
+      "check": "T5 MAE",
+      "hardcoded": 4.24,
+      "json_source": 4.069703578948975,
+      "diff": 0.170296,
+      "status": "FAIL",
+      "note": "exp_b_fixed individual T5"
+    },
+    {
+      "figure": "Fig 5.1",
+      "check": "T5 RMSE",
+      "hardcoded": 7.78,
+      "json_source": 7.466565132141113,
+      "diff": 0.313435,
+      "status": "FAIL",
+      "note": "exp_b_fixed individual T5"
+    },
+    {
+      "figure": "Fig 5.1",
+      "check": "T6 R2",
+      "hardcoded": 0.5223,
+      "json_source": 0.5222308933734894,
+      "diff": 6.9e-05,
+      "status": "PASS",
+      "note": "exp_b_fixed individual T6"
+    },
+    {
+      "figure": "Fig 5.1",
+      "check": "T6 MAE",
+      "hardcoded": 4.32,
+      "json_source": 4.147363185882568,
+      "diff": 0.172637,
+      "status": "FAIL",
+      "note": "exp_b_fixed individual T6"
+    },
+    {
+      "figure": "Fig 5.1",
+      "check": "T6 RMSE",
+      "hardcoded": 8.06,
+      "json_source": 7.738504886627197,
+      "diff": 0.321495,
+      "status": "FAIL",
+      "note": "exp_b_fixed individual T6"
+    },
+    {
+      "figure": "Fig 5.2",
+      "check": "T8 MC Dropout rho",
+      "hardcoded": 0.482,
+      "json_source": 0.4819531921120836,
+      "diff": 4.7e-05,
+      "status": "PASS",
+      "note": "mc_dropout_100g"
+    },
+    {
+      "figure": "Fig 5.2",
+      "check": "T7 MC Dropout rho",
+      "hardcoded": 0.446,
+      "json_source": 0.4459946296867467,
+      "diff": 5e-06,
+      "status": "PASS",
+      "note": "t7_error_detection.json"
+    },
+    {
+      "figure": "Fig 5.2",
+      "check": "Exp A MC Dropout rho",
+      "hardcoded": 0.4908,
+      "json_source": 0.4908428103776469,
+      "diff": 4.3e-05,
+      "status": "PASS",
+      "note": "experiment_a_fixed_results.json"
+    },
+    {
+      "figure": "Fig 5.2",
+      "check": "Exp A Ensemble Var rho",
+      "hardcoded": 0.437,
+      "json_source": 0.4370360468107798,
+      "diff": 3.6e-05,
+      "status": "PASS",
+      "note": "experiment_a_fixed_results.json"
+    },
+    {
+      "figure": "Fig 5.2",
+      "check": "Exp A Combined rho",
+      "hardcoded": 0.4909,
+      "json_source": 0.49088212371908535,
+      "diff": 1.8e-05,
+      "status": "PASS",
+      "note": "experiment_a_fixed_results.json"
+    },
+    {
+      "figure": "Fig 5.2",
+      "check": "Exp B Multi-Ens rho",
+      "hardcoded": 0.4333,
+      "json_source": 0.4332719254371174,
+      "diff": 2.8e-05,
+      "status": "PASS",
+      "note": "experiment_b_fixed_results.json"
+    },
+    {
+      "figure": "Fig 5.2",
+      "check": "T5 MC Dropout rho",
+      "hardcoded": 0.4263,
+      "json_source": 0.426269646215736,
+      "diff": 3e-05,
+      "status": "PASS",
+      "note": "T5 mc_metrics_50g"
+    },
+    {
+      "figure": "Fig 5.2",
+      "check": "T6 MC Dropout rho",
+      "hardcoded": 0.4186,
+      "json_source": 0.4186229012126431,
+      "diff": 2.3e-05,
+      "status": "PASS",
+      "note": "T6 mc_metrics_50g"
+    },
+    {
+      "figure": "Fig 5.3",
+      "check": "Achieved coverage 90%",
+      "hardcoded": 90.02,
+      "json_source": 90.02294926505454,
+      "diff": 0.002949,
+      "status": "PASS",
+      "note": "conformal_standard.json"
+    },
+    {
+      "figure": "Fig 5.3",
+      "check": "Achieved coverage 95%",
+      "hardcoded": 95.01,
+      "json_source": 95.01065275802118,
+      "diff": 0.000653,
+      "status": "PASS",
+      "note": "conformal_standard.json"
+    },
+    {
+      "figure": "Fig 5.3",
+      "check": "Interval width q90",
+      "hardcoded": 9.92,
+      "json_source": 9.919590950012207,
+      "diff": 0.000409,
+      "status": "PASS",
+      "note": "conformal_standard.json (quantile, not width)"
+    },
+    {
+      "figure": "Fig 5.3",
+      "check": "Interval width q95",
+      "hardcoded": 14.68,
+      "json_source": 14.67658805847168,
+      "diff": 0.003412,
+      "status": "PASS",
+      "note": "conformal_standard.json"
+    },
+    {
+      "figure": "Fig 5.5",
+      "check": "Baseline MAE (100%)",
+      "hardcoded": 3.95,
+      "json_source": 3.9476,
+      "diff": 0.0024,
+      "status": "PASS",
+      "note": "selective_prediction_s30.json"
+    },
+    {
+      "figure": "Fig 5.5",
+      "check": "MAE @ 90% retention",
+      "hardcoded": 3.23,
+      "json_source": 3.2257,
+      "diff": 0.0043,
+      "status": "PASS",
+      "note": "selective_prediction_s30.json"
+    },
+    {
+      "figure": "Fig 5.5",
+      "check": "MAE @ 50% retention",
+      "hardcoded": 2.32,
+      "json_source": 2.3197,
+      "diff": 0.0003,
+      "status": "PASS",
+      "note": "selective_prediction_s30.json"
+    },
+    {
+      "figure": "Fig 5.5",
+      "check": "Reduction @ 90%",
+      "hardcoded": 18.3,
+      "json_source": 18.3,
+      "diff": 0.0,
+      "status": "PASS",
+      "note": "selective_prediction_s30.json"
+    },
+    {
+      "figure": "Fig 5.5",
+      "check": "Reduction @ 50%",
+      "hardcoded": 41.2,
+      "json_source": 41.2,
+      "diff": 0.0,
+      "status": "PASS",
+      "note": "selective_prediction_s30.json"
+    },
+    {
+      "figure": "Fig 5.7",
+      "check": "VOL correlation",
+      "hardcoded": 0.332,
+      "json_source": 0.3316,
+      "diff": 0.0004,
+      "status": "PASS",
+      "note": "feature_analysis_report.txt"
+    },
+    {
+      "figure": "Fig 5.7",
+      "check": "CAP correlation",
+      "hardcoded": 0.262,
+      "json_source": 0.2615,
+      "diff": 0.0005,
+      "status": "PASS",
+      "note": "feature_analysis_report.txt"
+    },
+    {
+      "figure": "Fig 5.7",
+      "check": "SPD correlation",
+      "hardcoded": 0.211,
+      "json_source": 0.211,
+      "diff": 0.0,
+      "status": "PASS",
+      "note": "feature_analysis_report.txt"
+    },
+    {
+      "figure": "Fig 5.7",
+      "check": "CAP_RED correlation",
+      "hardcoded": -0.229,
+      "json_source": -0.2286,
+      "diff": 0.0004,
+      "status": "PASS",
+      "note": "feature_analysis_report.txt"
+    },
+    {
+      "figure": "Fig 5.7",
+      "check": "LEN correlation",
+      "hardcoded": -0.07,
+      "json_source": -0.0695,
+      "diff": 0.0005,
+      "status": "PASS",
+      "note": "feature_analysis_report.txt"
+    },
+    {
+      "figure": "Fig 5.20",
+      "check": "Det R2",
+      "hardcoded": 0.5957,
+      "json_source": 0.5957480552094567,
+      "diff": 4.8e-05,
+      "status": "PASS",
+      "note": "det_metrics_100g"
+    },
+    {
+      "figure": "Fig 5.20",
+      "check": "Det MAE",
+      "hardcoded": 3.96,
+      "json_source": 3.9572880456998263,
+      "diff": 0.002712,
+      "status": "PASS",
+      "note": "det_metrics_100g"
+    },
+    {
+      "figure": "Fig 5.20",
+      "check": "Det RMSE",
+      "hardcoded": 7.12,
+      "json_source": 7.11826476832191,
+      "diff": 0.001735,
+      "status": "PASS",
+      "note": "det_metrics_100g"
+    },
+    {
+      "figure": "Fig 5.20",
+      "check": "MC R2",
+      "hardcoded": 0.5857,
+      "json_source": 0.5856617093086243,
+      "diff": 3.8e-05,
+      "status": "PASS",
+      "note": "mc_metrics_100g"
+    },
+    {
+      "figure": "Fig 5.20",
+      "check": "MC MAE",
+      "hardcoded": 3.948,
+      "json_source": 3.947556734085083,
+      "diff": 0.000443,
+      "status": "PASS",
+      "note": "mc_metrics_100g"
+    },
+    {
+      "figure": "Fig 5.20",
+      "check": "MC RMSE",
+      "hardcoded": 7.207,
+      "json_source": 7.206520080566406,
+      "diff": 0.00048,
+      "status": "PASS",
+      "note": "mc_metrics_100g"
+    },
+    {
+      "figure": "Fig 6.2",
+      "check": "k95 (MC Dropout)",
+      "hardcoded": 11.34,
+      "json_source": 11.343751259029327,
+      "diff": 0.003751,
+      "status": "PASS",
+      "note": "trial8_uq_diagnostics.json"
+    },
+    {
+      "figure": "Fig 6.2",
+      "check": "k95 (Gaussian ideal)",
+      "hardcoded": 1.96,
+      "json_source": 1.959963984540054,
+      "diff": 3.6e-05,
+      "status": "PASS",
+      "note": "scipy.stats.norm.ppf(0.975) = 1.95996"
+    },
+    {
+      "figure": "Fig 6.2",
+      "check": "k95 cross-check (temp_scaling)",
+      "hardcoded": 11.34,
+      "json_source": 11.34,
+      "diff": 0.0,
+      "status": "PASS",
+      "note": "temperature_scaling_t8.json"
+    },
+    {
+      "figure": "Fig 6.2",
+      "check": "k95 cross-check (t7_err_det)",
+      "hardcoded": 11.34,
+      "json_source": 11.34,
+      "diff": 0.0,
+      "status": "PASS",
+      "note": "t7_error_detection.json t8_comparison"
+    },
+    {
+      "figure": "Fig 3.5",
+      "check": "T8 R2",
+      "hardcoded": 0.5957,
+      "json_source": 0.5957480552094567,
+      "diff": 4.8e-05,
+      "status": "PASS",
+      "note": "det_metrics_100g"
+    },
+    {
+      "figure": "Fig 3.5",
+      "check": "T8 MAE",
+      "hardcoded": 3.96,
+      "json_source": 3.9572880456998263,
+      "diff": 0.002712,
+      "status": "PASS",
+      "note": "det_metrics_100g"
+    },
+    {
+      "figure": "Fig 3.5",
+      "check": "T1 R2",
+      "hardcoded": 0.786,
+      "json_source": 0,
+      "diff": 0.786,
+      "status": "FAIL",
+      "note": "T1 eval_metrics_recomputed"
+    },
+    {
+      "figure": "Fig 3.5",
+      "check": "T1 MAE",
+      "hardcoded": 2.97,
+      "json_source": 0,
+      "diff": 2.97,
+      "status": "FAIL",
+      "note": "T1 eval_metrics_recomputed"
+    },
+    {
+      "figure": "Fig 3.6",
+      "check": "T8 R2 in workflow",
+      "hardcoded": 0.5957,
+      "json_source": 0.5957480552094567,
+      "diff": 4.8e-05,
+      "status": "PASS",
+      "note": "det_metrics_100g"
+    },
+    {
+      "figure": "Fig 3.6",
+      "check": "T8 MAE in workflow",
+      "hardcoded": 3.96,
+      "json_source": 3.9572880456998263,
+      "diff": 0.002712,
+      "status": "PASS",
+      "note": "det_metrics_100g"
+    },
+    {
+      "figure": "Fig 3.6",
+      "check": "MC rho in workflow",
+      "hardcoded": 0.482,
+      "json_source": 0.4819531921120836,
+      "diff": 4.7e-05,
+      "status": "PASS",
+      "note": "mc_metrics_100g"
+    }
+  ]
+}

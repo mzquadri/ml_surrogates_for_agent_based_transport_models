@@ -1,0 +1,45 @@
+{
+  "verification_type": "CRPS/MAE theoretical ratio (independent verification)",
+  "claim": "CRPS/MAE = 1/sqrt(2) ~ 0.707 for perfectly calibrated Gaussian",
+  "numerical_integration_sigma5": {
+    "sigma": 5.0,
+    "E_CRPS": 2.8209479177,
+    "E_MAE": 3.989422804,
+    "integration_error_crps": 2.6396237562708637e-12,
+    "integration_error_mae": 5.517069400102454e-08,
+    "ratio": 0.7071067812,
+    "theoretical": 0.7071067812,
+    "pct_error": 0.0,
+    "pass": true
+  },
+  "numerical_integration_sigma1_37": {
+    "sigma": 1.37,
+    "E_CRPS": 0.7729397295,
+    "E_MAE": 1.0931018483,
+    "integration_error_crps": 7.232511304744239e-13,
+    "integration_error_mae": 1.5116770240810327e-08,
+    "ratio": 0.7071067812,
+    "theoretical": 0.7071067812,
+    "pct_error": 0.0,
+    "pass": true
+  },
+  "energy_form_mc": {
+    "method": "energy_form",
+    "sigma": 5.0,
+    "n_samples": 5000000,
+    "E_CRPS_analytical_second": 2.819069,
+    "E_CRPS_mc_second": 2.819252,
+    "E_MAE": 3.986984,
+    "ratio": 0.707068,
+    "theoretical": 0.707107,
+    "pct_error": 0.0055,
+    "pass": true
+  },
+  "cross_check_main": {
+    "main_ratio": 0.7071067812,
+    "our_ratio": 0.7071067812,
+    "match": true,
+    "main_overall_pass": true
+  },
+  "overall_pass": true
+}

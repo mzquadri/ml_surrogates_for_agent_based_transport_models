@@ -1,0 +1,113 @@
+% !BIB TS-program = biber
+% !TEX encoding = UTF-8
+% =====================================================================
+% Master's Thesis — Technical University of Munich
+% Based on the official TUM-Dev/tum-thesis-latex template (master branch)
+% One-sided, 11pt, A4
+% =====================================================================
+
+\RequirePackage[l2tabu,orthodox]{nag}
+
+\documentclass[
+    headsepline,
+    footsepline,
+    footinclude=false,
+    oneside,
+    fontsize=11pt,
+    paper=a4,
+    bibliography=totoc,
+]{scrbook}
+
+% ---------- Thesis metadata ----------
+\newcommand*{\getUniversity}{Technische Universit\"at M\"unchen}
+\newcommand*{\getFaculty}{}
+\newcommand*{\getDegree}{Mathematics in Science and Engineering}
+\newcommand*{\getSchool}{Computation, Information and Technology}
+\newcommand*{\getDepartment}{Computer Science (Data Analytics and Machine Learning)}
+\newcommand*{\getTitle}{Uncertainty Quantification for Machine Learning Models in Transportation Policy Analysis}
+\newcommand*{\getTitleGer}{Unsicherheitsquantifizierung f\"ur maschinelle Lernmodelle in der Verkehrspolitikanalyse}
+\newcommand*{\getAuthor}{Mohd Zamin Quadri}
+\newcommand*{\getDoctype}{Master's Thesis}
+\newcommand*{\getSupervisor}{Prof.\ Dr.\ Stephan G\"unnemann}
+\newcommand*{\getAdvisor}{Dominik Fuchsgruber, M.Sc.,\ Elena Natterer, M.Sc.}
+\newcommand*{\getKeywords}{Graph Neural Networks;Uncertainty Quantification;MC Dropout;Conformal Prediction;Deep Ensemble;Agent-Based Models;Traffic Prediction}
+\newcommand*{\getSubmissionDate}{May 15, 2026}
+\newcommand*{\getSubmissionLocation}{Munich}
+
+\input{settings}
+
+\setcounter{tocdepth}{1}
+
+\begin{document}
+
+\pagenumbering{alph}
+\input{pages/cover}
+
+\frontmatter{}
+
+\input{pages/title}
+\input{pages/disclaimer}
+\input{pages/acknowledgments}
+\input{pages/abstract}
+\input{pages/zusammenfassung}
+
+\microtypesetup{protrusion=false}
+\tableofcontents{}
+\listoffigures
+\listoftables
+\microtypesetup{protrusion=true}
+
+\mainmatter{}
+
+\input{chapters/01_introduction}
+\input{chapters/02_background}
+\input{chapters/03_methodology}
+\input{chapters/04_experiments}
+\input{chapters/05_results}
+\input{chapters/06_discussion}
+\input{chapters/07_conclusion}
+
+\appendix{}
+\microtypesetup{protrusion=false}
+
+\input{chapters/appendix_a_master_table}
+
+\addchap{Abbreviations}
+\begin{description}[itemsep=-2pt, font=\bfseries, leftmargin=2.4cm, style=multiline]
+    \item[ABM]    Agent-Based Model
+    \item[AUROC]  Area Under the Receiver Operating Characteristic Curve
+    \item[AUPRC]  Area Under the Precision--Recall Curve
+    \item[BNN]    Bayesian Neural Network
+    \item[CIT]    Computation, Information and Technology (TUM school)
+    \item[CQR]    Conformalized Quantile Regression
+    \item[CRPS]   Continuous Ranked Probability Score
+    \item[DE]     Deep Ensemble
+    \item[ECE]    Expected Calibration Error
+    \item[GAT]    Graph Attention Network
+    \item[GNN]    Graph Neural Network
+    \item[GPU]    Graphics Processing Unit
+    \item[KS]     Kolmogorov--Smirnov (statistic)
+    \item[MAE]    Mean Absolute Error
+    \item[MATSim] Multi-Agent Transport Simulation
+    \item[MC]     Monte Carlo
+    \item[ML]     Machine Learning
+    \item[MLP]    Multi-Layer Perceptron
+    \item[MSE]    Mean Squared Error
+    \item[NLL]    Negative Log-Likelihood
+    \item[NPZ]    NumPy compressed archive (file format)
+    \item[OOD]    Out-of-Distribution
+    \item[PICP]   Prediction Interval Coverage Probability
+    \item[PIT]    Probability Integral Transform
+    \item[PyG]    PyTorch Geometric
+    \item[ReLU]   Rectified Linear Unit
+    \item[RMSE]   Root Mean Squared Error
+    \item[ROC]    Receiver Operating Characteristic
+    \item[RQ]     Research Question
+    \item[TUM]    Technical University of Munich
+    \item[UQ]     Uncertainty Quantification
+\end{description}
+
+\microtypesetup{protrusion=true}
+\printbibliography{}
+
+\end{document}

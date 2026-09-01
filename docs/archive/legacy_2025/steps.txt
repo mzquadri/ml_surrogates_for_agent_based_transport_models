@@ -1,0 +1,2 @@
+cd "D:\Python Projects\Zamin_Thesis"
+.\thesis_env\Scripts\Activate

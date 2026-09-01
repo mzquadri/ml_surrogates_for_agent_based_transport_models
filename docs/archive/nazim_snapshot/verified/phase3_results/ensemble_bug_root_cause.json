@@ -1,0 +1,13 @@
+{
+  "root_cause": "PyG GATConv API version mismatch",
+  "detail": "Checkpoint uses lin.weight (old PyG), but PyG 2.3.1 expects lin_src.weight + lin_dst.weight. strict=False silently drops weights.",
+  "affected_layers": [
+    "gat_graph_layers.module_6",
+    "gat_final"
+  ],
+  "fix": "Remap *.lin.weight -> *.lin_src.weight AND *.lin_dst.weight in state_dict before loading",
+  "standalone_npz_explanation": "Likely produced with matching older PyG version before environment upgrade",
+  "ensemble_affected": true,
+  "standalone_npz_still_valid": true,
+  "all_other_uq_results_from_npz_valid": true
+}

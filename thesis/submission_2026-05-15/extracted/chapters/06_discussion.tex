@@ -1,0 +1,149 @@
+% !TEX root = ../main.tex
+
+\chapter{Discussion}\label{chapter:discussion}
+
+\section{Freezing the Backbone: An Empirical Observation}\label{sec:freeze_principle}
+
+Trials~10 and 11 share head, loss, data, calibration protocol and learning rate ($5\times10^{-4}$, inherited from T8 in both cases); the only design difference is whether the backbone is fine-tuned end-to-end (T10) or frozen (T11).\ T10 collapses to $R^2 = 0.4057$ and fails three of the six gates; T11 reaches $R^2 = 0.5835$ and passes all six (Tables~\ref{tab:t10_gates}, \ref{tab:t11_gates}).\ T9 (frozen backbone, heteroscedastic head, NLL loss) reaches $k_{95} = 2.84$ -- four times better than T8 -- but misses the $R^2$ gate at $0.4991$, consistent with the NLL/MSE trade-off of Section~\ref{sec:hetero_bg}.\ For the architecture, subset and loss/head pairings tested here, the backbone-trainability flag alone is enough to flip the CQR result; we report this as a finding for the tested setup, not a universal one.
+
+\begin{quote}\itshape
+When adding an uncertainty-aware head on top of an MSE-trained backbone, freezing the backbone and training only the head appears to be the safer choice in the experimental setting studied here.
+\end{quote}
+
+\section{The Layered Calibration Hierarchy}\label{sec:calibration_hierarchy}
+
+The four post-hoc treatments of $\sigma$ compose into a layered pipeline (Table~\ref{tab:calibration_hierarchy}).\ MC Dropout supplies the $\sigma$ ranking, $\sigma$-scaling gives a quick approximate $1\sigma$ probability, and adaptive conformal gives the deployment interval with near-nominal empirical marginal coverage on the held-out scenarios.
+
+\begin{table}[htbp]
+\centering
+\caption[Layered calibration hierarchy]{Layered calibration hierarchy: each row adds one capability.\ Numbers from Sections~\ref{sec:mc_results}--\ref{sec:scoring_results}.}
+\label{tab:calibration_hierarchy}
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{lccccc}
+\toprule
+Layer & Ranking $\rho$ & ECE & $1\sigma$ cov.\ & $90\%$ marginal cov.\ & Conditional cov.\ range \\
+\midrule
+Raw MC Dropout & 0.4820 & 0.356 & 32.7\% & 48.55\% & --- \\
+$+$ $\sigma$-scaling ($T = 2.887$) & 0.4820 & \textbf{0.034} & \textbf{68.0\%} & --- & --- \\
+$+$ Standard conformal & 0.4820 & --- & --- & \textbf{90.02\%} & $[59.0\%, 98.1\%]$ \\
+$+$ Adaptive conformal & 0.4820 & --- & --- & 89.87\% & $\mathbf{[83.7\%, 96.4\%]}$ \\
+\bottomrule
+\end{tabular}
+\\[0.3em]
+\footnotesize Each row reports the metric native to that calibration layer.\ $\sigma$-scaling targets the $1\sigma$ Gaussian probability and leaves the conformal residual quantile untouched; conformal prediction targets the marginal $90\%$ interval and does not change the underlying $\sigma$.
+\end{table}
+
+\section{Stratified UQ: Why \texorpdfstring{$\rho$}{ρ} Drops on Large \texorpdfstring{$|\Delta v|$}{|Δv|}}\label{sec:stratified_why}
+
+The Q1$\to$Q4 contrast ($\rho = 0.721 \to 0.100$) is best read as ``MC Dropout works mechanically on trivial segments and breaks on hard ones'' rather than as ``MC Dropout is highly informative on easy regimes'': Q1 is dominated by $|\Delta v| = 0$ segments where $|\text{error}|$ and $\sigma$ both reduce to functions of small output magnitudes, so the high Q1 $\rho$ is partly an artefact of shared dependence.\ The substantive Q4 degradation is real and has three contributing mechanisms: (i)~\textbf{dynamic range} -- Q4 has $\bar{|y|} \approx 14$ veh/h and MAE $10.08$ vs Q1's $\bar{|y|} \approx 0$ and MAE $1.24$, so absolute error spans a much wider range than absolute $\sigma$ and Spearman noise dominates; (ii)~\textbf{near-capacity saturation} -- many Q4 segments sit near the knee of the flow--density curve where small policy changes trigger non-linear equilibrium shifts that MC Dropout variance does not capture (informed by traffic-equilibrium domain knowledge, not measured directly here); (iii)~\textbf{sparse training coverage} -- large-$|\Delta v|$ segments are rare in the $1{,}000$-scenario subset.\ Mitigations include heteroscedastic heads (T9 captures aleatoric uncertainty, dominant here), explicit OOD detectors, and feature-conditional conformal methods.
+
+\section{The Exchangeability Assumption}\label{sec:exchangeability}
+
+Every conformal statement here rests on exchangeability, which is not strictly satisfied at the node level: nodes within a single graph share the same policy input and sit in a spatially correlated road network.\ The calibration and evaluation splits are therefore at the \emph{scenario} level (50 calibration / 50 evaluation graphs, randomly assigned with seed $42$).\ Exchangeability is enforced by splitting scenarios, and is more plausible at the scenario level than at the node level; node-level dependence remains within each graph and is not removed by the scenario split.\ The coverage guarantee should therefore be read as a marginal-over-scenarios statement: averaged across scenarios (and within a scenario, across nodes), at least $90\%$ or $95\%$ of residuals fall inside the conformal interval, as the observed $90.02\%$ and $95.01\%$ confirm.\ Within a single scenario, coverage can deviate; the per-graph standard-conformal coverage range is $[80.5\%, 93.7\%]$ at the $90\%$ target.\ A natural extension is graph-level nonconformity scoring (aggregating residuals to a per-graph score before computing the conformal quantile), which would restore strict exchangeability at the node-aggregate level at the cost of coarser intervals.
+
+\section{The PIT Diagnostic and CRPS/MAE Ratio}\label{sec:pit_discussion}
+
+PIT mean $0.433$ (ideal $0.500$) and first-bin mass $28.4\%$ indicate asymmetric underdispersion with an upward bias in $\hat\mu$.\ $\sigma$-scaling reduces the PIT KS from $0.245$ to $0.104$ but cannot shift the predictive centre, so conformal prediction handles the residual tails because its intervals expand around $\hat\mu$ regardless of where $\hat\mu$ sits; CQR (Trial~11) supports asymmetric intervals when the residual distribution itself is asymmetric.\ The CRPS/MAE ratio of $0.857$ exceeds the Gaussian-calibrated optimum $1/\sqrt{2} \approx 0.707$ by $\approx 21\%$, quantifying the calibration cost of underdispersed $\sigma$.
+
+\section{Answers to the Research Questions}\label{sec:rq_answers}
+
+Each answer below is structured the same way: a direct answer, the supporting evidence, and the main limitation.
+
+\textbf{RQ1.\ How effectively does MC Dropout capture epistemic uncertainty?}\ MC Dropout works as a \emph{ranking} signal on Trial~8 but is not a calibrated probability model.\ Evidence: pooled $\rho = 0.4820$ between $\sigma$ and $|\text{error}|$; mean per-graph $\rho = 0.464$ with bootstrap 95\% CI $[0.460, 0.469]$; AUROC for top-10\% error detection $0.7548$; retaining the 50\% most confident predictions reduces MAE by $41.2\%$.\ Limitation: $k_{95} = 11.66$ vs Gaussian $1.96$, so raw $\sigma$ is not a calibrated standard deviation without an additional scaling or conformal step (RQ4).
+
+\textbf{RQ2.\ How does MC Dropout compare with ensemble-based UQ?}\ Deep Ensemble wins on point accuracy, MC Dropout on uncertainty ranking.\ Evidence: Deep Ensemble $R^2 = 0.6841$ at $\rho = 0.3997$, $k_{95} = 15.18$; MC Dropout $\rho = 0.4820$, $k_{95} = 11.66$.\ Limitation: only one architecture family tested; architecturally diverse ensembles could change this trade-off and were not evaluated.
+
+\textbf{RQ3.\ Does combining MC Dropout with seed-ensemble variance add benefit?}\ Essentially no: quadrature gives $\rho = 0.4909$ vs $0.4908$ for MC Dropout alone, within sampling noise.\ The useful signal in seed-ensemble variance is already captured by MC Dropout itself.\ Limitation: null result is specific to single-architecture ensembling; cross-family ensembles (GAT + GraphSAGE + GCN) might yield independent disagreement signals.
+
+\textbf{RQ4.\ Can distribution-free methods deliver trustworthy intervals without retraining?}\ Yes, in an empirical marginal sense: the layered framework (MC Dropout + $\sigma$-scaling + adaptive conformal) requires no backbone retraining.\ Evidence: $\mathrm{PICP}_{90} = 90.02\%$, $\mathrm{PICP}_{95} = 95.01\%$ on T8; $\sigma$-scaling at $T = 2.887$ reduces ECE by $90.5\%$ and hits Gaussian $1\sigma$ within $0.3$ pp; adaptive conformal narrows conditional coverage from $[59.0\%, 98.1\%]$ to $[83.7\%, 96.4\%]$; Winkler scores $49.68 \to 35.78 \to 32.32$.\ Limitation: marginal coverage is averaged over scenarios.\ Exchangeability is enforced by the scenario-level split, but node-level dependence within a single graph is not removed (Section~\ref{sec:exchangeability}), so strong marginal UQ metrics do not by themselves imply policy-level reliability for any individual scenario.
+
+\textbf{RQ5.\ Can uncertainty-aware training extensions improve native UQ while preserving accuracy?}\ Yes, but only when the MSE-trained backbone is kept frozen.\ Evidence: T9 (heteroscedastic, frozen) reaches $k_{95} = 2.84$ but misses the $R^2$ gate at $0.4991$; T10 (CQR, full backbone unfrozen) collapses to $R^2 = 0.4057$ and fails three of six gates; T11 (same CQR head, frozen) passes all six gates at $R^2 = 0.5835$.\ The T10/T11 contrast isolates a single design knob -- backbone trainability -- and is the strongest empirical evidence for the freezing observation.\ Limitation: a setup-specific finding for PointNetTransfGAT on the $1{,}000$-scenario subset and the loss/head pairings tested; replication across architectures, datasets and backbone objectives is left for follow-up work.
+
+\section{Primary Findings}\label{sec:primary_results}
+
+\begin{enumerate}
+ \item \textbf{MC Dropout works as a ranking signal at modest cost.}\ For T8, $\rho = 0.4820$ between $\sigma$ and absolute error, with AUROC $= 0.7548$ for top-10\% error detection.\ Across all 100 test scenarios no graph drops below $\rho = 0.41$.
+
+ \item \textbf{The calibration cascade closes the gap to near-nominal empirical marginal coverage.}\ Raw MC Dropout requires $k_{95} = 11.66$ for $95\%$ coverage; regression $\sigma$-scaling at $T = 2.887$ brings this to $4.04$ and reduces ECE by $90.5\%$ (from $0.356$ to $0.034$).\ Adaptive conformal then narrows conditional coverage from $[59.0\%, 98.1\%]$ to $[83.7\%, 96.4\%]$ across uncertainty deciles.
+
+ \item \textbf{In these experiments, freezing the MSE-trained backbone is the strongest observed design choice when adding an uncertainty-aware head.}\ T9 (frozen, heteroscedastic head) is a partial positive; T10 (CQR, unfrozen backbone) collapses to $R^2 = 0.4057$; T11 (same CQR head, backbone frozen) clears all six gates with $R^2 = 0.5835$.\ With all other settings held fixed across T10 and T11, the contrast isolates the backbone-trainability flag.\ Broader claims would require replication across architectures, datasets, loss/head pairings, and backbone objectives.
+
+ \item \textbf{Deep ensembling and MC Dropout are complementary, not competing.}\ The five-member Deep Ensemble achieves the project's highest GNN-based, UQ-capable point accuracy ($R^2 = 0.6841$, $+14.8\%$ over T8) but its weakest UQ ranking ($\rho = 0.3997$).\ MC Dropout sits on the opposite corner of the trade-off.\ Pairing both at $\approx 5\times$ training compute gives the best of both.
+
+ \item \textbf{Stratified UQ has two regimes that should not be conflated.}\ On the smallest-$|\Delta v|$ quartile $\rho = 0.721$, but Q1 is dominated by segments with $|\Delta v| = 0$ (no policy effect at all), so the high correlation is partly a mechanical artefact.\ On the largest-$|\Delta v|$ quartile $\rho = 0.100$, a real breakdown driven by dynamic range, saturation effects, and sparse training-data coverage in the high-response regime.\ Uncertainty-guided filtering works best where the model is already good.
+\end{enumerate}
+
+\section{What the Existing Trials Do and Do Not Prove}\label{sec:ablation_summary}
+
+The thesis runs many trials, but only a subset of design questions is directly answered by them; for the others, confounders remain.\ Table~\ref{tab:ablation_summary} summarises the main questions, the empirical answer reached here, the trial that supplies the evidence, and the confounds that remain.\ This is intended as a check on over-interpretation rather than a new experiment.
+
+\begin{table}[htbp]
+\centering
+\caption[Ablation summary: what the trials do and do not prove]{Summary of which design questions are answered by the existing trials, the answer in the present setting, and the remaining confounders that should be controlled in any follow-up.}
+\label{tab:ablation_summary}
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{p{3.6cm}p{2.0cm}p{4.2cm}p{3.7cm}}
+\toprule
+\textbf{Design question} & \textbf{Answer} & \textbf{Evidence} & \textbf{Remaining confounders} \\
+\midrule
+Does dropout hurt point accuracy here? &
+No (small) &
+T1 (no dropout, $R^2 = 0.786$) vs T2--T8 (with dropout, $R^2$ in 0.51--0.60); gap also reflects Linear vs GATConv head &
+Final-layer, batch size, and learning rate all differ between T1 and the dropout trials. \\
+\midrule
+Does freezing the backbone help under CQR? &
+Yes, here &
+T10 (unfrozen, $R^2 = 0.4057$) vs T11 (same head, learning rate $5\times10^{-4}$, calibration; frozen, $R^2 = 0.5835$) &
+T10/T11 share head, loss, data, calibration, and LR. One untested alternative: the inherited LR ($5\times10^{-4}$) may be too high for fine-tuning a converged backbone. Cross-architecture and cross-dataset replication left for future work. \\
+\midrule
+Does ensembling improve point accuracy? &
+Yes, when independently seeded &
+5-member Deep Ensemble $R^2 = 0.6841$ vs single-member range $[0.640, 0.650]$; multi-model ensemble below best single trial &
+Deep Ensemble shares architecture and hyperparameters; architecturally diverse ensembles untested. \\
+\midrule
+Does ensembling improve UQ ranking? &
+No, here &
+Deep Ensemble $\rho = 0.3997$ vs MC Dropout $\rho = 0.4820$; quadrature combination gives no gain over MC alone &
+Only one architecture family tested. \\
+\midrule
+Does raw MC Dropout give calibrated intervals? &
+No &
+$k_{95} = 11.66$ vs Gaussian $1.96$; Gaussian $95\%$ interval covers only $54.85\%$ of residuals &
+None major; follows from full-test-set audit. \\
+\midrule
+Does regression $\sigma$-scaling fully calibrate? &
+No (rescales, can't reshape) &
+After $T = 2.887$, ECE drops $90.5\%$ and $1\sigma$ hits $68.0\%$, but $2\sigma$/$3\sigma$ stay below Gaussian target &
+Calibration set is a node-level subset; node-within-graph correlation breaks strict scenario independence. \\
+\midrule
+Does the freezing observation generalise? &
+Untested &
+Only PointNetTransfGAT on Paris $1{,}000$-scenario subset under MSE-trained backbones is evaluated &
+Architecture, dataset, intervention type, and backbone objective all held fixed. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Limitations and Future Directions}\label{sec:limitations}
+
+\begin{itemize}
+\item \textbf{Data scale.}\ $1{,}000$ of $10{,}000$ scenarios, reused across all eleven trials so that method-to-method comparisons sit on identical data.\ The resulting $3{,}163{,}500$ node-level test predictions give per-graph Spearman $\rho$ standard deviation $0.023$ (bootstrap 95\% CI $\pm 0.005$ on the mean), which is the relevant precision for the relative UQ rankings that are the contribution here.\ The absolute $R^2 = 0.5957$ on T8 is below the $R^2 > 0.9$ reported by~\textcite{natterer2025ml} at full scale; replicating the UQ comparisons at full scale is the most direct piece of follow-up work.
+\item \textbf{T1 vs T8 confounds.}\label{sec:t1_vs_t8_limitation}\ Final layer (Linear vs GATConv), batch size (32 vs 8) and learning rate ($10^{-3}$ vs $5\times10^{-4}$) all differ.\ T1 has \texttt{use\_dropout=False}, so MC Dropout is undefined; T8 is the strongest UQ-compatible base (Table~\ref{tab:t1_t8_de_compact}).
+\item \textbf{Single network, single policy type.}\ Paris + capacity-reduction only; generalisation to other cities and policy types is untested.
+\item \textbf{Non-GNN baseline scope.}\ RF, XGBoost and MLP reported (Section~\ref{sec:non_gnn_baselines}); tree-native UQ extensions (quantile regression forests, NGBoost) not evaluated.
+\item \textbf{MC Dropout inference cost.}\ Inference scales linearly in the number of stochastic forward passes $S$; Trial~11 (frozen-backbone CQR) and GEBM~\cite{fuchsgruber2024energy} are single-forward-pass alternatives that eliminate this overhead when latency matters.
+\item \textbf{Future work.}\ Repeat at full $10{,}000$-scenario scale; controlled T1-vs-T8 ablation; architecturally diverse ensembles (GAT + GraphSAGE + GCN); conformal risk control~\cite{angelopoulos2023conformal} and feature-conditional conformal; multi-city validation; explicit OOD detectors for the large-$|\Delta v|$ regime.
+\end{itemize}
+
+\section{Threats to Validity}\label{sec:threats_to_validity}
+
+\begin{itemize}
+\item \textbf{Dataset selection.}\ The $1{,}000$-scenario subset is the first 20 contiguous batches of the $10{,}000$-scenario Natterer corpus~\cite{natterer2025ml} rather than a uniform random sample, so a mild batch-ordering selection bias cannot be excluded.\ All eleven trials share the same subset, so the relative method-to-method comparisons that constitute the contribution remain valid; only the absolute accuracy and UQ figures inherit the potential bias.
+\item \textbf{External validity.}\ One road network (Paris), one intervention type (capacity reduction).\ Generalisation to other cities, topologies and policy types (road pricing, new infrastructure) is untested.
+\item \textbf{Model family.}\ All trials are PointNetTransfGAT variants.\ Transfer of the accuracy/UQ trade-offs and the freezing observation to other GNN families (GraphSAGE, GCN, message-passing transformers) or to non-graph models is untested.
+\item \textbf{Baseline scope.}\ RF, XGBoost and MLP reported (Section~\ref{sec:non_gnn_baselines}); tree-native UQ extensions (quantile regression forests, NGBoost) not evaluated, so whether tree-native methods can match MC Dropout's ranking or the adaptive conformal conditional-coverage range is left for follow-up work.
+\item \textbf{Metrics.}\ Strong UQ metrics ($\rho$, AUROC, PICP, $k_{95}$, CRPS) do not on their own imply policy-level usefulness.\ Whether uncertainty-guided filtering changes the quality of an actual planner decision requires user studies or simulated decision pipelines outside the scope here.
+\end{itemize}

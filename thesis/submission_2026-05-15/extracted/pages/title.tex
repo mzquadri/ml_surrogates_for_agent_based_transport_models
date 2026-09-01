@@ -1,0 +1,40 @@
+\begin{titlepage}
+ \centering
+
+ \IfFileExists{logos/tum-black.pdf}{%
+ \includegraphics[width=2.0cm]{logos/tum-black.pdf}\\[1.5em]
+ }{%
+ \vspace*{20mm}
+ }
+
+ \vspace{4mm}
+ {\huge\bfseries TUM School of \getSchool{} \par}
+
+ \vspace{2mm}
+ {\Large Department of \getDepartment{} \par}
+
+ \vspace{3mm}
+ {\large\MakeUppercase{\getUniversity{}} \par}
+
+ \vspace{15mm}
+ {\Large \getDoctype{} in \getDegree{} \par}
+
+ \vspace{12mm}
+ {\huge\bfseries \getTitle{} \par}
+
+ \vspace{8mm}
+ {\huge\bfseries \foreignlanguage{ngerman}{\getTitleGer{}} \par}
+
+ \vspace{12mm}
+ \begin{tabular}{l l}
+ Author: & \getAuthor{} \\
+ Examiner: & \getSupervisor{} \\
+ Supervisor: & \getAdvisor{} \\
+ Submission Date: & \getSubmissionDate{} \\
+ \end{tabular}
+
+ \IfFileExists{logos/faculty-\fg.pdf}{%
+ \vfill{}
+ \includegraphics[height=20mm]{logos/faculty-\fg.pdf}
+ }{}
+\end{titlepage}

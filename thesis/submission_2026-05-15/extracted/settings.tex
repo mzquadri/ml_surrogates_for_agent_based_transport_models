@@ -1,0 +1,104 @@
+% TUM-style settings (adapted from TUM-Dev/tum-thesis-latex master branch).
+% pdfx and lstautogobble/pgfplotstable are omitted (pdfx requires additional
+% xmpdata plumbing; the last two are not strictly required).
+
+\PassOptionsToPackage{table,svgnames,dvipsnames}{xcolor}
+\usepackage{xcolor}
+
+% KOMA-Script compatibility hack (silences \float@addtolists deprecation warning)
+\usepackage{scrhack}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[sc]{mathpazo}
+\usepackage[ngerman,american]{babel}
+\usepackage[autostyle]{csquotes}
+\usepackage[%
+    backend=biber,
+    url=true,
+    doi=true,
+    eprint=true,
+    style=numeric-comp,
+    sorting=none,
+    maxnames=4,
+    minnames=3,
+    maxbibnames=99,
+    giveninits,
+    uniquename=init]{biblatex}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage[final]{microtype}
+\usepackage{caption}
+\usepackage[printonlyused]{acronym}
+\usepackage{ifthen}
+
+% Additional maths / algorithms
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\usepackage{subcaption}
+\usepackage{multirow}
+\usepackage{tabularx}
+\usepackage{enumitem}
+\usepackage{float}
+
+% Theorems
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}[chapter]
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}[chapter]
+\newtheorem{lemma}[theorem]{Lemma}
+
+% Hyperref (loaded late, after most packages)
+\usepackage{hyperref}
+\hypersetup{hidelinks}
+
+% Colour theme resolution (template supports dark/light)
+\ifthenelse{\equal{\detokenize{dark}}{\jobname}}{%
+    \newcommand{\bg}{black}
+    \newcommand{\fg}{white}
+    \usepackage[pagecolor=\bg]{pagecolor}
+    \color{\fg}
+}{%
+    \newcommand{\bg}{white}
+    \newcommand{\fg}{black}
+}
+
+\bibliography{bibliography}
+
+% Palatino-friendly tweaks
+\setkomafont{disposition}{\normalfont\bfseries}
+\linespread{1.05}
+
+% Allow up to 3em of extra inter-word stretch when a paragraph would otherwise
+% overflow the line; without this, paragraphs containing long URLs, citation
+% lists or non-breakable maths runs trigger ``Overfull \hbox'' warnings and
+% printable text drifts into the right margin.
+\setlength{\emergencystretch}{3em}
+
+% Algorithm float customisation (input/output keywords)
+\renewcommand{\algorithmicrequire}{\textbf{Input:}}
+\renewcommand{\algorithmicensure}{\textbf{Output:}}
+
+% Table of contents bookmark
+\BeforeTOCHead[toc]{{\cleardoublepage\pdfbookmark[0]{\contentsname}{toc}}}
+
+% ---------- TUM corporate-design colours ----------
+\definecolor{TUMBlue}{HTML}{0065BD}
+\definecolor{TUMSecondaryBlue}{HTML}{005293}
+\definecolor{TUMSecondaryBlue2}{HTML}{003359}
+\definecolor{TUMBlack}{HTML}{000000}
+\definecolor{TUMWhite}{HTML}{FFFFFF}
+\definecolor{TUMDarkGray}{HTML}{333333}
+\definecolor{TUMGray}{HTML}{808080}
+\definecolor{TUMLightGray}{HTML}{CCCCC6}
+\definecolor{TUMAccentGray}{HTML}{DAD7CB}
+\definecolor{TUMAccentOrange}{HTML}{E37222}
+\definecolor{TUMAccentGreen}{HTML}{A2AD00}
+\definecolor{TUMAccentLightBlue}{HTML}{98C6EA}
+\definecolor{TUMAccentBlue}{HTML}{64A0C8}
+
+% Prevent blank pages in one-sided book on clearpage
+\let\cleardoublepage\clearpage
+
+\raggedbottom

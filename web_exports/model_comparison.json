@@ -1,0 +1,69 @@
+{
+  "models": [
+    {
+      "mae": 4.060104846954346,
+      "model": "T7 deterministic",
+      "protocol": "reported held-out test metrics",
+      "r2": 0.5471095442771912,
+      "rmse": 7.534329891204834
+    },
+    {
+      "mae": 3.957288980484009,
+      "model": "T8 deterministic",
+      "protocol": "reported held-out test metrics",
+      "r2": 0.5957479476928711,
+      "rmse": 7.118265151977539
+    },
+    {
+      "mae": 3.4853219985961914,
+      "model": "Deep Ensemble",
+      "protocol": "recomputed and reported held-out test metrics",
+      "r2": 0.6840807795524597,
+      "rmse": 6.292686462402344
+    },
+    {
+      "coverage_90": 0.8947349454717876,
+      "coverage_95": 0.9177926347400032,
+      "gate": "FAIL",
+      "mae": 4.130488872528076,
+      "model": "T10 CQR midpoint",
+      "protocol": "reported CQR test metrics; no cached test arrays",
+      "r2": 0.40566354990005493,
+      "rmse": 8.631062507629395
+    },
+    {
+      "coverage_90": 0.8982241188556978,
+      "coverage_95": 0.949078552236447,
+      "gate": "PASS",
+      "mae": 4.3015241622924805,
+      "model": "T11 frozen CQR midpoint",
+      "protocol": "reported CQR test metrics; no cached test arrays",
+      "r2": 0.5835253000259399,
+      "rmse": 7.2250752449035645
+    }
+  ],
+  "provenance": {
+    "classification": "thesis-result",
+    "dataset_release": "train-data-v1",
+    "generated_by": "scripts/export_web_artifacts.py",
+    "metric_definition": "Held-out test metrics per model. The CQR rows report interval coverage at nominal 90 and 95 percent; the gate records whether observed coverage met the nominal level.",
+    "schema_version": 2,
+    "source_artifacts": [
+      "analysis_outputs/thesis_intelligence.json"
+    ],
+    "source_commit": "3ad2fb3fccb1885e2f34a1098170499b44af328a",
+    "source_repository": "https://github.com/mzquadri/ml-surrogates-thesis",
+    "units": "veh/h for mae and rmse; r2 and coverage unitless",
+    "upstream": {
+      "audit_source_commit": "fdb4ef0c9c736576ae34d5e331d8b66a7a6d877a",
+      "audit_source_repository": "https://github.com/mzquadri/ml_surrogates_for_agent_based_transport_models",
+      "submitted_artifact_commit": "4b95a3d8aca5929bb88b84bb7f7ae86c48e2f428",
+      "submitted_pdf_sha256": "0ac5309d060cda53d82a05cc837136fe853e7f9dcbabd2f4fb4b4282a39bc97e"
+    }
+  },
+  "scope_notes": {
+    "full_data": "All scalar model/UQ metrics and aggregate bins use full cached arrays.",
+    "reported_only": "T10/T11 test metrics and final-thesis calibration lack replayable test/split artifacts.",
+    "sampled": "Only dashboard scatter rendering uses a deterministic sample (seed 42)."
+  }
+}

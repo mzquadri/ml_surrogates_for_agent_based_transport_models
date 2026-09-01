@@ -1,0 +1,42 @@
+# Training data, dataloaders, benchmark results, trained models (kept locally only)
+code/data/
+data/*
+models/
+
+# Exceptions: published data. Small vector layer is tracked in-repo; the 2.5 GB
+# of .pt dataloaders is distributed as release assets, so only its README ships.
+!data/visualisation/
+!data/train_data/
+data/train_data/*
+!data/train_data/README.md
+!data/train_data/SHA256SUMS.txt
+
+results/
+private_artifacts/
+policy-dashboard/
+
+# Large binary data files
+*.npz
+*.npy
+*.pt
+*.pth
+*.ckpt
+*.h5
+
+# Training logs / experiment tracking
+logs/
+wandb/
+mlruns/
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# OS junk
+Thumbs.db
+.DS_Store

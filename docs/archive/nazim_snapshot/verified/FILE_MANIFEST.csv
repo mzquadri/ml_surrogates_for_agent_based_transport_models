@@ -1,0 +1,26 @@
+file_path,file_type,authoritative_for,verified_this_session,key_facts_extracted,trust_level
+data/TR-C_Benchmarks/pointnet_transf_gat_1st_bs32_5feat_seed42/test_results.json,JSON,T1 test metrics,YES,R2=0.7860 MAE=2.97 RMSE=5.40 - but different architecture,LOW - excluded from comparison
+data/TR-C_Benchmarks/point_net_transf_gat_2nd_try/test_evaluation_complete.json,JSON,T2 hyperparams+metrics,YES,batch=16 LR=0.0005 dropout=0.3 weighted=No R2=0.5117 MAE=4.33 RMSE=8.15,HIGH
+data/TR-C_Benchmarks/point_net_transf_gat_3rd_trial_weighted_loss/test_evaluation_complete.json,JSON,T3 hyperparams+metrics,YES,batch=16 LR=0.0005 dropout=0.0 weighted=Yes R2=0.2246 MAE=5.99 RMSE=10.27,HIGH
+data/TR-C_Benchmarks/point_net_transf_gat_4th_trial_weighted_loss/test_results.json,JSON,T4 test metrics only,YES,R2=0.2426 MAE=6.08 RMSE=10.15 - no hyperparams block saved,MEDIUM - metrics OK but batch_size unknown
+data/TR-C_Benchmarks/point_net_transf_gat_5th_try/test_evaluation_complete.json,JSON,T5 hyperparams+metrics,YES,batch=8 LR=0.0005 dropout=0.3 weighted=No R2=0.5553 MAE=4.24 RMSE=7.78,HIGH
+data/TR-C_Benchmarks/point_net_transf_gat_6th_trial_lower_lr/test_evaluation_complete.json,JSON,T6 hyperparams+metrics,YES,batch=8 LR=0.0003 dropout=0.3 weighted=No R2=0.5223 MAE=4.32 RMSE=8.06,HIGH
+data/TR-C_Benchmarks/point_net_transf_gat_7th_trial_80_10_10_split/test_evaluation_complete.json,JSON,T7 hyperparams+metrics,YES,batch=8 LR=0.0006 dropout=0.3 weighted=No R2=0.5471 MAE=4.06 RMSE=7.53,HIGH
+data/TR-C_Benchmarks/point_net_transf_gat_8th_trial_lower_dropout/test_evaluation_complete.json,JSON,T8 hyperparams+metrics (BEST),YES,batch=8 LR=0.0005 dropout=0.2 weighted=No R2=0.5957 MAE=3.96 RMSE=7.12,HIGH - BEST MODEL
+data/TR-C_Benchmarks/point_net_transf_gat_8th_trial_lower_dropout/uq_results/mc_dropout_full_metrics_model8_mc30_100graphs.json,JSON,T8 MC Dropout UQ,YES,spearman_rho=0.4820 n_nodes=3163500 mc_samples=30 inference=228.25min,HIGH
+data/TR-C_Benchmarks/point_net_transf_gat_8th_trial_lower_dropout/uq_results/conformal_standard.json,JSON,T8 Conformal Prediction,YES,90%: q=9.9196 achieved=90.02%; 95%: q=14.6766 achieved=95.01%,HIGH
+data/TR-C_Benchmarks/point_net_transf_gat_8th_trial_lower_dropout/uq_results/uq_comparison_model8.json,JSON,T8 full UQ comparison,YES,k95=11.65 sigma_norm 65.8% narrower reject-50pct gives MAE drop 39.9%,HIGH
+data/TR-C_Benchmarks/point_net_transf_gat_8th_trial_lower_dropout/uq_results/ensemble_experiments/experiment_a_results.json,JSON,Ensemble Exp A,YES,MC_avg_rho=0.1600 ensemble_var_rho=0.1035 combined_rho=0.1601,HIGH - low rho explained by cross-distribution artifact
+data/TR-C_Benchmarks/point_net_transf_gat_8th_trial_lower_dropout/uq_results/ensemble_experiments/experiment_b_results.json,JSON,Ensemble Exp B,YES,multi_model_rho=0.1167,HIGH
+data/TR-C_Benchmarks/point_net_transf_gat_7th_trial_80_10_10_split/uq_results/mc_dropout_full_metrics_model7_mc30_100graphs.json,JSON,T7 MC Dropout UQ,YES,spearman_rho=0.4437 n_nodes=3163500,HIGH
+data/TR-C_Benchmarks/point_net_transf_gat_5th_try/uq_results/mc_dropout_full_metrics_model5_mc30_50graphs.json,JSON,T5 MC Dropout UQ,YES,spearman_rho=0.4263 n_nodes=1581750,HIGH
+data/TR-C_Benchmarks/point_net_transf_gat_6th_trial_lower_lr/uq_results/mc_dropout_full_metrics_model6_mc30_50graphs.json,JSON,T6 MC Dropout UQ,YES,spearman_rho=0.4186 n_nodes=1581750,HIGH
+data/TR-C_Benchmarks/point_net_transf_gat_8th_trial_lower_dropout/feature_analysis_plots/feature_analysis_report.txt,TXT,T8 feature-error correlation,YES,VOL_BASE_CASE=0.3316 CAPACITY_BASE_CASE=0.2615 CAPACITY_REDUCTION=-0.2286 FREESPEED=0.2110 LENGTH=-0.0695,HIGH
+data/TR-C_Benchmarks/point_net_transf_gat_8th_trial_lower_dropout/uq_results/ADVANCED_UQ_SUMMARY_MODEL8.md,MD,T8 UQ narrative,YES,k95=11.65; 65.8% narrower intervals; reject-top-50%-uncertain gives MAE drop 39.9%,HIGH - computed summary
+data/TR-C_Benchmarks/ALL_MODELS_COMPARISON/all_models_summary.json,JSON,Multi-model comparison,YES,Summary of all 8 trials,HIGH
+scripts/gnn/models/point_net_transf_gat.py,Python,Architecture definition,YES,PointNetConv x2 + TransformerConv x2 (128->512) + GATConv x2 (512->64->1); Dropout in PointNet+Transformer not final GAT,HIGH
+scripts/data_preprocessing/process_simulations_for_gnn.py,Python,Preprocessing pipeline,YES,LineGraph() transform: nodes become road_segments(31635); target=delta_vol_car,HIGH
+scripts/data_preprocessing/help_functions.py,Python,Target variable definition,YES,y = vol_car - vol_base_case (delta volume in veh/h); line 121-123,HIGH
+scripts/training/run_models.py,Python,Training configuration,YES,Training loop and hyperparameter config,HIGH
+scripts/evaluation/generate_thesis_charts.py,Python,Figure generation,YES,WRONG hardcoded test_r2 values - DO NOT USE FOR THESIS,LOW - WRONG VALUES - DEPRECATED
+docs/MEETING_PREPARATION.md,MD,Meeting prep notes,YES,WRONG hyperparameters throughout - see OLD_CLAIMS_AUDIT.md for full list,LOW - DO NOT TRUST HYPERPARAMS

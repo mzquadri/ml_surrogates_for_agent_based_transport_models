@@ -1,0 +1,367 @@
+{
+  "total": 72,
+  "pass": 72,
+  "fail": 0,
+  "checks": [
+    {
+      "check": "MC Dropout NPZ exists",
+      "status": "PASS",
+      "detail": "keys=['predictions', 'uncertainties', 'targets']"
+    },
+    {
+      "check": "MC Dropout NPZ predictions shape",
+      "status": "PASS",
+      "detail": "shape=(3163500,)"
+    },
+    {
+      "check": "MC Dropout NPZ uncertainties shape",
+      "status": "PASS",
+      "detail": "shape=(3163500,)"
+    },
+    {
+      "check": "MC Dropout NPZ targets shape",
+      "status": "PASS",
+      "detail": "shape=(3163500,)"
+    },
+    {
+      "check": "MC Dropout NPZ no NaN in predictions",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "MC Dropout NPZ no NaN in uncertainties",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "MC Dropout NPZ no NaN in targets",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "MC Dropout NPZ all uncertainties > 0",
+      "status": "PASS",
+      "detail": "min=0.042446"
+    },
+    {
+      "check": "Deterministic NPZ exists",
+      "status": "PASS",
+      "detail": "keys=['predictions', 'targets']"
+    },
+    {
+      "check": "Deterministic NPZ predictions shape",
+      "status": "PASS",
+      "detail": "shape=(3163500,)"
+    },
+    {
+      "check": "Deterministic NPZ no NaN",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "S-convergence NPZ exists",
+      "status": "PASS",
+      "detail": "keys=['raw_preds', 'targets', 's_values']"
+    },
+    {
+      "check": "Exp A run 0 NPZ exists",
+      "status": "PASS",
+      "detail": "keys=['predictions', 'uncertainties', 'targets']"
+    },
+    {
+      "check": "Exp A run 1 NPZ exists",
+      "status": "PASS",
+      "detail": "keys=['predictions', 'uncertainties']"
+    },
+    {
+      "check": "Exp A run 2 NPZ exists",
+      "status": "PASS",
+      "detail": "keys=['predictions', 'uncertainties']"
+    },
+    {
+      "check": "Exp A run 3 NPZ exists",
+      "status": "PASS",
+      "detail": "keys=['predictions', 'uncertainties']"
+    },
+    {
+      "check": "Exp A run 4 NPZ exists",
+      "status": "PASS",
+      "detail": "keys=['predictions', 'uncertainties']"
+    },
+    {
+      "check": "phase3/selective_prediction_s30.json",
+      "status": "PASS",
+      "detail": "12 top-level keys"
+    },
+    {
+      "check": "phase3/temperature_scaling_t8.json",
+      "status": "PASS",
+      "detail": "14 top-level keys"
+    },
+    {
+      "check": "phase3/reliability_diagram_t8.json",
+      "status": "PASS",
+      "detail": "11 top-level keys"
+    },
+    {
+      "check": "phase3/crps_t8.json",
+      "status": "PASS",
+      "detail": "17 top-level keys"
+    },
+    {
+      "check": "phase3/pit_t8.json",
+      "status": "PASS",
+      "detail": "18 top-level keys"
+    },
+    {
+      "check": "phase3/pit_after_tempscaling_t8.json",
+      "status": "PASS",
+      "detail": "9 top-level keys"
+    },
+    {
+      "check": "phase3/winkler_t8.json",
+      "status": "PASS",
+      "detail": "9 top-level keys"
+    },
+    {
+      "check": "phase3/s_convergence_results.json",
+      "status": "PASS",
+      "detail": "3 top-level keys"
+    },
+    {
+      "check": "phase3/conformal_conditional_coverage_t8.json",
+      "status": "PASS",
+      "detail": "8 top-level keys"
+    },
+    {
+      "check": "phase3/per_graph_variation_t8.json",
+      "status": "PASS",
+      "detail": "11 top-level keys"
+    },
+    {
+      "check": "phase3/stratified_uq_t8.json",
+      "status": "PASS",
+      "detail": "6 top-level keys"
+    },
+    {
+      "check": "phase3/t7_error_detection.json",
+      "status": "PASS",
+      "detail": "16 top-level keys"
+    },
+    {
+      "check": "phase3/nll_results.json",
+      "status": "PASS",
+      "detail": "3 top-level keys"
+    },
+    {
+      "check": "phase3/bootstrap_ci_results.json",
+      "status": "PASS",
+      "detail": "2 top-level keys"
+    },
+    {
+      "check": "phase3/ensemble_bug_root_cause.json",
+      "status": "PASS",
+      "detail": "8 top-level keys"
+    },
+    {
+      "check": "phase3/ensemble_bug_diagnostic.json",
+      "status": "PASS",
+      "detail": "3 top-level keys"
+    },
+    {
+      "check": "phase3/final_numeric_verification.json",
+      "status": "PASS",
+      "detail": "4 top-level keys"
+    },
+    {
+      "check": "phase3/verify_all_metrics_summary.json",
+      "status": "PASS",
+      "detail": "7 top-level keys"
+    },
+    {
+      "check": "uq_results/mc_dropout_full_metrics_model8_mc30_100graphs.json",
+      "status": "PASS",
+      "detail": "14 top-level keys"
+    },
+    {
+      "check": "uq_results/deterministic_metrics_100graphs.json",
+      "status": "PASS",
+      "detail": "6 top-level keys"
+    },
+    {
+      "check": "uq_results/conformal_standard.json",
+      "status": "PASS",
+      "detail": "16 top-level keys"
+    },
+    {
+      "check": "ensemble/experiment_a_fixed_results.json",
+      "status": "PASS",
+      "detail": "5 top-level keys"
+    },
+    {
+      "check": "ensemble/experiment_b_fixed_results.json",
+      "status": "PASS",
+      "detail": "3 top-level keys"
+    },
+    {
+      "check": "Figure: fig1_trial_comparison.pdf",
+      "status": "PASS",
+      "detail": "size=38,057 bytes"
+    },
+    {
+      "check": "Figure: fig2_uq_ranking.pdf",
+      "status": "PASS",
+      "detail": "size=46,097 bytes"
+    },
+    {
+      "check": "Figure: fig3_conformal_coverage.pdf",
+      "status": "PASS",
+      "detail": "size=35,464 bytes"
+    },
+    {
+      "check": "Figure: fig3_feature_distributions.pdf",
+      "status": "PASS",
+      "detail": "size=46,338 bytes"
+    },
+    {
+      "check": "Figure: fig5_feature_correlation.pdf",
+      "status": "PASS",
+      "detail": "size=32,651 bytes"
+    },
+    {
+      "check": "Figure: fig6_with_without_uq.pdf",
+      "status": "PASS",
+      "detail": "size=36,060 bytes"
+    },
+    {
+      "check": "Figure: fig7_calibration.pdf",
+      "status": "PASS",
+      "detail": "size=43,206 bytes"
+    },
+    {
+      "check": "Figure: fig8_architecture.pdf",
+      "status": "PASS",
+      "detail": "size=35,044 bytes"
+    },
+    {
+      "check": "Figure: fig9_policy_explanation.pdf",
+      "status": "PASS",
+      "detail": "size=36,378 bytes"
+    },
+    {
+      "check": "Figure: fig10_node_vs_graph.pdf",
+      "status": "PASS",
+      "detail": "size=56,506 bytes"
+    },
+    {
+      "check": "Figure: fig11_thesis_workflow.pdf",
+      "status": "PASS",
+      "detail": "size=24,063 bytes"
+    },
+    {
+      "check": "Figure: fig12_trial_progression.pdf",
+      "status": "PASS",
+      "detail": "size=48,605 bytes"
+    },
+    {
+      "check": "Figure: fig13_mc_dropout_inference.pdf",
+      "status": "PASS",
+      "detail": "size=27,955 bytes"
+    },
+    {
+      "check": "Figure: fig14_conformal_workflow.pdf",
+      "status": "PASS",
+      "detail": "size=43,172 bytes"
+    },
+    {
+      "check": "Figure: fig_network_intro.pdf",
+      "status": "PASS",
+      "detail": "size=51,472 bytes"
+    },
+    {
+      "check": "Figure: pointnet_data_flow.pdf",
+      "status": "PASS",
+      "detail": "size=46,944 bytes"
+    },
+    {
+      "check": "Figure: t7_calibration_curve.pdf",
+      "status": "PASS",
+      "detail": "size=45,247 bytes"
+    },
+    {
+      "check": "Figure: t7_interval_width_comparison.pdf",
+      "status": "PASS",
+      "detail": "size=40,446 bytes"
+    },
+    {
+      "check": "Figure: t7_selective_prediction_curve.pdf",
+      "status": "PASS",
+      "detail": "size=40,292 bytes"
+    },
+    {
+      "check": "Figure: t7_vs_t8_uq_comparison.pdf",
+      "status": "PASS",
+      "detail": "size=55,150 bytes"
+    },
+    {
+      "check": "Figure: t8_calibration_curve.pdf",
+      "status": "PASS",
+      "detail": "size=53,637 bytes"
+    },
+    {
+      "check": "Figure: t8_conformal_conditional.pdf",
+      "status": "PASS",
+      "detail": "size=50,193 bytes"
+    },
+    {
+      "check": "Figure: t8_error_detection_auroc.pdf",
+      "status": "PASS",
+      "detail": "size=139,246 bytes"
+    },
+    {
+      "check": "Figure: t8_interval_width_comparison.pdf",
+      "status": "PASS",
+      "detail": "size=40,623 bytes"
+    },
+    {
+      "check": "Figure: t8_per_graph_variation.pdf",
+      "status": "PASS",
+      "detail": "size=57,221 bytes"
+    },
+    {
+      "check": "Figure: t8_pit_after_tempscaling.pdf",
+      "status": "PASS",
+      "detail": "size=30,127 bytes"
+    },
+    {
+      "check": "Figure: t8_pit_histogram.pdf",
+      "status": "PASS",
+      "detail": "size=50,437 bytes"
+    },
+    {
+      "check": "Figure: t8_reliability_diagram.pdf",
+      "status": "PASS",
+      "detail": "size=47,287 bytes"
+    },
+    {
+      "check": "Figure: t8_s_convergence.pdf",
+      "status": "PASS",
+      "detail": "size=50,017 bytes"
+    },
+    {
+      "check": "Figure: t8_selective_prediction_curve.pdf",
+      "status": "PASS",
+      "detail": "size=52,142 bytes"
+    },
+    {
+      "check": "Figure: t8_stratified_uq.pdf",
+      "status": "PASS",
+      "detail": "size=50,560 bytes"
+    },
+    {
+      "check": "Figure: t8_temperature_scaling.pdf",
+      "status": "PASS",
+      "detail": "size=49,905 bytes"
+    }
+  ]
+}
