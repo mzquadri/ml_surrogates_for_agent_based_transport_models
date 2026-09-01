@@ -1,0 +1,74 @@
+% !TEX root = ../main.tex
+
+\chapter{Background and Related Work}\label{chapter:background}
+
+\section{Agent-Based Transport Models}\label{sec:abm}
+
+Rather than aggregating behaviour into mean-field equations, agent-based models (ABMs) assign individual decision logic to each entity in the system, with macroscopic patterns produced by the cumulative interactions of those entities~\cite{bonabeau2002agent,railsback2019agent}.\ In transport applications, agents stand for individual travellers who decide on activities, departure times, modes, and routes; macroscopic patterns then emerge from the interactions on a shared infrastructure.
+
+The Multi-Agent Transport Simulation (MATSim)~\cite{horni2016matsim} is the open-source platform used here.\ Within MATSim, each synthetic traveller is initialised with a daily plan covering activities, modes, and routes; a queue-based mesoscopic loader executes those plans on the network, and a co-evolutionary replanning loop iterates until a Nash-style equilibrium is reached.\ Simulating the Paris metropolitan region requires more than eight hours per scenario on modern hardware~\cite{natterer2025ml}, the cost that motivates surrogate modelling.
+
+\section{Graph Neural Networks}\label{sec:gnn}
+
+Graph Neural Networks (GNNs) extend deep learning to graph-structured data~\cite{scarselli2009graph,kipf2017semi,wu2020comprehensive,wu2022graph} and follow the message-passing paradigm of Gilmer~et~al.~\cite{gilmer2017neural}.\ A graph $\mathcal{G} = (\mathcal{V}, \mathcal{E}, \mathbf{X})$ has node features $\mathbf{X}$; the architectures used here do not consume edge-level features.\ Each node $v$ has an incoming neighbourhood $\mathcal{N}(v) = \{u : (u,v) \in \mathcal{E}\}$, and messages are aggregated over that set.\ Starting from $\mathbf{h}_v^{(0)} = \mathbf{x}_v$, a message-passing network applies $K$ rounds of aggregation and update:
+\begin{align}
+ \mathbf{m}_v^{(k)} &= \textsc{Aggregate}^{(k)}\!\left(\left\{\mathbf{h}_u^{(k-1)} : u \in \mathcal{N}(v)\right\}\right), \label{eq:aggregate}\\
+ \mathbf{h}_v^{(k)} &= \textsc{Update}^{(k)}\!\left(\mathbf{h}_v^{(k-1)},\ \mathbf{m}_v^{(k)}\right), \label{eq:update}
+\end{align}
+where the aggregation function is permutation-invariant.\ Graph Attention Networks (GATs~\cite{velickovic2018graph}) replace fixed aggregation weights with learned attention coefficients, weighting neighbour contributions by relevance.
+
+\paragraph{Traffic prediction with GNNs and the line-graph representation.}\ Most prior GNN work on traffic targets a temporal task: given a window of past observations, predict the next time steps; intersections are graph nodes and road links are edges.\ This thesis takes the alternative line-graph view, in which each road segment becomes a node and edges encode segment adjacency.\ The line graph $L(G)$ is a classical graph-theoretic object; the practical motivation for using it here is that the prediction target, the change in volume induced by a policy intervention, is naturally per-segment.\ Following Natterer~et~al.~\cite{natterer2025ml}, each node carries the policy-relevant features (volume, capacity, capacity reduction, free-flow speed, length) and the model produces a per-segment $\Delta v$.\ Geometric coordinates of each segment are preserved as auxiliary node features and consumed by the PointNetConv layers~\cite{qi2017pointnet} of the architecture described in Chapter~\ref{chapter:methodology}.
+
+\section{Uncertainty Quantification in Deep Learning}\label{sec:uq}
+
+Uncertainty quantification (UQ) lets a model express how confident it is in its outputs~\cite{abdar2021review,gawlikowski2023survey}.\ Two kinds are distinguished: \emph{aleatoric} uncertainty reflects intrinsic stochasticity of the data-generating process and cannot be eliminated by collecting more data; \emph{epistemic} uncertainty stems from gaps in training coverage and shrinks as the dataset grows or the model capacity is better matched to the task.\ Bayesian neural networks~\cite{mackay1992practical} formalise epistemic uncertainty by a posterior over weights, but exact inference is intractable for non-trivial networks.
+
+\subsection{Monte Carlo Dropout and Deep Ensembles}\label{sec:mc_dropout_bg}
+
+Gal and Ghahramani~\cite{gal2016dropout} showed that a network trained with dropout can be interpreted as a variational approximation to a Bayesian neural network.\ Keeping dropout active at inference time and averaging $S$ stochastic forward passes,
+\begin{equation}
+ \hat{y}_s = f_{\hat{\mathbf{w}}_s}(\mathbf{x}), \quad
+ \mathbb{E}[y] \approx \frac{1}{S}\sum_s \hat{y}_s, \quad
+ \mathrm{Var}[y] \approx \frac{1}{S}\sum_s (\hat{y}_s - \mathbb{E}[y])^2,
+\end{equation}
+yields samples from the approximate predictive distribution.\ MC Dropout requires no architectural change at training time and can be applied post-hoc to any existing model that already includes dropout layers.\ Its variational posterior, however, is typically too concentrated, so the raw $\sigma$ from MC Dropout is not a calibrated standard deviation in absolute terms~\cite{foong2019between}, a property quantified empirically in Chapter~\ref{chapter:results} via the scaling factor $k_{95}$.\ Deep ensembles~\cite{lakshminarayanan2017simple} replace stochastic dropout sampling with $M$ independently trained networks; the ensemble mean is the prediction and the inter-member variance is the uncertainty, at the cost of $M\times$ training and inference compute.
+
+\subsection{Conformal Prediction}\label{sec:conformal_bg}
+
+Conformal prediction~\cite{vovk2005algorithmic,angelopoulos2023conformal} is a distribution-free framework for finite-sample marginal coverage, requiring only the \emph{exchangeability} of the data.\ Given a model $f$, a calibration set $\mathcal{D}_\text{cal} = \{(x_i, y_i)\}_{i=1}^{n}$, and target level $1-\alpha$, split conformal computes nonconformity scores $s_i = |y_i - f(x_i)|$, sets $q = \mathrm{Quantile}(s_1, \dots, s_n;\ \lceil (n+1)(1-\alpha) \rceil / n)$, and returns intervals $\mathcal{C}(x_\text{new}) = [f(x_\text{new}) - q,\ f(x_\text{new}) + q]$ with $\Pr(y_\text{new} \in \mathcal{C}) \geq 1-\alpha$.
+
+When an auxiliary $\sigma_i$ (e.g.~from MC Dropout) is available, the score can be normalised, $s_i^\text{adapt} = |y_i - f(x_i)|/(\sigma_i + \varepsilon)$ for a small $\varepsilon > 0$, producing input-adaptive widths $[\hat y - q^\text{adapt}\sigma,\ \hat y + q^\text{adapt}\sigma]$~\cite{romano2019conformalized} while preserving the marginal guarantee.\ Barber~et~al.~\cite{barber2021limits} prove that distribution-free \emph{conditional} coverage is impossible without further assumptions; standard conformal can therefore over-cover low-uncertainty inputs and under-cover high-uncertainty ones, a pattern observed empirically in Chapter~\ref{chapter:results}, while adaptive conformal partly mitigates this in practice.
+
+\subsection{Heteroscedastic Regression and the NLL--MSE Trade-off}\label{sec:hetero_bg}
+
+A heteroscedastic head outputs a mean $\hat\mu$ and a log-variance $\log\hat\sigma^2$ per node, trained by minimising the Gaussian negative log-likelihood
+\begin{equation}\label{eq:hetero_nll_bg}
+ \mathcal{L}_\text{NLL} = \frac{1}{n}\sum_{i=1}^{n} \left[\frac{(y_i - \hat\mu_i)^2}{2\hat\sigma_i^2} + \tfrac{1}{2}\log\hat\sigma_i^2\right]\!,
+\end{equation}
+where the Gaussian normalising constant $\tfrac{1}{2}\log 2\pi$ is omitted.
+The loss can be reduced either by improving $\hat\mu$ or by inflating $\hat\sigma$ on hard examples.\ \textcite{seitzer2022pitfalls} analyse the joint optimisation of $(\hat\mu,\hat\sigma)$ and observe a degenerate regime in which the gradient pathway through $\hat\sigma$ dominates whenever the mean head has insufficient capacity, leaving $\hat\mu$ under-fit and $\hat\sigma$ inflated on hard examples.\ A regulariser $\lambda \sum_i (\log\hat\sigma_i^2)^2$ is commonly added to keep optimisation stable~\cite{seitzer2022pitfalls}.\ This trade-off is the central reason why Trial~9 here trades $R^2$ for a roughly four-fold improvement in $k_{95}$ (from $11.66$ to $2.84$).
+
+\subsection{Conformalized Quantile Regression}\label{sec:cqr_bg}
+
+Conformalized Quantile Regression (CQR)~\cite{romano2019conformalized} obtains prediction intervals that are both adaptive and conformally calibrated.\ A model is trained to predict the lower and upper quantiles $\hat q^\text{lo}$ and $\hat q^\text{hi}$ via the joint pinball loss
+\begin{equation}\label{eq:pinball_bg}
+ \mathcal{L}_\text{pinball} = \frac{1}{n}\sum_{i=1}^{n} \left[\rho_{\tau_\text{lo}}(y_i - \hat q_i^\text{lo}) + \rho_{\tau_\text{hi}}(y_i - \hat q_i^\text{hi})\right],
+ \quad \rho_\tau(u) = u(\tau - \mathbf{1}[u<0]).
+\end{equation}
+A single conformal correction $\hat Q$ is then computed on a held-out set, and intervals become $[\hat q^\text{lo} - \hat Q,\ \hat q^\text{hi} + \hat Q]$.
+
+\subsection{Selective Prediction and Evaluation Metrics}\label{sec:uq_metrics_bg}
+
+Selective prediction~\cite{geifman2017selective}, originally formulated for classification but easily extended to regression, ranks predictions by an uncertainty score $\sigma_i$ and retains only the most confident fraction $\tau$, characterising how much an uncertainty signal can sharpen accuracy when an abstention budget is available.
+
+Several complementary metrics evaluate uncertainty quality.\ The Spearman rank correlation $\rho$ between $\sigma$ and $|y - \hat y|$ measures whether large uncertainty tracks large error and is invariant to monotone rescaling.\ The Expected Calibration Error~\cite{kuleshov2018accurate,guo2017calibration} summarises how observed coverage deviates from nominal across the full $[0,1]$ range.\ The Continuous Ranked Probability Score (CRPS)~\cite{gneiting2007strictly} is a proper scoring rule that for a Gaussian predictive distribution admits the closed form
+\begin{equation}\label{eq:crps_gaussian_bg}
+ \mathrm{CRPS}\!\left(\mathcal{N}(\mu,\sigma^2), y\right)
+ = \sigma\!\left[z\bigl(2\Phi(z) - 1\bigr) + 2\varphi(z) - \tfrac{1}{\sqrt{\pi}}\right],
+ \quad z = (y - \mu)/\sigma,
+\end{equation}
+giving the theoretical Gaussian-calibrated optimum $\mathrm{CRPS}/\mathrm{MAE} = 1/\sqrt{2} \approx 0.707$.\ The Probability Integral Transform~\cite{dawid1984present} is uniform on $[0,1]$ for a calibrated forecaster, with departures from uniformity flagged by the Kolmogorov--Smirnov statistic.\ The Winkler interval score~\cite{winkler1972decision} rewards narrow intervals and penalises non-coverage, enabling direct comparison of Gaussian, conformal, and adaptive conformal intervals.\ For binary error-detection, AUROC measures whether $\sigma$ separates large-error from small-error nodes; AUPRC is more informative under class imbalance, with the random baseline equal to the positive-class prevalence~\cite{davis2006relationship,saito2015precision}.
+
+\section{Surrogates and UQ in Adjacent Domains}\label{sec:related}
+
+GNN-based transport surrogates exploit the network topology that controls flow propagation~\cite{natterer2025ml}; PointNetTransfGAT (PointNet + transformer + graph attention)~\cite{natterer2025ml} is the base architecture used here.\ Existing UQ work on traffic targets temporal forecasting rather than the cross-sectional policy-impact setting studied here, and UQ for GNNs has been studied primarily for classification: Fuchsgruber~et~al.~\cite{fuchsgruber2024energy} propose single-pass epistemic uncertainty via Graph Energy-Based Models, and~\cite{fuchsgruber2024uncertainty} explore uncertainty-guided active learning on graphs.\ Within conformal prediction, Romano~et~al.~\cite{romano2019conformalized} introduce CQR (basis for Trials~10/11), Barber~et~al.~\cite{barber2021limits} establish the impossibility of distribution-free conditional coverage, and the regression-calibration literature~\cite{kuleshov2018accurate,laves2020wellcal,guo2017calibration} provides the $\sigma$-scaling step used here.

@@ -1,0 +1,99 @@
+% !TEX root = ../main.tex
+
+\chapter{Verified Master Table}\label{app:master_table}
+
+This appendix collects the numerical results of the thesis in one place, grouped by topic.\ Every value in the tables below has been recomputed from the saved per-trial prediction arrays and cross-checked against the canonical metric files produced during evaluation.\ As a reminder for cross-table comparisons: T1--T6 are evaluated on 50 test graphs (80/15/5 split, $1{,}581{,}750$ nodes), while T7--T11 and the Deep Ensemble use 100 test graphs (80/10/10 split, $3{,}163{,}500$ nodes).\ Comparisons of $R^2$ across the two groups should therefore be read descriptively, not as strict apples-to-apples.
+
+\section*{A.1 Point Prediction Metrics (UQ-Capable Models)}\label{app:tab:point}
+
+\begin{table}[H]
+\centering
+\caption[Verified point-prediction metrics, UQ-capable models]{Point-prediction metrics for the UQ-capable models on the 100-graph test set ($3{,}163{,}500$ nodes); T1--T7 base trial metrics are in Section~\ref{sec:trial_results}.\ T9 reports the MC mean; T10 and T11 report the quantile midpoint.}
+\label{tab:app_point}
+\begin{tabular}{lccc}
+\toprule
+Model & $R^2$ & MAE (veh/h) & RMSE (veh/h) \\
+\midrule
+T8 (primary UQ base) & 0.5957 & 3.957 & 7.118 \\
+T9 (MC mean) & 0.4991 & 4.053 & 7.924 \\
+T10 (midpoint) & 0.4057 & 4.130 & 8.631 \\
+T11 (midpoint) & 0.5835 & 4.302 & 7.225 \\
+\textbf{Deep Ensemble} & \textbf{0.6841} & \textbf{3.485} & \textbf{6.293} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section*{A.2 T8 MC Dropout UQ Metrics}\label{app:tab:t8mc}
+
+\begin{table}[H]
+\centering
+\caption[Verified T8 MC Dropout UQ metrics]{T8 MC Dropout, $S = 30$, full $3{,}163{,}500$-node test set unless noted.}
+\label{tab:app_t8mc}
+\begin{tabular}{lc}
+\toprule
+Metric & Value \\
+\midrule
+Spearman $\rho$ ($\sigma$ vs $|y - \hat y|$) & $0.4820$ \\
+Mean per-graph $\rho$ (mean / std) & $0.464$ / $0.023$ \\
+Per-graph $\rho$ range & $[0.407,\ 0.505]$ \\
+Bootstrap 95\% CI for mean per-graph $\rho$ ($B = 10{,}000$) & $[0.460,\ 0.469]$ \\
+Mean uncertainty $\bar\sigma$ (veh/h) & $1.369$ \\
+$\sigma$ range (veh/h) & $[0.042,\ 44.29]$ \\
+$k_{50},\ k_{70},\ k_{80},\ k_{90},\ k_{95}$ & $1.71,\ 3.09,\ 4.55,\ 7.74,\ 11.66$ \\
+Coverage at $1.96\sigma$ & $54.85\%$ \\
+AUROC top-10\% errors & $0.7548$ \\
+AUROC top-20\% errors & $0.7324$ \\
+$S$-convergence: $\rho$ at $S = 30$ / $S = 50$ & $0.466$ / $0.471$ \\
+$S$-convergence: gain $S = 30 \to 50$ & $+1.03\%$ \\
+T7 cross-check: Spearman $\rho$ / $k_{95}$ / AUROC top-10\% & $0.4437$ / $16.15$ / $0.7416$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section*{A.3 Conformal Prediction (T8)}\label{app:tab:conformal}
+
+\begin{table}[H]
+\centering
+\caption[Verified conformal prediction results]{Standard split conformal and adaptive ($\sigma$-scaled) conformal on T8.\ Random scenario-level partition (seed $42$, 50 calibration / 50 evaluation graphs, $1{,}581{,}750$ nodes each).}
+\label{tab:app_conformal}
+\begin{tabular}{lccc}
+\toprule
+Method & Level & Quantile $q$ (veh/h) & PICP \\
+\midrule
+Standard conformal & 90\% & $9.920$ & $90.02\%$ \\
+Standard conformal & 95\% & $14.677$ & $95.01\%$ \\
+Adaptive conformal & 90\% (global) & $q^\text{adapt} = 7.71$ & $89.87\%$\,\footnotemark[1] \\
+\midrule
+\multicolumn{4}{l}{\emph{Conditional coverage range across deciles D1--D10:}} \\
+\midrule
+Standard conformal & 90\% & range & $[59.0\%,\ 98.1\%]$ \\
+Adaptive conformal & 90\% & range & $[83.7\%,\ 96.4\%]$ \\
+\bottomrule
+\end{tabular}
+\\[2pt]
+\footnotesize $^{1}$ Adaptive conformal global PICP$_{90}$ = $89.87\%$ is $0.13$ pp below the $90\%$ nominal target -- within finite-sample tolerance but not strictly above the target.
+\end{table}
+
+\section*{A.4 Proper Scoring Rules (T8)}\label{app:tab:scoring}
+
+\begin{table}[H]
+\centering
+\caption[Verified proper scoring rule diagnostics]{CRPS, PIT and Winkler scores including PIT KS on the full $3{,}163{,}500$-node T8 test set.}
+\label{tab:app_scoring}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{lcl}
+\toprule
+Metric & Value & Note \\
+\midrule
+Mean CRPS (veh/h) & $3.384$ & --- \\
+CRPS / MAE & $0.857$ & Gaussian-calibrated optimum $1/\sqrt{2} \approx 0.707$ \\
+PIT mean & $0.433$ & ideal $0.500$ \\
+PIT KS statistic & $0.245$ & --- \\
+PIT first-bin mass & $28.4\%$ & --- \\
+Winkler 90\% (raw MC) & $49.68$ & --- \\
+Winkler 90\% (standard conformal) & $35.78$ & $-28.0\%$ vs raw \\
+Winkler 90\% (adaptive conformal) & $\mathbf{32.32}$ & $-35.0\%$ vs raw \\
+\bottomrule
+\end{tabular}}
+\end{table}
+

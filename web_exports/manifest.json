@@ -1,0 +1,72 @@
+{
+  "artifacts": {
+    "calibration": {
+      "bytes": 6812,
+      "classification": "thesis-result",
+      "file": "calibration.json"
+    },
+    "corpus": {
+      "bytes": 2152,
+      "classification": "post-thesis-data-audit",
+      "file": "corpus.json"
+    },
+    "feature_variability": {
+      "bytes": 950,
+      "classification": "post-thesis-data-audit",
+      "file": "feature_variability.json"
+    },
+    "features": {
+      "bytes": 4742,
+      "classification": "post-thesis-data-audit",
+      "file": "features.json"
+    },
+    "intervention": {
+      "bytes": 2448,
+      "classification": "post-thesis-data-audit",
+      "file": "intervention.json"
+    },
+    "model_comparison": {
+      "bytes": 2703,
+      "classification": "thesis-result",
+      "file": "model_comparison.json"
+    },
+    "network_response": {
+      "bytes": 165960,
+      "classification": "post-thesis-data-audit",
+      "file": "network_response.webp"
+    },
+    "network_scenario": {
+      "bytes": 133592,
+      "classification": "post-thesis-data-audit",
+      "file": "network_scenario.webp"
+    },
+    "representative_scenario": {
+      "bytes": 1645,
+      "classification": "post-thesis-data-audit",
+      "file": "representative_scenario.json"
+    },
+    "selective_risk": {
+      "bytes": 6117,
+      "classification": "thesis-result",
+      "file": "selective_risk.json"
+    },
+    "uncertainty": {
+      "bytes": 7362,
+      "classification": "thesis-result",
+      "file": "uncertainty.json"
+    }
+  },
+  "provenance": {
+    "classification": "manifest",
+    "dataset_release": "train-data-v1",
+    "generated_at": "2026-08-31T16:13:38Z",
+    "generated_by": "scripts/export_web_artifacts.py",
+    "schema_version": 2,
+    "source_artifacts": [
+      "analysis_outputs/thesis_intelligence.json",
+      "train-data-v1/*.pt"
+    ],
+    "source_commit": "3ad2fb3fccb1885e2f34a1098170499b44af328a",
+    "source_repository": "https://github.com/mzquadri/ml-surrogates-thesis"
+  }
+}

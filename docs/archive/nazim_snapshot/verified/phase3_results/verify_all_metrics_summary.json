@@ -1,0 +1,295 @@
+{
+  "total_checks": 57,
+  "passed": 57,
+  "failed": 0,
+  "warnings": 0,
+  "figures_found": 32,
+  "figures_expected": 32,
+  "all_results": {
+    "R\u00b2 (recomputed vs JSON)": {
+      "computed": 0.5856617727244149,
+      "expected": 0.5856617093086243,
+      "status": "PASS"
+    },
+    "MAE (recomputed vs JSON)": {
+      "computed": 3.9475570181896895,
+      "expected": 3.947556734085083,
+      "status": "PASS"
+    },
+    "RMSE (recomputed vs JSON)": {
+      "computed": 7.206519741528802,
+      "expected": 7.206520080566406,
+      "status": "PASS"
+    },
+    "Spearman rho (recomputed vs JSON)": {
+      "computed": 0.481953192179139,
+      "expected": 0.4819531921120836,
+      "status": "PASS"
+    },
+    "Mean uncertainty (recomputed vs JSON)": {
+      "computed": 1.3687029801196944,
+      "expected": 1.368703007698059,
+      "status": "PASS"
+    },
+    "R\u00b2 (recomputed vs thesis 0.5857)": {
+      "computed": 0.5856617727244149,
+      "expected": 0.5857,
+      "status": "PASS"
+    },
+    "MAE (recomputed vs thesis 3.95)": {
+      "computed": 3.9475570181896895,
+      "expected": 3.95,
+      "status": "PASS"
+    },
+    "RMSE (recomputed vs thesis 7.21)": {
+      "computed": 7.206519741528802,
+      "expected": 7.21,
+      "status": "PASS"
+    },
+    "Spearman rho (recomputed vs thesis 0.4820)": {
+      "computed": 0.481953192179139,
+      "expected": 0.482,
+      "status": "PASS"
+    },
+    "Mean unc (recomputed vs thesis 1.369)": {
+      "computed": 1.3687029801196944,
+      "expected": 1.369,
+      "status": "PASS"
+    },
+    "Selective MAE @ 100%": {
+      "computed": 3.9475570181896895,
+      "expected": 3.9476,
+      "status": "PASS"
+    },
+    "Selective MAE @ 95%": {
+      "computed": 3.478746505771441,
+      "expected": 3.4787,
+      "status": "PASS"
+    },
+    "Selective MAE @ 90%": {
+      "computed": 3.225745067002951,
+      "expected": 3.2257,
+      "status": "PASS"
+    },
+    "Selective MAE @ 85%": {
+      "computed": 3.051390375447243,
+      "expected": 3.0514,
+      "status": "PASS"
+    },
+    "Selective MAE @ 80%": {
+      "computed": 2.913110818508724,
+      "expected": 2.9131,
+      "status": "PASS"
+    },
+    "Selective MAE @ 75%": {
+      "computed": 2.7945090963398576,
+      "expected": 2.7945,
+      "status": "PASS"
+    },
+    "Selective MAE @ 70%": {
+      "computed": 2.689274431029225,
+      "expected": 2.6893,
+      "status": "PASS"
+    },
+    "Selective MAE @ 60%": {
+      "computed": 2.500753544596014,
+      "expected": 2.5008,
+      "status": "PASS"
+    },
+    "Selective MAE @ 50%": {
+      "computed": 2.3197280183417783,
+      "expected": 2.3197,
+      "status": "PASS"
+    },
+    "Selective MAE @ 40%": {
+      "computed": 2.1333202437633885,
+      "expected": 2.1333,
+      "status": "PASS"
+    },
+    "Selective MAE @ 30%": {
+      "computed": 1.9218086156358025,
+      "expected": 1.9218,
+      "status": "PASS"
+    },
+    "Selective MAE @ 25%": {
+      "computed": 1.7926492535553504,
+      "expected": 1.7926,
+      "status": "PASS"
+    },
+    "Selective MAE @ 10%": {
+      "computed": 1.0554514474478134,
+      "expected": 1.0555,
+      "status": "PASS"
+    },
+    "Selective reduction % @ 90%": {
+      "computed": 18.28502914234673,
+      "expected": 18.3,
+      "status": "PASS"
+    },
+    "Selective reduction % @ 50%": {
+      "computed": 41.23636447420884,
+      "expected": 41.2,
+      "status": "PASS"
+    },
+    "Selective reduction % @ 25%": {
+      "computed": 54.588388583239734,
+      "expected": 54.6,
+      "status": "PASS"
+    },
+    "CRPS mean (recomputed vs JSON)": {
+      "computed": 3.38301125048274,
+      "expected": 3.383,
+      "status": "PASS"
+    },
+    "CRPS median (recomputed vs JSON)": {
+      "computed": 1.3291546650578325,
+      "expected": 1.3292,
+      "status": "PASS"
+    },
+    "CRPS/MAE ratio (recomputed vs JSON)": {
+      "computed": 0.8569885716392148,
+      "expected": 0.857,
+      "status": "PASS"
+    },
+    "CRPS mean (recomputed vs thesis 3.383)": {
+      "computed": 3.38301125048274,
+      "expected": 3.383,
+      "status": "PASS"
+    },
+    "CRPS/MAE (recomputed vs thesis 0.857)": {
+      "computed": 0.8569885716392148,
+      "expected": 0.857,
+      "status": "PASS"
+    },
+    "Temperature T (JSON vs thesis 2.70)": {
+      "computed": 2.7024848450799777,
+      "expected": 2.7,
+      "status": "PASS"
+    },
+    "ECE before (JSON vs thesis 0.269)": {
+      "computed": 0.2687388177651336,
+      "expected": 0.269,
+      "status": "PASS"
+    },
+    "ECE after (JSON vs thesis 0.048)": {
+      "computed": 0.04786340287656077,
+      "expected": 0.048,
+      "status": "PASS"
+    },
+    "ECE improvement % (JSON vs thesis 82%)": {
+      "computed": 82.18962066046173,
+      "expected": 82.0,
+      "status": "PASS"
+    },
+    "ECE improvement self-consistent": {
+      "computed": 82.18962066046173,
+      "expected": 82.18962066046173,
+      "status": "PASS"
+    },
+    "Conformal q90 (JSON vs thesis 9.92)": {
+      "computed": 9.919590950012207,
+      "expected": 9.92,
+      "status": "PASS"
+    },
+    "Conformal PICP 90% (JSON vs thesis 90.0)": {
+      "computed": 90.02294926505454,
+      "expected": 90.0,
+      "status": "PASS"
+    },
+    "Conformal q95 (JSON vs thesis 14.68)": {
+      "computed": 14.67658805847168,
+      "expected": 14.68,
+      "status": "PASS"
+    },
+    "Conformal PICP 95% (JSON vs thesis 95.01)": {
+      "computed": 95.01065275802118,
+      "expected": 95.01,
+      "status": "PASS"
+    },
+    "PIT mean raw (JSON vs thesis 0.4331)": {
+      "computed": 0.4331,
+      "expected": 0.4331,
+      "status": "PASS"
+    },
+    "PIT KS stat raw (JSON vs thesis 0.245)": {
+      "computed": 0.244533,
+      "expected": 0.245,
+      "status": "PASS"
+    },
+    "PIT first bin raw (JSON vs thesis 0.2839)": {
+      "computed": 0.283899,
+      "expected": 0.2839,
+      "status": "PASS"
+    },
+    "PIT KS stat after TS (JSON vs thesis 0.104)": {
+      "computed": 0.104209,
+      "expected": 0.104,
+      "status": "PASS"
+    },
+    "PIT KS reduction % (JSON vs thesis 57.4)": {
+      "computed": 57.4,
+      "expected": 57.4,
+      "status": "PASS"
+    },
+    "PIT first bin after TS (JSON vs thesis 0.0879)": {
+      "computed": 0.0879,
+      "expected": 0.0879,
+      "status": "PASS"
+    },
+    "PIT mean (recomputed vs JSON)": {
+      "computed": 0.4330783510678592,
+      "expected": 0.4331,
+      "status": "PASS"
+    },
+    "PIT KS stat (recomputed vs JSON)": {
+      "computed": 0.243394092904755,
+      "expected": 0.244533,
+      "status": "PASS"
+    },
+    "Winkler 90% Gaussian (JSON vs thesis 49.7)": {
+      "computed": 49.6848,
+      "expected": 49.7,
+      "status": "PASS"
+    },
+    "Winkler 90% Conformal sigma (JSON vs thesis 32.3)": {
+      "computed": 32.326,
+      "expected": 32.3,
+      "status": "PASS"
+    },
+    "S-conv S=30 rho (JSON vs thesis 0.4584)": {
+      "computed": 0.45844967381166724,
+      "expected": 0.4584,
+      "status": "PASS"
+    },
+    "S-conv S=50 rho (JSON vs thesis 0.4632)": {
+      "computed": 0.4631749251334919,
+      "expected": 0.4632,
+      "status": "PASS"
+    },
+    "S-conv: <1.5% improvement S30->S50": {
+      "computed": 1.0307022977108309,
+      "expected": 0.0,
+      "status": "PASS"
+    },
+    "Adaptive conformal D1 cov 90% (vs thesis 90.0)": {
+      "computed": 90.0288446341078,
+      "expected": 90.0,
+      "status": "PASS"
+    },
+    "Adaptive conformal D10 cov 90% (vs thesis 96.2)": {
+      "computed": 96.23676307886834,
+      "expected": 96.2,
+      "status": "PASS"
+    },
+    "Global conformal D1 cov 90% (vs thesis 98.6)": {
+      "computed": 98.57278330962541,
+      "expected": 98.6,
+      "status": "PASS"
+    },
+    "Global conformal D10 cov 90% (vs thesis 62.9)": {
+      "computed": 62.91804962857594,
+      "expected": 62.9,
+      "status": "PASS"
+    }
+  }
+}

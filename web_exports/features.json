@@ -1,0 +1,132 @@
+{
+  "excluded_from_model": [
+    "HIGHWAY"
+  ],
+  "graph_semantics": {
+    "coordinate_reference_system": "EPSG:4326 (WGS84), set explicitly in process_simulations_for_gnn.py",
+    "graph_edge": "an adjacency between two road segments that meet at a junction",
+    "graph_node": "one road segment (link) of the Paris network",
+    "pos_0": "segment start point",
+    "pos_1": "segment end point",
+    "pos_2": "segment midpoint, stored but unused by the forward pass",
+    "representation": "dual line graph",
+    "source": "code/scripts/data_preprocessing/process_simulations_for_gnn.py",
+    "x_row": "feature vector of one road segment",
+    "y_row": "Delta v for one road segment"
+  },
+  "items": [
+    {
+      "constant_across_scenarios": true,
+      "max": 1596.0,
+      "max_delta_across_scenarios": 0.0,
+      "mean": 50.908044134360416,
+      "meaning": "Base-case road-segment car volume",
+      "min": 0.0,
+      "model_index": 0,
+      "name": "VOL_BASE_CASE",
+      "pct_zero": 23.859649122807017,
+      "role": "static network context",
+      "std": 135.8297716589983,
+      "unit": "veh/h"
+    },
+    {
+      "constant_across_scenarios": true,
+      "max": 14400.0,
+      "max_delta_across_scenarios": 0.0,
+      "mean": 1028.9555871661134,
+      "meaning": "Base-case car capacity; zero where cars are not permitted",
+      "min": 0.0,
+      "model_index": 1,
+      "name": "CAPACITY_BASE_CASE",
+      "pct_zero": 10.785522364469733,
+      "role": "static network context",
+      "std": 1264.4536617959332,
+      "unit": "veh/h"
+    },
+    {
+      "constant_across_scenarios": false,
+      "max": 0.0,
+      "max_delta_across_scenarios": 7200.0,
+      "mean": -93.33258795637742,
+      "meaning": "Policy car capacity minus base-case car capacity; reductions are negative",
+      "min": -7200.0,
+      "model_index": 2,
+      "name": "CAPACITY_REDUCTION",
+      "pct_zero": 87.94473210052158,
+      "role": "scenario intervention",
+      "std": 334.02638953253165,
+      "unit": "veh/h"
+    },
+    {
+      "constant_across_scenarios": true,
+      "max": 33.333333333333336,
+      "max_delta_across_scenarios": 0.0,
+      "mean": 8.152406792759763,
+      "meaning": "Policy-scenario free-flow speed, zero where cars are not permitted",
+      "min": 0.0,
+      "model_index": 3,
+      "name": "FREESPEED",
+      "pct_zero": 10.785522364469733,
+      "role": "static network context",
+      "std": 4.012836628472734,
+      "unit": "m/s"
+    },
+    {
+      "constant_across_scenarios": true,
+      "max": 9.0,
+      "max_delta_across_scenarios": 0.0,
+      "mean": 2.725936462778568,
+      "meaning": "Label-encoded road class; -1 marks a class absent from the mapping",
+      "min": -1.0,
+      "model_index": null,
+      "name": "HIGHWAY",
+      "pct_zero": 2.9492650545282126,
+      "role": "stored but not consumed by the selected model",
+      "std": 2.1322326250935943,
+      "unit": "category code"
+    },
+    {
+      "constant_across_scenarios": true,
+      "max": 2568.5756735727387,
+      "max_delta_across_scenarios": 0.0,
+      "mean": 91.59788404061959,
+      "meaning": "Base-case road-segment length",
+      "min": 4.166666666666667,
+      "model_index": 4,
+      "name": "LENGTH",
+      "pct_zero": 0.0,
+      "role": "static network context",
+      "std": 109.93730381702568,
+      "unit": "m"
+    }
+  ],
+  "model_feature_count": 5,
+  "positional_input": {
+    "note": "Segment endpoints are consumed separately by the two PointNet stages, not as extra feature columns.",
+    "pos_0": "segment start point",
+    "pos_1": "segment end point"
+  },
+  "provenance": {
+    "classification": "post-thesis-data-audit",
+    "dataset_release": "train-data-v1",
+    "generated_by": "scripts/export_web_artifacts.py",
+    "metric_definition": "Per-column statistics over every node of all 1,000 scenarios (31,635,000 node observations).",
+    "schema_version": 2,
+    "source_artifacts": [
+      "train-data-v1/datalist_batch_1..20.pt"
+    ],
+    "source_commit": "3ad2fb3fccb1885e2f34a1098170499b44af328a",
+    "source_repository": "https://github.com/mzquadri/ml-surrogates-thesis",
+    "units": "see per-feature unit field"
+  },
+  "stored_feature_count": 6,
+  "target": {
+    "change_type": "absolute",
+    "expression": "vol_car(policy scenario) - vol_car(base case)",
+    "name": "policy-induced change in road-segment car volume",
+    "sign_convention": "positive means more car volume under the policy than in the base case",
+    "source": "code/scripts/data_preprocessing/help_functions.py:compute_target_tensor_only_edge_features",
+    "symbol": "Delta v",
+    "unit": "veh/h"
+  }
+}

@@ -1,0 +1,19 @@
+================================================================================
+COMPLETE TRAINING RESULTS - olive-shadow-2
+================================================================================
+
+YOUR MODEL RESULTS:
+  R² Score (best):          0.569997 at epoch 714
+  R² Score (final):         0.569289
+  Pearson Correlation:      0.757406
+  Spearman Correlation:     0.192922
+  Validation Loss (best):   51.0013 at epoch 714
+  Training Loss (final):    52.2023
+
+ELENA'S BENCHMARK:
+  R² Score:                 0.760000
+  Pearson Correlation:      0.870000
+  Spearman Correlation:     0.850000
+  MSE:                      24.9500
+
+DIFFERENCES:

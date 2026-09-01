@@ -1,0 +1,7 @@
+# data/
+logs/
+**/wandb/
+**/.ipynb_checkpoints/
+**/__pycache__/
+scripts/evaluation/results/
+.vscode/

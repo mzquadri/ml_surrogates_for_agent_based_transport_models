@@ -1,0 +1,93 @@
+================================================================================
+TRIAL 5 OVERFITTING/UNDERFITTING ANALYSIS
+================================================================================
+
+VALIDATION vs TEST PERFORMANCE:
+================================================================================
+
+Metric               Validation      Test            Difference
+------------------------------------------------------------------------
+R² Score             0.5500          0.5553          +0.0053 (better!)
+Pearson              0.7500          0.7468          -0.0032 (similar)
+Spearman             0.2200          0.2276          +0.0076 (similar)
+Loss (MSE)           53.61           58.99           +5.38 (expected)
+
+================================================================================
+DIAGNOSIS:
+================================================================================
+
+1. OVERFITTING CHECK:
+   ❌ NO OVERFITTING DETECTED
+   
+   Evidence:
+   - Test R² (0.5553) ≈ Validation R² (0.5500) [+0.9% better]
+   - Test Pearson (0.7468) ≈ Val Pearson (0.7500) [-0.4% worse]
+   - Test metrics are NOT significantly worse than validation
+   - Model generalizes well to unseen data
+
+2. UNDERFITTING CHECK:
+   ✅ LIKELY SLIGHT UNDERFITTING
+   
+   Evidence:
+   - Both validation and test R² plateau around 0.55
+   - Model stopped improving after ~550 epochs (early stopping)
+   - Loss curve might have room to decrease further
+   - Dropout=0.3 + small dataset might be too restrictive
+
+3. VARIANCE ANALYSIS:
+   Target std:       11.66
+   Prediction std:   8.23 (70.5% of target)
+   
+   → Model predictions are less varied than targets
+   → Suggests conservative predictions (underfitting sign)
+
+================================================================================
+RECOMMENDATION BASED ON DIAGNOSIS:
+================================================================================
+
+Since Trial 5 shows UNDERFITTING (not overfitting), we should:
+
+TRIAL 7 (Current plan): ✅ GOOD CHOICE
+--lr 0.0006  
+→ Higher LR can help escape shallow local minima
+→ Allow model to learn more aggressively
+
+TRIAL 8 (If Trial 7 succeeds): ✅ ALSO GOOD
+--dropout 0.2
+→ Reduce regularization to allow more learning
+→ Since no overfitting, we can afford less dropout
+
+TRIAL 9 (Alternative): Consider
+--gradient_accumulation_steps 4  # Effective BS = 32
+→ More stable gradients might help convergence
+
+================================================================================
+WHAT TO AVOID:
+================================================================================
+
+❌ Don't INCREASE dropout (will worsen underfitting)
+❌ Don't LOWER learning rate (will slow convergence)
+❌ Don't add MORE regularization (L2, weight decay)
+
+================================================================================
+EXPECTED IMPROVEMENT FROM TRIAL 7:
+================================================================================
+
+Realistic target: R² = 0.56 - 0.58 (+1-5% improvement)
+
+Why limited improvement?
+- Data constraint: 1,000 samples (vs paper's 10,000)
+- Fundamental limit: Can't learn patterns not in data
+- Already at 73% of paper's benchmark (0.55 vs 0.76)
+
+================================================================================
+CONCLUSION:
+================================================================================
+
+✅ Trial 5 is UNDERFITTING (good news - room to improve!)
+✅ Trial 7 (higher LR) is the RIGHT approach
+✅ If Trial 7 improves, try Trial 8 (lower dropout)
+✅ Model architecture is fine, just needs better optimization
+
+Proceed with Trial 7! 🚀
+================================================================================

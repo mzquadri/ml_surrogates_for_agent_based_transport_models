@@ -1,0 +1,324 @@
+% !TEX root = ../main.tex
+
+\chapter{Methodology}\label{chapter:methodology}
+
+This chapter describes the GNN architecture adopted for traffic prediction, the six uncertainty quantification methods evaluated in this thesis, and the metrics used to assess both predictive accuracy and uncertainty quality.
+
+\section{Problem Formulation}
+
+We formulate traffic prediction as a node-level regression task on a directed graph. Given a road network $G = (V, E)$ where nodes represent road segments and edges represent connectivity, we aim to predict the change in traffic volume $\Delta v_i$ for each node $i$ after a policy intervention.
+
+\subsection{Input Features}
+
+Each node $i$ is characterised by five input features:
+
+\begin{table}[htbp]
+\centering
+\caption[Input features for each road segment (node)]{Input features for each road segment (node).}
+\label{tab:features}
+\begin{tabular}{llp{7cm}}
+\toprule
+\textbf{Feature} & \textbf{Unit} & \textbf{Description} \\
+\midrule
+\texttt{VOL\_BASE\_CASE} & vehicles/hour & Traffic volume in baseline scenario \\
+\texttt{CAPACITY\_BASE\_CASE} & vehicles/hour & Road segment capacity \\
+\texttt{CAPACITY\_REDUCTION} & vehicles/hour & Policy-induced capacity reduction (absolute, $\leq 0$) \\
+\texttt{FREESPEED} & m/s & Free-flow speed limit \\
+\texttt{LENGTH} & meters & Road segment length \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{figures/fig3_feature_distributions.pdf}
+\caption[Distribution of input features across the training set]{Distribution of the five input features across 200 training graphs (6,327,000 node observations). Dashed vertical lines mark the median. \texttt{VOL\_BASE\_CASE} and \texttt{CAPACITY\_BASE\_CASE} are right-skewed, reflecting the heavy-tailed nature of urban traffic volumes; \texttt{FREESPEED} is concentrated at a few discrete speed-limit values; \texttt{LENGTH} spans several orders of magnitude. \emph{Results based on 1,000 of 10,000 available MATSim scenarios (10\% subset).}}
+\label{fig:feature_distributions}
+\end{figure}
+
+\subsection{Target Variable}
+
+The target variable is:
+\begin{equation}
+    \Delta v_i = v_i^{\text{policy}} - v_i^{\text{baseline}}
+\end{equation}
+representing the change in traffic volume on segment $i$ after the policy intervention is applied.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{figures/fig10_node_vs_graph.pdf}
+\caption[Node-level vs graph-level GNN prediction with MC Dropout uncertainty]{Node-level predictions ($\Delta v$ per node, with per-node MC Dropout $\sigma$) and graph-level evaluation (MAE per scenario with uncertainty error bars). T8: 100 test graphs $\times$ 31,635 nodes $=$ 3,163,500 total predictions. Source: \texttt{mc\_dropout\_full\_metrics\_model8\_mc30\_100graphs.json}.}
+\label{fig:node_vs_graph}
+\end{figure}
+
+\section{Model Architecture}
+
+We use the PointNetTransfGAT architecture developed by Natterer~et~al.~\cite{natterer2025ml}, which combines ideas from PointNet~\cite{qi2017pointnet}, graph transformers~\cite{shi2021masked}, and graph attention networks~\cite{velickovic2018graph} into a single end-to-end model for node-level regression on road networks.
+
+\textbf{Note on architectural variants:} Trial~1 uses a \texttt{Linear(64$\to$1)} final prediction layer, while Trials~2--8 use a \texttt{GATConv(64$\to$1)} final layer. This difference makes Trial~1 results not directly comparable with Trials~2--8, and Trial~1 is excluded from MC Dropout UQ experiments (effective dropout $= 0.0$).
+
+\subsection{Geometric Representation}
+
+The architecture encodes the physical geometry of road segments as follows. Each node carries two 2D positional coordinates: the start point of its corresponding road segment, $\mathbf{pos}[:,0,:] \in \mathbb{R}^{N \times 2}$, and its end point, $\mathbf{pos}[:,1,:] \in \mathbb{R}^{N \times 2}$. The two PointNetConv layers~\cite{qi2017pointnet} exploit these coordinates by computing, for each node $i$ and neighbour $j$, the relative displacement $\mathbf{pos}_j - \mathbf{pos}_i$ as part of the local MLP input. This means the first PointNetConv uses the start-point geometry of each segment relative to its neighbours, while the second uses the end-point geometry. The effect is that the model learns not only the graph-topological neighbourhood of each segment but also the spatial proximity of where segments begin and end in the 2D plane, providing geometric information that complements the topological structure.
+
+\subsection{Layer-by-Layer Architecture}
+
+Table~\ref{tab:architecture} details the complete forward pass through the network. All dimensions and layer specifications are verified directly from \texttt{scripts/gnn/models/\allowbreak{}point\_net\_transf\_gat.py}.
+
+\begin{table}[htbp]
+\centering
+\caption[PointNetTransfGAT layer progression]{PointNetTransfGAT layer progression. Input: node features $\mathbf{x} \in \mathbb{R}^{N \times 5}$, positional coordinates $\mathbf{pos} \in \mathbb{R}^{N \times 3 \times 2}$ (start, end, and midpoint coordinates; only start and end are used in the forward pass). All dimensions verified from \texttt{point\_net\_transf\_gat.py}.}
+\label{tab:architecture}
+\begin{tabular}{clp{5.2cm}cc}
+\toprule
+\textbf{Stage} & \textbf{Layer} & \textbf{Operation} & \textbf{In dim} & \textbf{Out dim} \\
+\midrule
+1 & PointNetConv-1 & Local MLP: $7 \to 256$ (feat+pos\_start); global MLP: $256 \to 512 \to 512$ & 5 & 512 \\
+2 & PointNetConv-2 & Local MLP: $514 \to 256$ (feat+pos\_end); global MLP: $256 \to 512 \to 128$ & 512 & 128 \\
+3 & TransformerConv-1 & 4 attention heads, $64$ dims/head & 128 & 256 \\
+4 & TransformerConv-2 & 4 attention heads, $128$ dims/head & 256 & 512 \\
+5 & GATConv & 1 head & 512 & 64 \\
+6a & GATConv (final) & 1 head; \textbf{Trials~2--8} & 64 & 1 \\
+6b & Linear (final) & Point projection; \textbf{Trial~1 only} & 64 & 1 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+In Stage~1, the local MLP receives a $7$-dimensional input: the 5 node features concatenated with the 2D start-position displacement $(\mathbf{pos}_j - \mathbf{pos}_i)[:,0,:]$. In Stage~2, the local MLP receives $514$ dimensions: the 512-dimensional embedding from Stage~1 concatenated with the 2D end-position displacement. The TransformerConv layers~\cite{shi2021masked} apply multi-head attention over the graph edges; the GATConv layers~\cite{velickovic2018graph} aggregate neighbourhood information with learned attention weights.
+
+\textbf{Dropout placement:} Dropout is applied within the local and global MLPs of both PointNetConv layers, and between the TransformerConv layers. All dropout calls are gated by the \texttt{use\_dropout} flag (default: \texttt{False}); the flag must be set to \texttt{True} at inference time to activate MC Dropout uncertainty estimation. The architecture also includes a \texttt{predict\_mode\_stats} branch (a TransformerEncoder-based mode predictor) that was implemented in code but was not activated in any of the eight training trials reported in this thesis.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{figures/fig8_architecture.pdf}
+\caption[PointNetTransfGAT architecture: data flow diagram]{PointNetTransfGAT architecture. Two PointNetConv layers encode start- and end-point geometry (512 and 128 channels); two TransformerConv layers capture long-range attention (256 and 512 channels, 4 heads each); two GATConv layers produce the final embedding and scalar prediction (64 then 1 channel). Trial~1 replaces the final \texttt{GATConv(64$\to$1)} with \texttt{Linear(64$\to$1)}. Verified from \texttt{point\_net\_transf\_gat.py}.}
+\label{fig:architecture}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{figures/pointnet_data_flow.pdf}
+\caption[End-to-end data flow: road network to traffic prediction with uncertainty]{End-to-end data flow from road network to traffic prediction with uncertainty. The Paris road network (31,635 nodes) is encoded as a feature matrix ($N \times 5$) with positional coordinates, processed through the GNN, and produces per-node $\Delta v$ predictions with MC Dropout uncertainty $\sigma$. T8 achieves Spearman~$\rho = 0.4820$ (100 test graphs, $S = 30$).}
+\label{fig:data_flow}
+\end{figure}
+
+\subsection{Hyperparameter Summary}
+
+\begin{table}[htbp]
+\centering
+\caption[PointNetTransfGAT hyperparameters by trial group]{Key hyperparameters of the PointNetTransfGAT model, grouped by trial. Full per-trial configurations are given in Table~\ref{tab:trials}.}
+\label{tab:hyperparams}
+\begin{tabular}{lll}
+\toprule
+\textbf{Parameter} & \textbf{Value / Range} & \textbf{Trials} \\
+\midrule
+Hidden channels (PointNet local, GAT) & 64 & All \\
+Hidden channels (TransformerConv) & 256 / 512 & All \\
+TransformerConv attention heads & 4 (both layers) & All \\
+GATConv attention heads & 1 & All \\
+Dropout rate & 0.2 & T8 \\
+ & 0.3 & T5--T7 \\
+ & 0.0 & T1, T3 \\
+Learning rate & $3\times10^{-4}$ to $10^{-3}$ & varies \\
+Batch size & 8 & T5--T8 \\
+ & 16 & T2--T4 \\
+ & 32 & T1 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Uncertainty Quantification Methods}
+
+Six UQ approaches are implemented and compared in this thesis.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{figures/fig12_trial_progression.pdf}
+\caption[Trial progression T1$\rightarrow$T8: architecture changes and performance]{Trial progression from T1 to T8. Top panel shows $R^2$ per trial; bottom panel shows MAE. The key architectural changes per trial are annotated below the bars. T8 (orange) achieves the best combination of predictive accuracy and uncertainty quality among MC Dropout-enabled trials. Verified from \texttt{test\_evaluation\_complete.json}.}
+\label{fig:trial_progression}
+\end{figure}
+
+\subsection{Method 1: MC Dropout}
+
+MC Dropout~\cite{gal2016dropout, gal2016thesis} enables uncertainty estimation by keeping dropout active during inference:
+
+\begin{algorithm}[htbp]
+\caption[MC Dropout uncertainty estimation]{MC Dropout uncertainty estimation. Given a trained model with dropout layers, $S$ stochastic forward passes yield a predictive mean and standard deviation per node.}
+\label{alg:mc_dropout}
+\begin{algorithmic}
+\STATE \textbf{Input:} Input features $\mathbf{x}$, trained model $f$, number of samples $S$
+\STATE \textbf{Output:} Mean prediction $\mu$, uncertainty $\sigma$
+\FOR{$s = 1$ to $S$}
+    \STATE $\hat{y}_s \leftarrow f(\mathbf{x})$ with dropout enabled
+\ENDFOR
+\STATE $\mu \leftarrow \frac{1}{S}\sum_s \hat{y}_s$
+\STATE $\sigma \leftarrow \sqrt{\frac{1}{S}\sum_s (\hat{y}_s - \mu)^2}$
+\RETURN $\mu$, $\sigma$
+\end{algorithmic}
+\end{algorithm}
+
+We use $S = 30$ MC samples, balancing computational cost against estimate stability.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{figures/fig13_mc_dropout_inference.pdf}
+\caption[MC Dropout inference: S=30 stochastic forward passes]{MC Dropout inference procedure for T8. A single road network graph is passed through the GNN with dropout active for $S = 30$ stochastic forward passes, yielding 30 prediction vectors $\hat{y}_1, \ldots, \hat{y}_{30}$. Their per-node mean ($\hat{y}$) and standard deviation ($\sigma$) form the final prediction with uncertainty. Spearman rank correlation between $\sigma$ and $|y - \hat{y}|$ reaches $\rho = 0.4820$ for T8.}
+\label{fig:mc_dropout_inference}
+\end{figure}
+
+\subsection{Method 2: Deep Ensembles}
+
+Ensemble variance measures disagreement across independent training runs of the same model:
+
+\begin{equation}
+    \sigma_{\text{ens}} = \sqrt{\frac{1}{M}\sum_{m=1}^{M}(f_m(\mathbf{x}) - \bar{f}(\mathbf{x}))^2}
+\end{equation}
+
+where $M = 5$ is the number of independently trained models.
+
+\subsection{Method 3: Combined Uncertainty}
+
+We combine MC Dropout and ensemble uncertainty:
+\begin{equation}
+    \sigma_{\text{combined}} = \sqrt{\sigma_{\text{MC}}^2 + \sigma_{\text{ens}}^2}
+\end{equation}
+
+\subsection{Method 4: Split Conformal Prediction}
+
+Split conformal prediction~\cite{vovk2005algorithmic, angelopoulos2023conformal} provides distribution-free prediction intervals with finite-sample coverage guarantees:
+
+\begin{algorithm}[htbp]
+\caption[Split conformal prediction]{Split conformal prediction. A calibration set is used to compute a coverage-valid quantile; the evaluation set receives prediction intervals with guaranteed marginal coverage.}
+\label{alg:conformal}
+\begin{algorithmic}
+\STATE \textbf{Input:} Calibration set $\mathcal{D}_\text{cal} = \{(\mathbf{x}_i, y_i)\}_{i=1}^n$, trained model $f$, coverage level $1 - \alpha$
+\STATE \textbf{Output:} Prediction interval $C(\mathbf{x}_\text{new})$ for new inputs
+\FOR{$i = 1$ to $n$}
+    \STATE $s_i \leftarrow |y_i - f(\mathbf{x}_i)|$ \COMMENT{nonconformity score}
+\ENDFOR
+\STATE $q \leftarrow \text{Quantile}\left(s_1, \ldots, s_n;\; \lceil(n+1)(1-\alpha)\rceil / n\right)$
+\RETURN $C(\mathbf{x}_\text{new}) = \left[f(\mathbf{x}_\text{new}) - q,\; f(\mathbf{x}_\text{new}) + q\right]$
+\end{algorithmic}
+\end{algorithm}
+
+\textbf{Adaptive conformal prediction.} Standard split conformal produces fixed-width intervals identical for all nodes. When an auxiliary uncertainty estimate $\sigma_i$ (e.g., from MC Dropout) is available, the nonconformity score can be \emph{normalised} to produce uncertainty-adaptive intervals~\cite{romano2019conformalized}:
+\begin{equation}
+    s_i^{\text{adapt}} = \frac{|y_i - f(\mathbf{x}_i)|}{\sigma_i}
+\end{equation}
+The conformal quantile $q^{\text{adapt}}$ is computed from $\{s_i^{\text{adapt}}\}$ on the calibration set, and the resulting prediction interval for a new input is:
+\begin{equation}
+    C^{\text{adapt}}(\mathbf{x}_\text{new}) = \left[f(\mathbf{x}_\text{new}) - q^{\text{adapt}} \cdot \sigma_\text{new},\; f(\mathbf{x}_\text{new}) + q^{\text{adapt}} \cdot \sigma_\text{new}\right]
+\end{equation}
+This yields wider intervals where uncertainty is high and narrower intervals where the model is confident, while preserving the marginal coverage guarantee.
+
+\subsection{Method 5: Selective Prediction}
+
+Selective prediction~\cite{geifman2017selective} uses MC Dropout uncertainty to filter out unreliable predictions, retaining only those the model is most confident about:
+
+\begin{algorithm}[htbp]
+\caption[Selective prediction via uncertainty filtering]{Selective prediction. Predictions are ranked by MC Dropout uncertainty and only the most confident fraction is retained.}
+\label{alg:selective}
+\begin{algorithmic}
+\STATE \textbf{Input:} Predictions $\hat{y}_1, \ldots, \hat{y}_n$, uncertainties $\sigma_1, \ldots, \sigma_n$, retention fraction $\tau \in (0, 1]$
+\STATE \textbf{Output:} Filtered predictions, MAE on retained set
+\STATE Sort predictions by ascending $\sigma$
+\STATE Retain top-$\tau$ fraction (i.e., the $\lfloor \tau \cdot n \rfloor$ predictions with lowest $\sigma$)
+\STATE Compute $\text{MAE}_\tau = \frac{1}{|\mathcal{R}|}\sum_{i \in \mathcal{R}} |y_i - \hat{y}_i|$ on retained set $\mathcal{R}$
+\RETURN filtered predictions, $\text{MAE}_\tau$
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{Method 6: Post-Hoc Temperature Scaling}
+
+Temperature scaling~\cite{guo2017calibration, laves2020well} is a post-hoc recalibration method that learns a single scalar $T$ to rescale uncertainty estimates toward calibration:
+
+\begin{algorithm}[htbp]
+\caption[Post-hoc temperature scaling for uncertainty calibration]{Post-hoc temperature scaling. A single temperature parameter $T$ is optimised on a calibration set to minimise the Expected Calibration Error (ECE).}
+\label{alg:temperature}
+\begin{algorithmic}
+\STATE \textbf{Input:} Calibration set $(y_\text{cal}, \hat{y}_\text{cal}, \sigma_\text{cal})$, evaluation set, candidate temperatures $\mathcal{T}$
+\STATE \textbf{Output:} Optimal $T^*$, scaled uncertainties $\sigma_\text{scaled}$
+\FOR{each $T \in \mathcal{T}$}
+    \STATE $\sigma_\text{scaled} \leftarrow \sigma_\text{raw} \times T$
+    \STATE Compute Kuleshov ECE on calibration set using $\sigma_\text{scaled}$
+\ENDFOR
+\STATE $T^* \leftarrow \arg\min_{T \in \mathcal{T}} \text{ECE}(T)$
+\STATE Apply $\sigma_\text{scaled} \leftarrow \sigma_\text{raw} \times T^*$ to evaluation set
+\RETURN $T^*$, $\sigma_\text{scaled}$
+\end{algorithmic}
+\end{algorithm}
+
+\section{Evaluation Metrics}
+
+\subsection{Prediction Quality}
+
+Prediction accuracy is evaluated using three standard regression metrics. The \textbf{coefficient of determination} ($R^2$) measures the proportion of variance in the target explained by the model:
+\begin{equation}
+    R^2 = 1 - \frac{\sum_i (y_i - \hat{y}_i)^2}{\sum_i (y_i - \bar{y})^2}
+\end{equation}
+The \textbf{mean absolute error} (MAE) gives the average magnitude of prediction errors in the original units (vehicles per hour):
+\begin{equation}
+    \text{MAE} = \frac{1}{n}\sum_i |y_i - \hat{y}_i|
+\end{equation}
+The \textbf{root mean square error} (RMSE) penalises large deviations more heavily and is reported for comparability with prior work:
+\begin{equation}
+    \text{RMSE} = \sqrt{\frac{1}{n}\sum_i (y_i - \hat{y}_i)^2}
+\end{equation}
+
+\subsection{Uncertainty Quality}
+
+Uncertainty quality is assessed with three complementary measures. The \textbf{Spearman rank correlation} ($\rho$) captures the monotonic relationship between the predicted uncertainty $\sigma_i$ and the absolute error $|y_i - \hat{y}_i|$; higher values indicate that uncertainty tracks error more faithfully, and $\rho > 0$ is the minimum bar for a useful uncertainty estimate. The \textbf{Pearson correlation} ($r$) provides a linear analogue that is more sensitive to outliers, offering a cross-check on the rank-based result. Finally, the \textbf{$p$-value} of each correlation test is reported to confirm that the observed association is statistically distinguishable from zero.
+
+A well-calibrated uncertainty estimate should correlate positively with prediction error ($\rho > 0$): where uncertainty is high, actual errors should tend to be larger.
+
+\subsection{Error Detection via AUROC}\label{sec:auroc_method}
+
+Beyond correlation, we evaluate uncertainty as a \emph{binary classifier} for large prediction errors using the Area Under the Receiver Operating Characteristic curve (AUROC). Treating uncertainty as a detection problem: can the model's uncertainty $\sigma$ discriminate between high-error and low-error predictions?
+
+\textbf{Label construction.} Given the test-set absolute errors $\{|y_i - \hat{y}_i|\}_{i=1}^{n}$, we define binary labels at two percentile thresholds:
+\begin{equation}
+    \ell_i^{(p)} = \begin{cases} 1 & \text{if } |y_i - \hat{y}_i| \geq Q_p \\ 0 & \text{otherwise} \end{cases}
+\end{equation}
+where $Q_p$ is the $p$-th percentile of the error distribution ($p = 90$ for top-10\% errors, $p = 80$ for top-20\%). The MC Dropout standard deviation $\sigma_i$ serves as the continuous score.
+
+\textbf{Metrics.} The AUROC measures the probability that a randomly chosen high-error node receives a higher $\sigma$ than a randomly chosen low-error node; $\text{AUROC} = 0.5$ corresponds to random ranking and $\text{AUROC} = 1.0$ to perfect separation. We additionally report the \textbf{Area Under the Precision--Recall Curve} (AUPRC), which is more informative under class imbalance (10\% or 20\% positive rate). The random baseline for AUPRC equals the class prevalence. Both metrics are computed using \texttt{sklearn.metrics.roc\_auc\_score} and \texttt{average\_precision\_score} on the full test set.
+
+\subsection{Calibration Metrics}\label{sec:calibration_metrics}
+
+\textbf{Expected Calibration Error (ECE).} A well-calibrated probabilistic prediction satisfies $P(y_i \in C_p) = p$ for all nominal levels $p \in [0,1]$, where $C_p$ is the $p$-level prediction interval. The Kuleshov reliability diagram~\cite{kuleshov2018accurate} plots observed coverage against nominal level for a grid of $p$ values. The \textbf{Expected Calibration Error} summarises miscalibration as:
+\begin{equation}
+    \text{ECE} = \frac{1}{L}\sum_{l=1}^{L} \left| \hat{p}_l - p_l \right|
+\end{equation}
+where $p_l$ are $L$ equally spaced nominal levels and $\hat{p}_l$ is the observed fraction of residuals falling within the $p_l$-level interval $[\hat{y}_i - z_{(1+p_l)/2}\,\sigma_i,\; \hat{y}_i + z_{(1+p_l)/2}\,\sigma_i]$. Lower ECE indicates better calibration, with $\text{ECE} = 0$ for a perfectly calibrated model.
+
+\textbf{Prediction Interval Coverage Probability (PICP).} For conformal prediction intervals at a target level $1-\alpha$, we report the empirical coverage:
+\begin{equation}
+    \text{PICP}_{1-\alpha} = \frac{1}{n}\sum_{i=1}^{n} \mathbf{1}\!\left[y_i \in C_{1-\alpha}(\mathbf{x}_i)\right]
+\end{equation}
+The conformal guarantee ensures $\text{PICP}_{1-\alpha} \geq 1 - \alpha$ in expectation over exchangeable data.
+
+\subsection{Proper Scoring Rules}\label{sec:proper_scoring_rules}
+
+While ECE and PICP assess calibration through coverage, \emph{proper scoring rules} evaluate the full predictive distribution by jointly rewarding both calibration and sharpness~\cite{gneiting2007strictly}. A scoring rule is \emph{proper} if the expected score is minimised when the forecaster reports the true data-generating distribution, and \emph{strictly proper} if the minimum is unique.
+
+\textbf{Continuous Ranked Probability Score (CRPS).} The CRPS generalises the mean absolute error to probabilistic forecasts. For a cumulative predictive distribution $F$ and observed value $y$:
+\begin{equation}
+    \text{CRPS}(F, y) = \int_{-\infty}^{\infty} \left[F(x) - \mathbf{1}(x \geq y)\right]^2 \, dx
+\end{equation}
+For the Gaussian predictive distribution $\mathcal{N}(\mu, \sigma^2)$ used in MC~Dropout, the CRPS admits the closed form~\cite{gneiting2007strictly}:
+\begin{equation}\label{eq:crps_gaussian}
+    \text{CRPS}\!\left(\mathcal{N}(\mu,\sigma^2),\, y\right) = \sigma\!\left[z\bigl(2\Phi(z)-1\bigr) + 2\varphi(z) - \frac{1}{\sqrt{\pi}}\right]
+\end{equation}
+where $z = (y - \mu)/\sigma$, and $\Phi$, $\varphi$ denote the standard normal CDF and PDF. Unlike the NLL, CRPS is expressed in the same unit as the target variable (vehicles per hour), facilitating direct comparison with the MAE. A ratio $\text{CRPS}/\text{MAE} < 1$ indicates that the probabilistic forecast provides additional value beyond the point prediction.
+
+\textbf{Probability Integral Transform (PIT).} The PIT maps each observation through its own predictive CDF:
+\begin{equation}
+    p_i = F_i(y_i) = \Phi\!\left(\frac{y_i - \mu_i}{\sigma_i}\right)
+\end{equation}
+If the predictive distributions are well-calibrated, the PIT values $\{p_i\}_{i=1}^{n}$ are uniformly distributed on $[0,1]$~\cite{dawid1984present}. A histogram of PIT values therefore provides a visual diagnostic: a U-shaped histogram indicates underdispersion (intervals too narrow), an inverse-U shape indicates overdispersion, and skewness reveals systematic bias. We assess departure from uniformity using the Kolmogorov--Smirnov statistic and the chi-squared goodness-of-fit test.
+
+\textbf{Winkler Interval Score.} For a prediction interval $[L_i, U_i]$ at nominal level $(1-\alpha)$, the Winkler interval score~\cite{winkler1972decision} rewards narrow intervals while penalising missed observations:
+\begin{equation}\label{eq:winkler}
+    S_\alpha(L_i, U_i, y_i) = (U_i - L_i) + \frac{2}{\alpha}(L_i - y_i)\,\mathbf{1}(y_i < L_i) + \frac{2}{\alpha}(y_i - U_i)\,\mathbf{1}(y_i > U_i)
+\end{equation}
+The first term rewards sharpness, while the penalty terms (scaled by $2/\alpha$) impose a steep cost for non-coverage. The Winkler score is a proper scoring rule for interval forecasts and enables direct comparison between Gaussian, conformal absolute, and conformal sigma-scaled intervals at identical nominal levels.

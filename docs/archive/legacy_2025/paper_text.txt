@@ -1,0 +1,637 @@
+
+
+--- Page 1 ---
+
+Machine Learning Surrogates for Agent-Based Models
+in Transportation Policy Analysis
+Elena Natterera,∗, Saini Rohan Raoa, Alejandro Tejada Lapuertab,c, Roman Engelhardta, Sebastian
+H¨ orld, Klaus Bogenbergera
+aChair of Traffic Engineering and Control, Technical University of Munich, Germany, Munich, Germany
+bTUM School of Computation, Information & Technology, Technical University of Munich, Garching, Germany
+cComputational Health Center, Helmholtz Munich, Neuherberg, Germany
+dInstitut de Recherche Technologique SystemX, Palaiseau, France
+Abstract
+Effective traffic policies are crucial for managing congestion and reducing emissions. Agent-based
+transportation models (ABMs) offer a detailed analysis of how these policies affect travel behaviour at
+a granular level. However, computational constraints limit the number of scenarios that can be tested
+with ABMs and therefore their ability to find optimal policy settings.
+In this proof-of-concept study, we propose a machine learning (ML)-based surrogate model to effi-
+ciently explore this vast solution space. Leveraging a Graph Neural Network (GNN), the model predicts
+the effects of traffic policies on the road network at the link level.
+We implement our approach in a large-scale MATSim simulation of Paris, France, covering over
+30,000 road segments and 10,000 simulations, applying a policy involving capacity reduction on main
+roads. The ML surrogate model achieves an overall R2of 0.76, with significantly lower Mean Squared
+Error and Mean Absolute Error than naive baselines. On primary roads where the policy applies, it
+reaches an R2of 0.95. This study therefore shows that GNNs can act as surrogates for complex agent-
+based transportation models with the potential to enable large-scale policy optimization, helping urban
+planners explore a broader range of interventions more efficiently.
+Keywords: Graph Neural Networks, Agent-based simulations, Optimization-Based Transportation
+Policies, Surrogate Models, Street Capacity Reduction
+1. Introduction
+Cities around the world face growing challenges in terms of congestion and air pollution, exacerbated
+by rapid urbanization and population growth. Addressing these issues requires effective policies that
+reduce car dependency while maintaining flexibility for residents.
+Urban planners have a wide range of policy interventions at their disposal, including congestion charg-
+ing, parking and traffic control measures, the establishment of limited traffic zones or rededicating space
+allocated for cars. In recent years, additional mobility options such as shared mobility and micromobility
+have emerged, expanding the set of possible policy measures.
+However, designing effective policies is highly complex. Urban planners must not only decide which
+policies to introduce but also determine the optimal level at which they should be implemented and,
+for most measures, their optimal spatial extent. The number of possible policy combinations grows
+exponentially, leading to an immense solution space. This multi-dimensional space is too vast to be
+explored manually based on experience alone. In practice, stakeholders often limit the solution space
+to a few scenarios, which in all likelihood will not include the optimal solution, and in the worst case
+might not even be close to it. Therefore, a more structured approach is needed to narrow down the most
+promising solutions.
+Agent-based simulations are commonly employed to assess how potential policy measures impact
+the broader transportation system. While these models provide detailed and realistic assessments of
+the effect of policies in terms of congestion, emissions, and travel times per mode, their computational
+∗Corresponding author. E-mail address: elena.natterer@tum.de, Work Address : Arcisstr. 21, 80333 Munich, Germany,
+Phone : +49 89 28922438
+Preprint submitted to Elsevier March 15, 2025
+This preprint research paper has not been peer reviewed. Electronic copy available at: https://ssrn.com/abstract=5182100Preprint not peer reviewed
+
+--- Page 2 ---
+
+intensity severely limits the number of scenarios that can be tested in practice.
+Agent-based models can be understood as functions that map policy interventions to their corre-
+sponding effects - both at the link level, such as changes in traffic volumes on specific street segments,
+and at the system level, including emissions, mode shifts, and travel times.
+Machine learning (ML) has emerged as a powerful tool for approximating complex functions when
+trained on sufficient data. A key milestone in its application to transportation was the study by
+Sroczy´ nski and Czy˙ zewski (2023), which demonstrated that ML models can replicate traffic patterns
+with accuracy comparable to microscopic simulations. While not directly related to this work, such
+advances highlight the potential of ML to approximate intricate relationships in transportation systems.
+If machine learning could effectively approximate agent-based models, it could serve as the foundation
+for fast and scalable surrogates. Even if their predictions were not perfectly aligned with full agent-
+based simulations, the ability to rapidly filter out ineffective policy setups and thus being able to focus
+computational resources on the most promising solutions would be a major advantage. Furthermore,
+such an approach could reveal novel policy combinations that human planners might not have initially
+considered. Once trained, such a surrogate model could predict the impacts of policies within seconds,
+enabling efficient scenario exploration and large-scale optimization.
+Graph Neural Networks (GNNs) are machine learning models specifically designed to handle graph-
+structured data. GNNs have gained increasing attention in the transportation domain due to their ability
+to capture spatial dependencies, making them well-suited for modeling complex network dynamics. As
+such, intersections or street segments can be represented as nodes, while edges capture relationships such
+as connectivity or proximity. Their ability to capture spatial dependencies within urban networks makes
+them an intuitive choice for predicting the impact of policy interventions on link-level.
+In this paper, we present a surrogate model for agent-based transport simulations, leveraging a Graph
+Neural Network to approximate the effects of policy interventions. We evaluate its performance using
+the large-scale MATSim simulation of Paris, France, applying the policy “50% capacity reduction on
+main roads”. Importantly, the developed method is not limited to this specific policy or location; it can
+be applied to any policy intervention in any city.
+Our results show that the surrogate model can accurately predict changes in traffic volume per street
+segment resulting from the policy, demonstrating the feasibility of using Graph Neural Networks as
+surrogates for agent-based models in transport planning. This approach enables efficient solution-space
+exploration, allowing (1) planners to systematically narrow down policy options and identify the most
+effective interventions and (2) providing an efficient methodology for objective evaluation in optimization-
+based approaches.
+This paper is structured as follows: Section 2 reviews the relevant literature, followed by Section
+3, which introduces the used methodology. Section 4 provides an in-depth explanation of the surrogate
+model, while Section 5 outlines the methodology for assessing its accuracy. In Section 6, we introduce the
+case study based on a MATSim simulation of Paris, France, to validate the proposed approach. Finally,
+Section 7 presents the results, and Section 8 concludes with key insights, methodological limitations, and
+directions for future research.
+2. Background
+2.1. Agent-Based Models for Transport Policy Evaluation
+Agent-based models (ABMs) have become a widely adopted approach for analyzing transportation
+systems due to their ability to simulate individual decision-making processes and interactions at a fine-
+grained level (Kagho et al., 2020). Unlike macroscopic and mesoscopic models, which aggregate traveler
+behavior, ABMs explicitly model each agent (e.g., travelers, vehicles) and their adaptive choices, allowing
+for a more detailed representation of network dynamics and behavioral responses to policies, as shown
+e.g. by Horni et al. (2016) and Macal and North (2010).
+Agent-based models have been widely applied to assess various transportation policies, including
+congestion pricing (Ben-Dor et al., 2024), parking fee schemes (Balac et al., 2017), the impact of speed
+limits on street safety and emissions (Lu et al., 2023), and to evaluate low-traffic zones (Yin et al., 2024;
+M¨ uller et al., 2023).
+ABMs are particularly well-suited for analyzing the impact of emerging mobility solutions and their
+integration into existing transportation systems. As urban mobility continues to evolve, there is an
+2
+This preprint research paper has not been peer reviewed. Electronic copy available at: https://ssrn.com/abstract=5182100Preprint not peer reviewed
+
+--- Page 3 ---
+
+urgent need for innovative transport solutions that not only improve efficiency and sustainability but
+also integrate seamlessly with current infrastructure.
+The integration of emerging transport modes and mobility schemes into existing transportation sys-
+tems presents both challenges and opportunities for policymakers and planners. Understanding travel
+behavior and demand in these evolving systems is essential for designing adaptive infrastructure and
+policies that can accommodate technological advancements and urban mobility transitions. Modern
+travelers’ decisions are influenced by spatial, societal, and economic factors, adding complexity to the
+prediction of travel behavior in changing environments. Recent studies emphasize the need to analyze
+how emerging transport modes - such as ridesharing, electric vehicles, and autonomous vehicles - interact
+with existing systems. These interactions can be competitive or complementary, depending on regional
+and national contexts (Bastarianto et al., 2023).
+Agent-based models provide a powerful approach to studying these interactions. They can be used to
+assess the integration of new transport modes with existing systems and to evaluate sustainable mobility
+transitions, such as shared mobility services (H¨ orl et al., 2021), electric vehicle adoption (Marmaras
+et al., 2017), and demand-responsive transit (Auld et al., 2016).
+By simulating traveler behavior and mobility trends, ABMs enable researchers and policymakers to
+explore potential impacts and identify strategies for optimizing urban mobility. Despite these advantages,
+the increasing complexity of ABMs also poses computational challenges, especially when scaling to large
+urban regions. As the number of agents and interactions increases, computational costs rise rapidly,
+making real-time policy testing difficult (Balmer et al., 2008).
+2.2. Computational Challenges of Agent-Based Models
+The disadvantage of agent-based simulations is a high run-time of usually several hours, limiting the
+amount of scenarios that can be tested. Large-scale ABMs simulate thousands to millions of agents,
+each with their own decision-making processes. This requires significant memory and processing power,
+with computational demands growing rapidly as more agents and decision rules are incorporated. Since
+many ABMs do not parallelize efficiently, execution times often increase non-linearly, making real-time
+scenario testing infeasible (Auld et al., 2016; Bastarianto et al., 2023).
+Improving the scalabilitiy and efficiency of agent-based traffic simulations is an open research ques-
+tion. For the MATSim simulator, Laudan et al. (2025) compare local parallelization with distributed
+computing approaches, but show limitations in acceleration. Furthermore, MATSim is a highly modu-
+lar framework that is used by numerous domain experts from the transport field that often only have
+basic programming knowledge. This is a main reason why MATSim is still implemented in Java which
+is comparably slow with respect to other programming languages, but allows for quick adaptation and
+extension with new components. An interesting approach, therefore, remains to provide the framework
+with a high degree of implementation flexibility and find ways to approximate the high-level model out-
+comes. Smilovitskiy et al. (2025) present a GPU-accelerated transport model for the Isle of Wight using
+the FLAME-GPU framework. By comparing it with traditional non-GPU simulations like SUMO, the
+study demonstrates significant performance gains, enabling the simulation of larger vehicle populations
+and more detailed traffic interactions. However, the computational gains do not fully eliminate scal-
+ability issues, particularly for real-time or city-scale applications. Despite leveraging GPU hardware,
+simulations of large-scale networks still require extensive resources, and the dependency on specialized
+hardware limits accessibility. Furthermore, GPU-accelerated simulations often focus on the specific task
+of traffic assignment, but do not cover other aspects such as multimodality or mode choice behavior. An
+example where such elements are taken into account is presented by Saprykin et al. (2019). However,
+the rigid programming requirements for the GPU interaction limit modularization and easy adaptation
+and extension of the software by domain experts with basic programming knowledge as explained above.
+Manley et al. (2014) introduce a hybrid agent-based modeling framework that balances behavioral re-
+alism with computational efficiency by integrating detailed driver behavior with a simplified collective
+traffic flow model. They demonstrate how this approach enables scalable simulations of urban traffic
+dynamics while improving computational performance compared to traditional agent-based methods.
+However, they still face trade-offs between behavioral realism and scalability. The challenge lies in en-
+suring that large-scale simulations maintain sufficient fidelity in representing individual decision-making
+and emergent traffic phenomena.
+One widely-used alternative to speed up agent-based models for practical applications, is down-
+sampling the population size. For example, Llorca and Moeckel (2019) analyzed the effects of population
+scaling in agent-based transport models, investigating how different scale factors impact model runtime,
+travel times, and link volumes. The authors conclude that scaling down agent populations reduces
+3
+This preprint research paper has not been peer reviewed. Electronic copy available at: https://ssrn.com/abstract=5182100Preprint not peer reviewed
+
+--- Page 4 ---
+
+runtimes but must be done carefully to avoid distortions in travel times. For the Munich metropolitan
+area they found that a 5% sample produces travel time distributions similar to a full-scale simulation
+(100% sample) while being 50 times faster. Further, they find that the choice of scale factor depends on
+the analysis level: aggregate studies may tolerate smaller samples, while detailed corridor or small-area
+analyses may require full populations.
+However, downsampling the population size in agent-based transport models increases the inherent
+stochasticity due to the random selection of agents, which lead to variability in simulation outcomes.
+This variability arises because different subsamples may not accurately represent the full population’s
+travel behaviors, affecting demand distribution, route choices, congestion levels, and travel times. Such
+stochastic effects are particularly pronounced with smaller sampling rates, where statistics can substan-
+tially deviate from those of full-scale models. (Ben-Dor et al., 2021)
+Concluding, the goal of fully scalable agent-based models remains out of reach, as current research
+has yet to make them feasible for large-scale applications. In practice, population downsampling is
+used to reduce computational demands, but even with this approach, testing a single policy can take
+days. Consequently, the demand for more computationally efficient alternatives of agent-based models
+has driven interest in machine learning-based surrogates, which could approximate agent-based model
+outcomes while preserving key behavioral dynamics, enabling faster policy evaluation and optimization.
+2.3. Machine Learning Surrogates for Traffic Simulations
+Machine learning surrogates for traffic simulations learn the relationships between a simulations’ input
+parameters (characteristics of the different street segments, due to its nature or due to the introduced
+policy) and output variables (traffic flow metrics on street segment level) from data generated by the
+traffic simulation. Once trained, the surrogate model can rapidly predict the outcomes of various policy
+scenarios without the need for computationally intensive simulations.
+Table 1 provides an overview for machine learning surrogates for traffic simulations: Liu et al. (2020)
+propose a machine learning and particle swarm optimization (PSO) approach to efficiently calibrate
+microscopic traffic simulation parameters. Four machine learning models (Decision Tree, SVM, Gaus-
+sian Process Regression, and ANN) are tested to predict simulation outputs, with ANNs achieving the
+best accuracy. The ANN-based surrogate model is then embedded in PSO to optimize parameters,
+demonstrating superior efficiency and effectiveness when applied to TransModeler with field data from
+Shanghai. While effective, the authors recognize some limitations: They used a Multilayer Perceptron
+(MLP) for the artificial neural network but suggest that future studies explore Convolutional Neural
+Networks (CNNs) or Recurrent Neural Networks (RNNs) for better performance.
+Cervellera et al. (2021) investigate the use of a deep learning architecture with low-discrepancy
+sampling for surrogate modeling of traffic simulations. The approach leverages deep neural networks for
+their strong approximation capabilities and low-discrepancy sequences to efficiently cover the input space.
+Applied to the SUMO microsimulator, this method outperforms traditional surrogate models, such as
+Gaussian processes, in high-dimensional optimization tasks like traffic demand calibration and traffic
+light optimization. The authors highlight the need for a deeper theoretical analysis of their approach
+in the surrogate modeling framework and suggest broader testing across different applications beyond
+traffic simulation.
+Graph Neural Networks have gained increasing attention in the transportation domain due to their
+ability to capture spatial dependencies, making them well-suited for modeling complex network dynamics.
+As a class of deep learning models designed for graph-structured data, GNNs represent entities such as
+intersections or street segments as nodes, while edges encode relationships like connectivity or proximity.
+Their architecture enables the effective modeling of both local and global spatial dependencies, which
+has led to successful applications in various traffic-related tasks. For example, Jiang and Luo (2024)
+provide a comprehensive review of GNNs in traffic forecasting.
+Despite their potential, the use of GNNs as surrogates for traffic simulations remains largely un-
+explored. To the best of the author’s knowledge, only Narayanan et al. (2024) have investigated this
+application: In their study, they examine the feasibility of GNNs as surrogate models for the four-step
+model. They introduce a formal definition of a GNN-based surrogate and propose an augmented data
+generation process using small networks (15–80 nodes) for training. The authors evaluate different GNN
+architectures at the link level through classification and regression tasks. The classification task involves
+predicting traffic flow categories: 0–10 veh/h (no transport usage), 10–500 veh/h (low transport usage),
+and more than 500 veh/h (medium/high transport usage). The regression task focuses on estimating
+exact traffic flow values. While the results are promising, the study is constrained by its small scale and
+exclusive focus on the four-step model.
+4
+This preprint research paper has not been peer reviewed. Electronic copy available at: https://ssrn.com/abstract=5182100Preprint not peer reviewed
+
+--- Page 5 ---
+
+Authors Model Use Case ML Method Data
+SourcesEvaluation
+MetricsKey findings
+Liu, Zou, Ni,
+Gao, Zhang
+(Liu et al.,
+2020)Trans -
+Modeler
+(micro-
+scopic
+model)Traffic simu-
+lation calibra-
+tionDecision trees,
+Support Vec-
+tor Machines,
+Gaussian
+Process Re-
+gression,
+Artificial Neu-
+ral Networks
+(ANN), Par-
+ticle Swarm
+Optimization
+(PSO)Field data,
+simulated
+outputsPrediction
+accuracy,
+computational
+efficiencyANNs yielded the best
+prediction accuracy;
+ML+PSO methodology
+improved computational
+efficiency and effective-
+ness.
+Cervellera,
+Maccio,
+Rebora
+(Cervellera
+et al., 2021)SUMO Origin-
+destination
+(OD) demand
+calibration,
+traffic light
+optimization,
+and strategic
+mobility plan-
+ning.Deep Neu-
+ral Networks
+(DNNs),
+trained
+using low-
+discrepancy
+sampling
+(Sobol’ se-
+quences)Data gener-
+ated using
+SUMO, with
+OD flow val-
+ues as inputs
+and simulated
+traffic flows
+as outputs.
+Medium-sized
+urban net-
+work.1) Estimation
+accuracy of
+traffic flow
+at measure-
+ment points
+(MAE), 2)
+Distribution
+preservation
+comparing
+predicted
+and true flow
+distributions
+(MMD), 3)
+Surrogate
+model effec-
+tiveness in
+OD demand
+calibration.1) Deep learning-based
+surrogates outperform
+Gaussian Processes
+in high-dimensional
+traffic simulations, 2)
+Low-discrepancy sam-
+pling (Sobol’ sequences)
+improves training effi-
+ciency, accuracy, and
+reduces variance, 3)
+The surrogate better
+preserves traffic flow
+distributions, making
+it suitable for demand
+calibration, 4) Combin-
+ing deep learning with
+low-discrepancy sam-
+pling enhances efficiency
+without sacrificing accu-
+racy.
+Narayanan,
+Makarov,
+Antoniou
+(Narayanan
+et al., 2024)4-step
+modelReplicating
+traffic flows
+from simula-
+tionsGNN Synthetic
+transport
+simulation
+data, networks
+consisting of
+15-80 nodesAccuracy (F1
+Score, MAE
+and R2) and
+computational
+efficiencyProof-of-concept that a
+GNN can replicate traf-
+fic flows learned from the
+4-step model.
+This study Generic
+ABMPredicting
+the effects of
+transportation
+policies by
+approximating
+the outcomes
+of agent-based
+simulationsGNN Simulated
+ABM outputs
+from a large-
+scale network
+comprising
+over 30,000
+nodesAccuracy
+(MSE, MAE,
+R2, Pearson
+and Spearman
+Correlation),
+Impact of
+Simulation
+Stochasticity
+on the ErrorProof-of-concept that
+GNNs can learn the
+effect of transport poli-
+cies from agent-based
+models
+Table 1 – Summary of Machine Learning Surrogates for Transport Simulations, sorted by year
+In our study, the surrogate model effectively captures the complexity of agent-based simulations.
+Additionally, we evaluate our approach on large-scale networks - specifically Paris, France, with 30,000
+street segments. Finally, given that agent-based simulations inherently involve stochasticity due to the
+probabilistic nature of agent interactions, we examine its impact on model error - an aspect that has not
+been explored in previous studies.
+2.4. Contribution of this study
+In this work, we demonstrate that machine learning-based surrogate models can accurately replicate
+the outcomes of complex agent-based traffic simulations, effectively capturing the relationship between
+transportation policies and their impact on traffic volume at the link level.
+Our findings highlight the potential of GNN-based surrogates for systematically exploring the vast
+solution space of traffic policy combinations and their extents, and it lays the foundation for large-scale
+policy optimization. The contribution of this study is three-fold:
+1. Firstly, and at the core of this study, is the Proof of Concept of a machine-learning based surrogate
+model for agent-based transport simulations . By using a graph neural network architecture, we are
+able to predict the effects of policy interventions on a link level with high accuracy.
+2. Secondly, we examine the impact of simulation stochasticity on surrogate model error . Agent-based
+models inhibit randomness, due to the probabilistic nature of agent-based interactions. In trans-
+portation, downsampling the population is a common strategy to reduce computational costs, but
+5
+This preprint research paper has not been peer reviewed. Electronic copy available at: https://ssrn.com/abstract=5182100Preprint not peer reviewed
+
+--- Page 6 ---
+
+increases stochastic variability. When the training data is generated from a downsampled pop-
+ulation, the added randomness effectively acts as noise, potentially reducing the accuracy of the
+surrogate model. To better interpret the results, we analyze how the stochastic variability affects
+surrogate accuracy. This provides insights into the model’s strengths and limitations, informing its
+applicability across different levels of downsampling.
+3. Finally, we validate our methodology on a large-scale case study . The GNN surrogate is tested
+using MATSim with 1% downsampled data on the Paris network, encompassing over 30,000 streets.
+This demonstrates the effectiveness of the machine learning surrogate in capturing transportation
+dynamics.
+3. Methodological Approach
+Figure 1 gives an overview of the general methodology: The framework integrates an ABM with a
+GNN to predict changes in traffic volume at the link level under different policy scenarios. The process
+begins with an ABM that simulates travel behavior based on three key components: the street network,
+which represents the street infrastructure; travel modes, which define different transportation options;
+and a synthetic population, representing individual travelers and their mobility choices.
+Two types of scenarios are considered: a base case (defined in Section 3.1), which captures existing
+traffic conditions such as baseline traffic volume ¯ veand positional attributes without any intervention,
+andpolicy scenarios , where the introduced policy leads to adapted traffic volumes.
+To efficiently process this information, the street network is transformed into a dual graph , where
+street segments are represented as nodes, and their connectivity is defined by edges. A GNN-based
+surrogate model is then applied to capture relationships between the network and the applied policy, as
+described in Section 4. Finally, the trained GNN predicts the change in traffic volume at the link level
+under active policy conditions.
+The relevant variables for the analysis are listed in table 2.
+Symbol Description
+E Set of edges in the street network, single edges denoted e∈E
+R Set of random seeds for which we perform simulation runs, random seeds denoted {r1, r2, ...}
+P Set of policies that may be implemented on edge level, policies denoted {p1, p2, ...}
+vr
+e Traffic volume on edge ein simulation run r, without policy intervention
+ve Average traffic volume on edge e, without policy intervention
+yr
+e,p Simulated change in traffic volume on edge e∈Ein simulation run rdue to policy p.
+ye,p Single realization of ye,p: Simulated change in traffic volume on edge e∈Edue to policy p
+for one simulation run.
+ye,p Average simulated change of traffic volumes on edge e∈Edue to policy p:ye,p=1
+RP
+Ryr
+e,p
+yp Mean of the simulated change of traffic volumes over all edges e∈Edue to policy p:
+yp=1
+EP
+Eye,p=1
+E1
+RP
+EP
+Ryr
+e,p
+ˆye,p Predicted (GNN surrogate) change in traffic volume on edge e∈Edue to policy p.
+Table 2 – Symbols used in this analysis
+3.1. Base case
+Thebase case represents a simulation scenario of the agent-based model without any policy interven-
+tion, serving as the reference point for predicting changes in traffic volume. It is generated by running
+multiple simulations with different random seeds and averaging the results at street level.
+Consider the simulation, without any policy intervention, repeated with |R|different random seeds.
+Each simulation repetition produces a traffic volume vr
+e, where r= 1,2, . . . ,|R|. For a single edge e∈E,
+the base traffic volume for edge eis then defined by ve:
+ve=1
+|R||R|X
+r=1vr
+e, (1)
+6
+This preprint research paper has not been peer reviewed. Electronic copy available at: https://ssrn.com/abstract=5182100Preprint not peer reviewed
+
+--- Page 7 ---
+
+Figure 1 – Overview over the Methodology
+7
+This preprint research paper has not been peer reviewed. Electronic copy available at: https://ssrn.com/abstract=5182100Preprint not peer reviewed
+
+--- Page 8 ---
+
+With this, we can directly define the variance of the base case traffic volume for edge e∈Eas:
+σ2
+e,b=1
+|R||R|X
+r=1(vr
+e−ve), (2)
+which quantifies the dispersion of traffic volume across independent simulation runs with different random
+seeds. In Section 5.3 we state an assumption under which this variance can be used for quantifying the
+aleatoric variance of our surrogate model.
+3.2. Problem Statement
+We aim to develop a machine learning-based surrogate model that estimates traffic volumes in re-
+sponse to policy interventions, using data from agent-based simulations. Specifically, the model learns
+how each intervention affects traffic on individual roads within the network.
+Mathematically speaking, our objective is to learn a function Fthat maps a set of input simulation
+parameters Psimto the corresponding simulation output S:
+F(Psim)→S. (3)
+This defines a regression problem where the goal is to approximate Fsuch that it captures the
+relationship between the input parameters and the resulting traffic volume changes. Let Fpdenote F
+under policy intervention p, mapping input features to traffic volume changes under p. The goal is to
+learn the function:
+Fp:R|E|×n→R|E|, (4)
+which maps a set of nstreet characteristics per edge to the predicted change in traffic volume ˆ ye,p
+caused by a given policy intervention p. The impact of a policy intervention on a street is measured by
+the change in its traffic volume relative to the base case: For each edge e∈E, we predict the traffic
+volume change under intervention pcompared to the base case.
+To train the model, we use the Mean Squared Error (MSE) loss function, which quantifies the
+difference between predicted and actual values. Let xedenote street characteristics for street e:
+L(Fp) =1
+|E|X
+e∈E(F(xe)−ye,p)2(5)
+=1
+|E|X
+e∈E 
+ˆye,p−1
+|R|X
+r∈Ryr
+e,p!2
+. (6)
+In an ideal setting, minimizing this loss would require |R|simulation runs per policy intervention to
+compute the expected change in traffic volume. This distinction is crucial: the observed traffic volume
+change in a single run, yr
+e,p, differs from the expected change averaged over multiple runs with different
+random seeds, ye,p. Ideally, the surrogate model would predict ye,pto account for randomness in the
+simulation.
+However, due to computational constraints, each policy intervention is simulated only once ( |R|= 1),
+so the predicted value ˆ ye,papproximates ye,prather than the expected mean. Consequently, we train our
+model using this single realization, minimizing:
+L(F) =1
+|E|X
+e∈E 
+ˆye,p−yr
+e,p2. (7)
+where yr
+e,pis the observed traffic volume change for a simulation run with random seed r. As a
+result, the surrogate model approximates a single realization rather than the expected value, inherently
+incorporating the stochasticity present in the data. Since we always work with a single realization, we
+denote yr
+e,pasye,phereafter.
+The objective is to find the optimal function F∗that minimizes this loss:
+F∗= arg min
+FL(F). (8)
+8
+This preprint research paper has not been peer reviewed. Electronic copy available at: https://ssrn.com/abstract=5182100Preprint not peer reviewed
+
+--- Page 9 ---
+
+To develop an effective surrogate model, we first define the input and output parameters of the
+machine learning-based surrogate (see Section 4). The evaluation metrics are described in Section 5.1
+and 5.2. Given the high computational cost of full-scale simulations, we train the model on downsampled
+population data, which increases the variance of traffic volumes across simulation runs with different
+random seeds. Since the model predicts a single realization of the stochastic simulation rather than the
+expected value ye,p, it inherently reflects the randomness in the data and cannot reduce stochasticity
+beyond what is already present. We further analyze this in Section 5.3, highlighting the role of base case
+variance in error estimation.
+4. The Graph Neural Network Surrogate Model
+As a theoretical basis for our surrogate model, we propose using Graph Neural Networks. These are
+machine learning models that deal with graph-structured data. Street networks of cities form a natural
+graph, where edges represent streets and nodes represent intersections. In our case, where the goal is to
+predict features on street level, GNNs are the intuitive choice. Because most GNNs are optimized for
+node-based predictions, we transform the street network graphs into dual graphs, where nodes correspond
+to street segments and edges capture the connections between segments. This transformation allows the
+GNN to operate at the level of street segments rather than intersections, making it well-suited for learning
+spatial dependencies and traffic dynamics. To provide a clear understanding, we first explain the model’s
+inputs and outputs, followed by a detailed description of its architecture.
+4.1. Input and Output
+The input Psimfor the model is the dual graph containing the following attributes, for each street
+e∈E, where |E|corresponds to the number of nodes in each of the transformed dual graphs:
+1.Static features provide fixed attributes such as base traffic volume ve, capacity and speed limit in
+the base case, and street segment length.
+2.Variable features represent attributes modified by implemented policies, such as reductions in
+capacity or speed.
+3.Positional features capture the spatial information of each street, including the coordinates of its
+start and endpoint.
+We denote the number of static, variable, and positional features, respectively, as ds,dv, and dp.
+The output Scaptures the impact of the implemented policy at the street level, such as changes in
+traffic volume relative to the base case, represented by ˆ ye,pfor each street e.
+4.2. Architecture
+The architecture of the GNN, shown in Figure 2, consists of multiple stages and supports a flexible
+number of features.
+•PointNet Convolution: The model begins with two PointNet Convolution (Charles et al., 2017)
+layers. The first PointNet layer processes an input feature set of dimension ( dp+ds+dv), mapping
+it to a higher-dimensional space using a local Multi-Layer Perceptron (MLP) with 256 hidden
+units. A global MLP follows, further transforming the feature representations with 512 hidden
+units in successive layers. The second PointNet layer expands the input dimensions to 512 + dp,
+integrating the coordinates for the end position of the street segment, and follows a similar MLP-
+based transformation.
+•Transformer Convolution: Two layers of Transformer Convolutions (Shi et al., 2021) follow, lever-
+aging self-attention mechanisms to dynamically assign importance to neighboring segments. The
+first Transformer layer operates with 64-dimensional embeddings (using four attention heads), while
+the second layer increases the embedding size to 128, again using four attention heads. This enables
+the model to capture long-range dependencies within the street network.
+•GAT Convolution: The final stage consists of a two-layer Graph Attention Network (GAT) module
+(Veliˇ ckovi´ c et al., 2017). The first GAT layer projects embeddings into a 64-dimensional space using
+attention-weighted aggregation. The final layer then reduces the feature space to a single output
+dimension, completing the model’s predictions.
+9
+This preprint research paper has not been peer reviewed. Electronic copy available at: https://ssrn.com/abstract=5182100Preprint not peer reviewed
+
+--- Page 10 ---
+
+Figure 2 – Architecture of the Graph Neural Network
+All layers (except for the ones in GAT module) use ReLU activations to introduce non-linearity.
+Kaiming and Xavier weight initialization methods are applied to ensure stable weight scaling, reducing
+the risk of vanishing or exploding gradients and improving training stability. The combination of Point-
+Net, Transformer, and GAT convolutions enables the model to effectively capture both local segment
+interactions and global dependencies in the transport system, making it well-suited for learning from
+street network data.1
+5. Methodology for Evaluating Surrogate Model Accuracy
+While the model is trained by optimizing the MSE between simulated and predicted traffic volume
+changes, additional metrics are used to provide a more comprehensive assessment of its accuracy and
+robustness.
+This section outlines our approach to evaluating the performance of the surrogate model on the link
+level. First, we introduce the evaluation metrics beyond MSE that are used for a thorough performance
+analysis. We also explain that model performance is assessed on the entire test set, with accuracy
+analyzed separately for different street types to identify variations (Section 5.1). Next, we describe the
+benchmarking methodology used to compare model performance against a naive baseline (Section 5.2).
+Finally, since agent-based simulations inherently introduce stochasticity, understanding its impact is
+crucial for a meaningful evaluation of the results. To better interpret the results, we examine the extent
+to which model error is influenced by simulation stochasticity (Section 5.3).
+5.1. Evaluation Metrics
+The test set consists of multiple scenarios, where each scenario corresponds to applying a policy p
+to a specific combination of districts. To evaluate model performance across different street types, we
+define aggregated evaluation metrics computed over the entire test set for each street type. Let Sbe the
+set of scenarios in the test set, and let Tbe the set of street types. Define Etas the set of edges in the
+test set that belong to street type t. The total number of such edges is given by |Et|=|S| × |T|.
+Aggregated Base Case Quantities
+Themean base case traffic volume for street type tis given by:
+¯vt=1
+|Et|X
+e∈Etve, (9)
+where verepresents the base case traffic volume for edge e(Section 3.1).
+1The code for the GNN surrogate can be found on https://github.com/enatterer/gnn predicting effects oftraffic policies
+10
+This preprint research paper has not been peer reviewed. Electronic copy available at: https://ssrn.com/abstract=5182100Preprint not peer reviewed

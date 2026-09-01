@@ -1,0 +1,25 @@
+{
+  "verification_status": "VERIFIED",
+  "method_1_closed_form_v2": {
+    "description": "Independent closed-form Gaussian CRPS (full dataset)",
+    "crps_mean": 3.383011,
+    "crps_median": 1.329155,
+    "diff_vs_main_mean": 1.125e-05,
+    "diff_vs_main_median": 4.533e-05,
+    "match_mean": true,
+    "match_median": true
+  },
+  "method_2_numerical_integration": {
+    "description": "Numerical CDF integration on 10000 random nodes (seed=42)",
+    "n_subsample": 10000,
+    "crps_mean_numerical": 3.297841,
+    "crps_mean_v2_same_subsample": 3.297841,
+    "abs_diff": 0.0,
+    "rel_diff": 0.0,
+    "match": true
+  },
+  "main_script_values": {
+    "crps_mean": 3.383,
+    "crps_median": 1.3292
+  }
+}

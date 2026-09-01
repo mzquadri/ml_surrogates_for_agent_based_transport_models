@@ -41,18 +41,32 @@ All numbers verified against raw artifacts. See [`docs/verified/`](docs/verified
 ## Repository Structure
 
 ```
-thesis/latex_tum_official/   Thesis document (final LaTeX source + compiled PDF + DOCX)
-models/                      Trained model checkpoints (16 trials, PyTorch .pth)
-scripts/gnn/                 GNN architectures (PointNet + Transformer + GAT, incl. heteroscedastic + CQR variants)
-scripts/evaluation/          UQ analysis and plotting scripts
-scripts/training/            Model training pipeline (incl. deep ensemble and CQR training)
-scripts/data_preprocessing/  MATSim --> PyG graph conversion
-scripts/misc/                Figure generation and analysis helpers
-docs/                        Documentation and verified results
-results/                     Canonical result JSONs, pre-computed predictions (.npz), and per-trial metrics
-run_part{2,3,4}_*.py         Reproducibility verification scripts
-environment-minimal.yml      Conda environment (cross-platform)
+thesis/latex_tum_official/    Working thesis document (LaTeX source + compiled PDF + DOCX)
+thesis/submission_2026-05-15/ Frozen as-submitted thesis (PDF + ZIP + LaTeX) -- do not edit
+thesis/variants/              Earlier document snapshots, kept for provenance
+models/                       Trained model checkpoints (16 trials, PyTorch .pth)
+data/                         Dataloaders, training corpus, Paris network layer (local only, ~7.2 GB)
+scripts/gnn/                  GNN architectures (PointNet + Transformer + GAT, incl. heteroscedastic + CQR variants)
+scripts/evaluation/           UQ analysis and plotting scripts
+scripts/training/             Model training pipeline (incl. deep ensemble and CQR training)
+scripts/data_preprocessing/   MATSim --> PyG graph conversion
+scripts/misc/                 Figure generation and analysis helpers
+scripts/archive/              Superseded one-off scripts, kept for provenance
+notebooks/                    Colab notebooks (training, UQ, baselines)
+docs/                         Documentation and verified results
+docs/figures/                 Thesis figures, EDA plots, and hand-picked diagrams
+results/                      Canonical result JSONs, pre-computed predictions (.npz), metrics, training logs
+analysis_outputs/             Generated analysis figures and intelligence reports
+thesis_dashboard/             Streamlit dashboard over the result set
+policy-dashboard/             Policy confidence desk
+web_exports/                  Exported web artifacts (JSON + WebP)
+presentation/                 Defence slide decks
+tests/                        Test suite
+run_part{2,3,4}_*.py          Reproducibility verification scripts
+environment-minimal.yml       Conda environment (cross-platform)
 ```
+
+> **The thesis that was examined is `thesis/submission_2026-05-15/`, not `thesis/latex_tum_official/`.** The working LaTeX has been edited since submission and compiles to a different PDF. See that folder's `README.md` for the details.
 
 > Included: all reported result JSONs, the 16 trained model checkpoints, and the key pre-computed prediction archives (.npz) that back the reported numbers. Excluded from version control: the raw MATSim outputs and the intermediate data loaders (~7.5 GB regenerable artifacts), the two prediction archives over GitHub's 100 MB per-file limit (`experiment_a_fixed_data.npz`, `feature_data.npz`), and the Colab-side training outputs.
 

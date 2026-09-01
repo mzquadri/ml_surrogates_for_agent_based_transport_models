@@ -1,0 +1,33 @@
+{
+  "max_delta_across_scenarios": {
+    "CAPACITY_BASE_CASE": 0.0,
+    "CAPACITY_REDUCTION": 7200.0,
+    "FREESPEED": 0.0,
+    "HIGHWAY": 0.0,
+    "LENGTH": 0.0,
+    "VOL_BASE_CASE": 0.0
+  },
+  "provenance": {
+    "classification": "post-thesis-data-audit",
+    "dataset_release": "train-data-v1",
+    "generated_by": "scripts/export_web_artifacts.py",
+    "metric_definition": "A column is static when its values are identical in all 1,000 scenarios.",
+    "schema_version": 2,
+    "source_artifacts": [
+      "train-data-v1/datalist_batch_1..20.pt"
+    ],
+    "source_commit": "3ad2fb3fccb1885e2f34a1098170499b44af328a",
+    "source_repository": "https://github.com/mzquadri/ml-surrogates-thesis"
+  },
+  "scenario_varying_features": [
+    "CAPACITY_REDUCTION"
+  ],
+  "static_features": [
+    "VOL_BASE_CASE",
+    "CAPACITY_BASE_CASE",
+    "FREESPEED",
+    "HIGHWAY",
+    "LENGTH"
+  ],
+  "topology_constant": true
+}

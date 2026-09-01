@@ -1,0 +1,200 @@
+{
+  "conditional_conformal": {
+    "adaptive_quantiles": {
+      "q90_adapt": 7.5817549594034634,
+      "q95_adapt": 11.35716669737804
+    },
+    "calibration_nodes": 632700,
+    "evaluation_nodes": 2530800,
+    "global_quantiles": {
+      "q90": 9.99325749,
+      "q95": 14.769979187499981
+    },
+    "sigma_deciles": [
+      {
+        "adaptive_coverage_90": 0.900288446341078,
+        "adaptive_coverage_95": 0.9368895211000474,
+        "decile": 1,
+        "global_coverage_90": 0.9857278330962541,
+        "global_coverage_95": 0.9944246878457405,
+        "mae_veh_h": 1.024113244869062,
+        "mean_sigma": 0.2757933512995496,
+        "n_nodes": 253080,
+        "sigma_range": [
+          0.053343426,
+          0.44835702
+        ]
+      },
+      {
+        "adaptive_coverage_90": 0.8425043464517149,
+        "adaptive_coverage_95": 0.909048522206417,
+        "decile": 2,
+        "global_coverage_90": 0.966180654338549,
+        "global_coverage_95": 0.9872253832780149,
+        "mae_veh_h": 2.193309354507093,
+        "mean_sigma": 0.5230260280682788,
+        "n_nodes": 253080,
+        "sigma_range": [
+          0.4483578,
+          0.5893935
+        ]
+      },
+      {
+        "adaptive_coverage_90": 0.8598545914335388,
+        "adaptive_coverage_95": 0.9241662715346926,
+        "decile": 3,
+        "global_coverage_90": 0.9579856171961435,
+        "global_coverage_95": 0.9837205626679311,
+        "mae_veh_h": 2.4841157718808313,
+        "mean_sigma": 0.6492954049755413,
+        "n_nodes": 253080,
+        "sigma_range": [
+          0.5893937,
+          0.70871806
+        ]
+      },
+      {
+        "adaptive_coverage_90": 0.8744231073178441,
+        "adaptive_coverage_95": 0.9352378694483957,
+        "decile": 4,
+        "global_coverage_90": 0.9503556187766714,
+        "global_coverage_95": 0.9795598229808756,
+        "mae_veh_h": 2.744501574645075,
+        "mean_sigma": 0.7706192237535959,
+        "n_nodes": 253080,
+        "sigma_range": [
+          0.7087182,
+          0.8349749
+        ]
+      },
+      {
+        "adaptive_coverage_90": 0.8861585269480007,
+        "adaptive_coverage_95": 0.9439860913545124,
+        "decile": 5,
+        "global_coverage_90": 0.9408289868816184,
+        "global_coverage_95": 0.974905168326221,
+        "mae_veh_h": 3.053311494372137,
+        "mean_sigma": 0.905750283884582,
+        "n_nodes": 253080,
+        "sigma_range": [
+          0.8349755,
+          0.9815257
+        ]
+      },
+      {
+        "adaptive_coverage_90": 0.8984668879405722,
+        "adaptive_coverage_95": 0.9524656235182551,
+        "decile": 6,
+        "global_coverage_90": 0.9298087561245456,
+        "global_coverage_95": 0.9690572151098467,
+        "mae_veh_h": 3.3888341075761326,
+        "mean_sigma": 1.0696099423084797,
+        "n_nodes": 253080,
+        "sigma_range": [
+          0.9815262,
+          1.1663435
+        ]
+      },
+      {
+        "adaptive_coverage_90": 0.9110755492334439,
+        "adaptive_coverage_95": 0.9604868025920658,
+        "decile": 7,
+        "global_coverage_90": 0.9148214003477161,
+        "global_coverage_95": 0.9616524419155998,
+        "mae_veh_h": 3.8028454821468185,
+        "mean_sigma": 1.2867290360344559,
+        "n_nodes": 253080,
+        "sigma_range": [
+          1.1663451,
+          1.4235438
+        ]
+      },
+      {
+        "adaptive_coverage_90": 0.925975975975976,
+        "adaptive_coverage_95": 0.9700529476845267,
+        "decile": 8,
+        "global_coverage_90": 0.8936897423739529,
+        "global_coverage_95": 0.9502173225857437,
+        "mae_veh_h": 4.474817183705276,
+        "mean_sigma": 1.6094840263343606,
+        "n_nodes": 253080,
+        "sigma_range": [
+          1.4235448,
+          1.8318372
+        ]
+      },
+      {
+        "adaptive_coverage_90": 0.9436186186186186,
+        "adaptive_coverage_95": 0.9804172593646278,
+        "decile": 9,
+        "global_coverage_90": 0.848814604077762,
+        "global_coverage_95": 0.9271692745376956,
+        "mae_veh_h": 5.71263579253851,
+        "mean_sigma": 2.184324251012723,
+        "n_nodes": 253080,
+        "sigma_range": [
+          1.8318383,
+          2.6672523
+        ]
+      },
+      {
+        "adaptive_coverage_90": 0.9623676307886834,
+        "adaptive_coverage_95": 0.9886122965070333,
+        "decile": 10,
+        "global_coverage_90": 0.6291804962857594,
+        "global_coverage_95": 0.7807689268215584,
+        "mae_veh_h": 10.479387904976322,
+        "mean_sigma": 4.564252100621543,
+        "n_nodes": 253080,
+        "sigma_range": [
+          2.667271,
+          35.789856
+        ]
+      }
+    ]
+  },
+  "protocols": [
+    {
+      "approximate": false,
+      "ece_after": 0.04786340287656077,
+      "ece_before": 0.2687388177651336,
+      "evidence_class": "post-thesis verified; recomputed from full cached arrays",
+      "id": "graph20_80_v1",
+      "label": "Graph-level audit protocol",
+      "split": "20/80 graph-level (first 20 cal, last 80 eval)",
+      "status": "tracked and dashboard-reproducible",
+      "temperature": 2.7024848450799777
+    },
+    {
+      "approximate": true,
+      "ece_after": 0.034,
+      "ece_before": 0.356,
+      "evidence_class": "approximate; canonical split indices unavailable",
+      "id": "node30_70_thesis_final",
+      "label": "Final-thesis node protocol",
+      "split": "random 30% node calibration / 70% node evaluation",
+      "status": "reported in final thesis; no canonical cached split indices",
+      "temperature": 2.887,
+      "warning": "Not directly comparable with graph20_80_v1. Values are displayed as reported, not recomputed."
+    }
+  ],
+  "provenance": {
+    "classification": "thesis-result",
+    "dataset_release": "train-data-v1",
+    "generated_by": "scripts/export_web_artifacts.py",
+    "metric_definition": "Temperature scaling fits one scalar multiplier for sigma by minimising expected calibration error. It rescales the uncertainty; it does not change any point prediction.",
+    "schema_version": 2,
+    "source_artifacts": [
+      "analysis_outputs/thesis_intelligence.json"
+    ],
+    "source_commit": "3ad2fb3fccb1885e2f34a1098170499b44af328a",
+    "source_repository": "https://github.com/mzquadri/ml-surrogates-thesis",
+    "units": "unitless",
+    "upstream": {
+      "audit_source_commit": "fdb4ef0c9c736576ae34d5e331d8b66a7a6d877a",
+      "audit_source_repository": "https://github.com/mzquadri/ml_surrogates_for_agent_based_transport_models",
+      "submitted_artifact_commit": "4b95a3d8aca5929bb88b84bb7f7ae86c48e2f428",
+      "submitted_pdf_sha256": "0ac5309d060cda53d82a05cc837136fe853e7f9dcbabd2f4fb4b4282a39bc97e"
+    }
+  }
+}

@@ -1,0 +1,15 @@
+cff-version: 1.2.0
+message: "If you use this thesis, cite the submitted work and consult the post-submission corrigendum."
+title: "Uncertainty Quantification for Machine Learning Models in Transportation Policy Analysis"
+authors:
+  - family-names: Quadri
+    given-names: Mohd Zamin
+date-released: 2026-05-15
+repository-code: "https://github.com/mzquadri/ml-surrogates-thesis"
+url: "https://github.com/mzquadri/ml-surrogates-thesis/blob/main/document/main.pdf"
+abstract: "Master's thesis on uncertainty quantification for graph neural network surrogates of agent-based transport simulations."
+keywords:
+  - uncertainty quantification
+  - graph neural networks
+  - transport simulation
+  - conformal prediction
