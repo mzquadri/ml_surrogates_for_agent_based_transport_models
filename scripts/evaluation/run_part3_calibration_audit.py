@@ -66,9 +66,35 @@ def main():
     # ── Split: first 20% = calibration (matches conformal_from_mc.py fallback) ───
     n = len(df)
     split = n // 5  # 20%
+
+    # The split must fall on a graph boundary. Rows are ordered graph by graph, and the
+    # 31,635 segments inside one MATSim network are spatially correlated: a cut through the
+    # middle of a graph would place a calibration node and its immediate neighbours on
+    # opposite sides of the split. Conformal coverage assumes exchangeable calibration and
+    # test residuals, so that leak would report coverage better than the method delivers.
+    #
+    # With the 100 graphs used here, n // 5 lands exactly on a boundary (cal = graphs 1-20,
+    # test = graphs 21-100). That holds only because 100 is divisible by 5, which nothing
+    # about the split enforces -- at 99 or 101 graphs it would cut mid-graph and the failure
+    # would be silent, showing up as coverage that looks slightly too good. Assert it.
+    NODES_PER_GRAPH = 31_635  # road segments in the Paris Ile-de-France network
+    assert n % NODES_PER_GRAPH == 0, (
+        f"{n:,} rows is not a whole number of graphs at {NODES_PER_GRAPH:,} segments each "
+        f"({n / NODES_PER_GRAPH:.4f} graphs); the row ordering assumed here does not hold."
+    )
+    assert split % NODES_PER_GRAPH == 0, (
+        f"the 20% split at row {split:,} cuts through graph "
+        f"{split // NODES_PER_GRAPH + 1}: {n // NODES_PER_GRAPH} graphs is not divisible by 5. "
+        "Round the split to a graph boundary before trusting the coverage numbers."
+    )
+
     cal = df.iloc[:split].copy().reset_index(drop=True)
     test = df.iloc[split:].copy().reset_index(drop=True)
-    print(f"  Cal: {len(cal):,}   Test: {len(test):,}")
+    print(
+        f"  Cal: {len(cal):,}   Test: {len(test):,}"
+        f"   (graphs 1-{split // NODES_PER_GRAPH} vs "
+        f"{split // NODES_PER_GRAPH + 1}-{n // NODES_PER_GRAPH})"
+    )
 
     # Arrays
     yhat_c = cal["pred_mc_mean"].values.astype(np.float64)
