@@ -5,6 +5,9 @@ _archive/
 submission.zip
 zia80432
 
+# ── Presentations: kept locally only, never pushed ──
+presentation/
+
 # ── IDE / tooling ──
 .vscode/
 **/.ipynb_checkpoints/
