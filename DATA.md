@@ -21,17 +21,41 @@ network (31,635 road segments).
 
 ## Where to get it
 
-<!-- Replace this block once the Zenodo record is published. -->
-> **Not yet published.** Upload the archive to Zenodo (or the TUM data repository),
-> then replace this block with the DOI and direct download link, e.g.
->
-> ```
-> DOI: 10.5281/zenodo.XXXXXXX
-> https://doi.org/10.5281/zenodo.XXXXXXX
-> ```
+Everything is published as GitHub release assets on this repository. Release assets
+have a 2 GB per-file limit and do not count against repository size, so the data stays
+downloadable without bloating a clone.
 
-Zenodo accepts records up to 50 GB and mints a citable DOI, which is why it suits this
-dataset better than Git LFS.
+| Release | Contents | Size |
+| ------- | -------- | ---: |
+| [`train-data-v1`](../../releases/tag/train-data-v1) | The 20 `datalist_batch_*.pt` training batches | 2.44 GiB |
+| [`benchmarks-v1`](../../releases/tag/benchmarks-v1) | Per-trial evaluation artifacts, one tar per trial | 5.3 GiB |
+
+```bash
+# training corpus
+gh release download train-data-v1 \
+  --repo mzquadri/ml_surrogates_for_agent_based_transport_models \
+  --pattern 'datalist_batch_*.pt' \
+  --dir data/train_data/dist_not_connected_10k_1pct
+
+# evaluation artifacts (all trials; use --pattern to fetch just one)
+gh release download benchmarks-v1 \
+  --repo mzquadri/ml_surrogates_for_agent_based_transport_models \
+  --dir /tmp/benchmarks
+for f in /tmp/benchmarks/*.tar; do tar -xf "$f" -C data/TR-C_Benchmarks/; done
+```
+
+`misc/feature_data.npz` (121 MB), the pooled feature array, is attached to the
+`benchmarks-v1` release as a plain asset rather than inside a tar. Download it
+straight to `data/misc/`:
+
+```bash
+gh release download benchmarks-v1 \
+  --repo mzquadri/ml_surrogates_for_agent_based_transport_models \
+  --pattern 'feature_data.npz' --dir data/misc
+```
+
+`visualisation/districts_paris.geojson` (212 KB) is small enough to be tracked in the
+repository itself, so it needs no download.
 
 ## Verifying a download
 

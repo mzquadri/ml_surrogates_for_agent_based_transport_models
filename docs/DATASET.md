@@ -5,7 +5,7 @@ preprocessing code. Every number below comes from a full pass over all 20 batch 
 (`datalist_batch_1.pt` … `datalist_batch_20.pt`, 2.44 GiB, published on the
 [`train-data-v1`][release] release).
 
-[release]: https://github.com/mzquadri/ml-surrogates-thesis/releases/tag/train-data-v1
+[release]: https://github.com/mzquadri/ml_surrogates_for_agent_based_transport_models/releases/tag/train-data-v1
 
 ## Corpus shape
 
@@ -182,9 +182,9 @@ Both counts were read from the saved checkpoints rather than from a rebuilt mode
 
 ```bash
 gh release download train-data-v1 \
-  --repo mzquadri/ml-surrogates-thesis \
+  --repo mzquadri/ml_surrogates_for_agent_based_transport_models \
   --pattern 'datalist_batch_*.pt' \
-  --dir code/data/train_data/dist_not_connected_10k_1pct
+  --dir data/train_data/dist_not_connected_10k_1pct
 
 python scripts/analyse_train_data.py
 ```
