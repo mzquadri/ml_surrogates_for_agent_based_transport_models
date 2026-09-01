@@ -45,7 +45,7 @@ thesis/latex_tum_official/    Working thesis document (LaTeX source + compiled P
 thesis/submission_2026-05-15/ Frozen as-submitted thesis (PDF + ZIP + LaTeX) -- do not edit
 thesis/variants/              Earlier document snapshots, kept for provenance
 models/                       Trained model checkpoints (16 trials, PyTorch .pth)
-data/                         Dataloaders, training corpus, Paris network layer (local only, ~7.2 GB)
+data/                         Dataloaders, training corpus, Paris network layer -- see DATA.md (7.8 GB, not in git)
 scripts/gnn/                  GNN architectures (PointNet + Transformer + GAT, incl. heteroscedastic + CQR variants)
 scripts/evaluation/           UQ analysis and plotting scripts
 scripts/training/             Model training pipeline (incl. deep ensemble and CQR training)
@@ -68,7 +68,7 @@ environment-minimal.yml       Conda environment (cross-platform)
 
 > **The thesis that was examined is `thesis/submission_2026-05-15/`, not `thesis/latex_tum_official/`.** The working LaTeX has been edited since submission and compiles to a different PDF. See that folder's `README.md` for the details.
 
-> Included: all reported result JSONs, the 16 trained model checkpoints, and the key pre-computed prediction archives (.npz) that back the reported numbers. Excluded from version control: the raw MATSim outputs and the intermediate data loaders (~7.5 GB regenerable artifacts), the two prediction archives over GitHub's 100 MB per-file limit (`experiment_a_fixed_data.npz`, `feature_data.npz`), and the Colab-side training outputs.
+> Included: all reported result JSONs, the trained model checkpoints, and the key pre-computed prediction archives (.npz) that back the reported numbers. Excluded from version control: the 7.8 GB `data/` tree — 39 of its files exceed GitHub's 100 MB per-file limit — along with the presentation decks and the Colab-side training outputs. See [`DATA.md`](DATA.md) for what `data/` contains, where to download it, and how to verify it against `data/MANIFEST.sha256`.
 
 ---
 
