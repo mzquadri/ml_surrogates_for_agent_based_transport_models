@@ -45,7 +45,8 @@ thesis/latex_tum_official/    Working thesis document (LaTeX source + compiled P
 thesis/submission_2026-05-15/ Frozen as-submitted thesis (PDF + ZIP + LaTeX) -- do not edit
 thesis/variants/              Earlier document snapshots, kept for provenance
 models/                       Trained model checkpoints (16 trials, PyTorch .pth)
-data/                         Dataloaders, training corpus, Paris network layer -- see DATA.md (7.8 GB, not in git)
+data/                         Dataloaders, training corpus, Paris network layer -- lives in the
+                              companion data repository, see DATA.md (7.8 GB, not tracked here)
 scripts/gnn/                  GNN architectures (PointNet + Transformer + GAT, incl. heteroscedastic + CQR variants)
 scripts/evaluation/           UQ analysis and plotting scripts
 scripts/training/             Model training pipeline (incl. deep ensemble and CQR training)
@@ -68,7 +69,9 @@ environment-minimal.yml       Conda environment (cross-platform)
 
 > **The thesis that was examined is `thesis/submission_2026-05-15/`, not `thesis/latex_tum_official/`.** The working LaTeX has been edited since submission and compiles to a different PDF. See that folder's `README.md` for the details.
 
-> Included: all reported result JSONs, the trained model checkpoints, and the key pre-computed prediction archives (.npz) that back the reported numbers. Excluded from version control: the 7.8 GB `data/` tree — 39 of its files exceed GitHub's 100 MB per-file limit — along with the presentation decks and the Colab-side training outputs. See [`DATA.md`](DATA.md) for what `data/` contains, where to download it, and how to verify it against `data/MANIFEST.sha256`.
+> Included: all reported result JSONs, the trained model checkpoints, and the key pre-computed prediction archives (.npz) that back the reported numbers. Not tracked here: the 7.8 GB `data/` tree — 39 of its files exceed GitHub's 100 MB per-file limit — along with the presentation decks and the Colab-side training outputs.
+>
+> The data lives in the companion repository **[mzquadri/ml-surrogates-thesis-data](https://github.com/mzquadri/ml-surrogates-thesis-data)**, in the layout the training scripts wrote: `data_created_during_training/` for the split scalers, test set and loader parameters, `trained_model/` for `model.pth`. Clone it into `data/` and the evaluation scripts find everything where they expect it. See [`DATA.md`](DATA.md) for the full account, including the nineteen files published as release assets because they exceed the file-size limit.
 
 ---
 
@@ -77,6 +80,10 @@ environment-minimal.yml       Conda environment (cross-platform)
 ```bash
 git clone https://github.com/mzquadri/ml_surrogates_for_agent_based_transport_models.git
 cd ml_surrogates_for_agent_based_transport_models
+
+# The artifacts the analyses read. data/ is gitignored here, so this nests cleanly.
+git clone https://github.com/mzquadri/ml-surrogates-thesis-data.git data
+
 conda env create -f environment-minimal.yml
 conda activate traffic-gnn
 
@@ -85,7 +92,18 @@ python scripts/evaluation/run_part3_calibration_audit.py # Calibration and confo
 python scripts/evaluation/run_part4_t7_crosscheck.py     # Trial 7 cross-check
 ```
 
-The scripts reproduce analyses from versioned prediction artifacts; they do not retrain the models or rerun MATSim simulations. The prediction archives are mirrored under `results/predictions/`; evaluation scripts look for them under the local `data/` tree, so place the extracted `data/` directory (or point the scripts' `data/` paths at `results/predictions/`) before running. See [`docs/verified/REPRODUCIBILITY_GAP_SUMMARY.md`](docs/verified/REPRODUCIBILITY_GAP_SUMMARY.md) for a precise account of included artifacts and known limitations.
+The clone above covers the 1,267 tracked artifacts, which is everything `run_part4_t7_crosscheck.py` reads. The other two both need one more file — `trial8_uq_ablation_results.csv`, 199 MB and so over GitHub's per-file limit:
+
+```bash
+cd data && gh release download large-files-v1 \
+  --repo mzquadri/ml-surrogates-thesis-data \
+  --pattern '*trial8_uq_ablation_results.csv' --dir /tmp/large \
+  && python restore_large_files.py /tmp/large && cd ..
+```
+
+[`DATA.md`](DATA.md) lists the rest of the oversized files and the training corpus.
+
+The scripts reproduce analyses from versioned prediction artifacts; they do not retrain the models or rerun MATSim simulations. The prediction archives are also mirrored under `results/predictions/`, so the scripts' `data/` paths can be pointed there instead. See [`docs/verified/REPRODUCIBILITY_GAP_SUMMARY.md`](docs/verified/REPRODUCIBILITY_GAP_SUMMARY.md) for a precise account of included artifacts and known limitations.
 
 To compile the thesis: `cd thesis/latex_tum_official && pdflatex main.tex && biber main && pdflatex main.tex && pdflatex main.tex`
 
