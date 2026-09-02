@@ -44,3 +44,12 @@ thesis/latex_tum_official/build/
 # ── OS files ──
 .DS_Store
 Thumbs.db
+
+# ── Large prediction archives, published on the results-large-v1 release ──
+# 234 MB of the clone, read by no step in "Reproducing Results". Restore with the
+# command in that release's notes. deep_ensemble_predictions.npz is deliberately NOT
+# here: scripts/evidence_contract.py names it a tracked audited-source artifact and
+# tests/test_analysis_bundle.py asserts its presence.
+results/predictions/uq_verification_run/ensemble_verified.npz
+results/predictions/**/ensemble_experiments/experiment_b_fixed_data.npz
+results/s_convergence_raw.npz

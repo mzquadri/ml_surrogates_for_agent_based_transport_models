@@ -1,6 +1,14 @@
 from pathlib import Path
 
-from streamlit.testing.v1 import AppTest
+import pytest
+
+# Streamlit is a dashboard-only dependency, listed in dashboard-requirements.txt rather
+# than the analysis environment. Skip cleanly when it is absent: importing it at module
+# level made a missing optional dependency a collection error, which fails the whole run
+# before any analysis test executes.
+AppTest = pytest.importorskip(
+    "streamlit.testing.v1", reason="streamlit not installed; see dashboard-requirements.txt"
+).AppTest
 
 ROOT = Path(__file__).resolve().parents[1]
 APP_PATH = ROOT / "thesis_dashboard" / "app.py"
