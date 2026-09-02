@@ -50,6 +50,24 @@ def test_generated_bundle_is_aggregate_and_path_safe() -> None:
     assert '"target": [' not in serialized
 
 
+@pytest.mark.skip(
+    reason=(
+        "Locks a document tree that lives in the archived predecessor, not here. "
+        "This test arrived with the consolidation on 1 Sep 2026 and still reads "
+        "ROOT/'document'/main.pdf, the layout of mzquadri/ml-surrogates-thesis. This "
+        "repository keeps the thesis under thesis/ instead, and the contract cannot be "
+        "satisfied by any directory in it: SUBMITTED_DOCUMENT_GIT_TREE "
+        "(f104db73...) is not an object in this repository at all, and the 40-file count "
+        "matches thesis/submission_2026-05-15/extracted while SUBMITTED_PDF_SHA256 "
+        "(0ac5309d..., 674,395 bytes) matches thesis/latex_tum_official/main.pdf -- two "
+        "different directories. "
+        "Skipped rather than retargeted because making it pass means writing new contract "
+        "values, which changes what the evidence locks. The constants are kept: they still "
+        "describe the submitted artifact and remain checkable against the archived "
+        "repository, which stays readable. The SOURCE_ARTIFACTS half of this file does "
+        "apply here and still runs."
+    )
+)
 def test_bundle_and_submitted_pdf_provenance_is_locked() -> None:
     with BUNDLE_PATH.open(encoding="utf-8") as handle:
         bundle = json.load(handle)
