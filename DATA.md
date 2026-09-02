@@ -1,8 +1,9 @@
 # Dataset
 
-The artifacts backing this thesis total **7.8 GB across 1,307 files** — too large for
-GitHub, which rejects any single file over 100 MB. The data is therefore archived
-separately and this repository carries only the manifest needed to verify it.
+The artifacts backing this thesis total **7.8 GB across 1,307 files** — too large to track
+here, since GitHub rejects any single file over 100 MB. They live in a companion
+repository, **[mzquadri/ml-surrogates-thesis-data](https://github.com/mzquadri/ml-surrogates-thesis-data)**,
+in the same directory layout the training scripts wrote.
 
 ## Contents
 
@@ -21,61 +22,79 @@ network (31,635 road segments).
 
 ## Where to get it
 
-Everything is published as GitHub release assets on this repository. Release assets
-have a 2 GB per-file limit and do not count against repository size, so the data stays
-downloadable without bloating a clone.
-
-| Release | Contents | Size |
-| ------- | -------- | ---: |
-| [`train-data-v1`](../../releases/tag/train-data-v1) | The 20 `datalist_batch_*.pt` training batches | 2.44 GiB |
-| [`benchmarks-v1`](../../releases/tag/benchmarks-v1) | Per-trial evaluation artifacts, one tar per trial | 5.3 GiB |
+`data/` is gitignored here, so clone the data repository into it. The evaluation scripts
+read from a local `data/` tree and this puts everything at the paths they expect:
 
 ```bash
-# training corpus
+git clone https://github.com/mzquadri/ml-surrogates-thesis-data.git data
+```
+
+That gives you 1,267 files (1.3 GB): every scaler, checkpoint, metric file, prediction
+archive and plot small enough to be tracked. Two further downloads complete the tree.
+
+**The nineteen files over GitHub's 100 MB limit** — fifteen `test_dl.pt` test dataloaders
+at 148–296 MB each, `feature_data.npz`, `experiment_a_fixed_data.npz`, and a 200 MB
+ablation CSV — are attached to that repository's `large-files-v1` release. Their asset
+names encode the destination path with `__` in place of `/`, because release assets are a
+flat list and fifteen of them are called `test_dl.pt`:
+
+```bash
+cd data
+gh release download large-files-v1 \
+  --repo mzquadri/ml-surrogates-thesis-data --dir /tmp/large
+python restore_large_files.py /tmp/large
+```
+
+**The twenty training batches** (2.44 GiB) stay on this repository's release, where they
+were first published:
+
+```bash
 gh release download train-data-v1 \
   --repo mzquadri/ml_surrogates_for_agent_based_transport_models \
   --pattern 'datalist_batch_*.pt' \
   --dir data/train_data/dist_not_connected_10k_1pct
-
-# evaluation artifacts (all trials; use --pattern to fetch just one)
-gh release download benchmarks-v1 \
-  --repo mzquadri/ml_surrogates_for_agent_based_transport_models \
-  --dir /tmp/benchmarks
-for f in /tmp/benchmarks/*.tar; do tar -xf "$f" -C data/TR-C_Benchmarks/; done
 ```
 
-`misc/feature_data.npz` (121 MB), the pooled feature array, is attached to the
-`benchmarks-v1` release as a plain asset rather than inside a tar. Download it
-straight to `data/misc/`:
+`visualisation/districts_paris.geojson` (212 KB) is tracked in this repository directly,
+so it needs no download.
+
+### Also available as tar archives
+
+[`benchmarks-v1`](../../releases/tag/benchmarks-v1) on this repository holds the same
+`TR-C_Benchmarks` content as 23 tars, one per trial, plus `feature_data.npz`. It predates
+the data repository and is kept so existing links keep working. Prefer the clone above —
+it gives you the directory structure without unpacking anything, and lets you browse it on
+GitHub first.
 
 ```bash
 gh release download benchmarks-v1 \
-  --repo mzquadri/ml_surrogates_for_agent_based_transport_models \
-  --pattern 'feature_data.npz' --dir data/misc
+  --repo mzquadri/ml_surrogates_for_agent_based_transport_models --dir /tmp/benchmarks
+for f in /tmp/benchmarks/*.tar; do tar -xf "$f" -C data/TR-C_Benchmarks/; done
 ```
-
-`visualisation/districts_paris.geojson` (212 KB) is small enough to be tracked in the
-repository itself, so it needs no download.
 
 ## Verifying a download
 
-`data/MANIFEST.sha256` lists a SHA-256 for every one of the 1,307 files. After placing
-the extracted tree at `data/` in the repository root:
+`data/MANIFEST.sha256` lists a SHA-256 for every one of the 1,307 files:
 
 ```bash
 cd data && sha256sum -c MANIFEST.sha256
 ```
 
-Every line should report `OK`. The manifest is generated with paths relative to `data/`,
-so run the check from inside that directory.
+Every line should report `OK`. The manifest uses paths relative to `data/`, so run the
+check from inside that directory. The data repository carries its own manifest over the
+1,267 files it tracks, and `SHA256SUMS.txt` on `large-files-v1` covers the nineteen
+restored files.
 
-## Why it is not in git
+## Why it is not tracked here
 
-`data/` is listed in `.gitignore`. Thirty-nine files exceed GitHub's 100 MB hard limit
-(6.5 GB in total), the largest being the 297 MB test dataloaders. Committing them would
-fail outright; committing them through Git LFS would require a paid data pack and make
-every clone of this repository multi-gigabyte. Keeping the data in an archive with a DOI
-is both cheaper and more citable.
+Thirty-nine of these files exceed GitHub's 100 MB hard limit — 6.5 GB in total, the
+largest being the 297 MB test dataloaders. Committing them would fail outright, and Git
+LFS would need a paid data pack while making every clone of this repository
+multi-gigabyte.
 
-The evaluation scripts read from a local `data/` tree, so download and extract the
-archive before running anything in `Reproducing Results` in the [README](README.md).
+Splitting the data into its own repository keeps this one small enough to clone quickly
+while leaving the artifacts browsable at their real paths, rather than sealed inside
+archives. The layout there follows the convention in the upstream
+[`docs/training.md`](https://github.com/enatterer/ml_surrogates_for_agent_based_transport_models/blob/main/docs/training.md):
+`data_created_during_training/` for the split scalers, the test set and loader parameters,
+and `trained_model/` for `model.pth`.
