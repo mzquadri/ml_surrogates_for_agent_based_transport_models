@@ -1,7 +1,8 @@
 # How far the response travels
 
 The observation: **the response drops sharply at the first graph hop and is then
-flat**. Because that is the strongest claim in this analysis, the method and its
+flat** — an observed graph-distance pattern, reported as an association rather than
+a mechanism. Because it is the strongest claim in this analysis, the method and its
 controls come first.
 
 ## Method
@@ -72,17 +73,23 @@ the scenarios with the *lowest* offsite share, which would bias the profile
 downward at high hop counts. The equal-weight choice is the conservative one for
 this claim.
 
-## What it means
+## What the pattern is
 
-Traffic displaced by a capacity reduction does not seep outward through the street
-grid, thinning as it goes. It reappears across the network at broadly the same
-magnitude wherever it lands. Drivers reroute over whole journeys, so a road eight
-turns away from a closure absorbs about as much as a road one turn away.
+Stated as what was measured: **the graph-distance pattern is flat beyond the first
+hop**. Response magnitude at eight hops from an intervention is indistinguishable
+from response magnitude at one hop, even though those bands cover very different
+parts of the network. What the data shows is an **observed redistribution across
+the network**, not a gradient that fades with distance.
 
-This is a good argument for the architecture actually used: two graph-transformer
-layers give every link attention over distant parts of the graph, which a purely
-local aggregation scheme on a max-degree-10 graph could not match at the same
-depth.
+A behavioural explanation is available — rerouting happens over whole journeys, so
+proximity in the road graph need not govern where displaced traffic reappears — but
+**that is a hypothesis consistent with the pattern, not something these measurements
+establish.** Nothing here identifies a mechanism.
+
+The pattern is, however, directly relevant to the architecture: two
+graph-transformer layers give every link attention over distant parts of the graph.
+A purely local aggregation scheme on a max-degree-10 graph would need far more depth
+to relate links that this association shows are related.
 
 ## What it does not mean
 
@@ -98,9 +105,9 @@ intervention family. Specifically, it is not:
 - **independent of the graph definition** — "hops" are hops in *this* line graph.
   A different adjacency would give different bands.
 
-The 2.5% of response landing on unreachable links is a reminder of the last point:
-those links have no path to any intervention within 8 hops, yet still move,
-because the coupling is behavioural rather than topological.
+The 2.5% of response landing on unreachable links underlines the last point: those
+links have no path to any intervention within 8 hops and still move. Whatever
+couples them to the intervention is not captured by this graph distance.
 
 ## Reproducing
 
