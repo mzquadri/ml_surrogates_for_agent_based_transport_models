@@ -82,6 +82,14 @@ nominal category. The single most important property of this dataset is that **o
 Measured schema, per-feature statistics and the scenario-invariance analysis:
 **[`docs/DATASET.md`](docs/DATASET.md)**. Further figures in [`docs/figures/dataset/`](docs/figures/dataset/).
 
+A deeper read of the corpus — every attribute traced to the preprocessing code, the
+intervention design, the graph topology, and eight data-quality observations — is in
+**[`docs/portfolio_data_story/`](docs/portfolio_data_story/)**, with reproducible scripts under
+`scripts/data_exploration/`. Two findings from it are worth knowing here: about **65% of the
+traffic response lands on links that were never intervened**, and the policy only ever touches
+three road classes (primary, secondary, tertiary) — motorways are never intervened yet carry the
+second-highest mean response.
+
 ---
 
 ## Model
@@ -240,10 +248,12 @@ scripts/
   verify_headline_results.py    Recomputes every published number; non-zero exit on drift
   evaluation/                   UQ analyses, calibration audit, cross-checks
   figure_generation/            Dataset and results figures
+  data_exploration/             Reproducible dataset analysis and asset builder
   gnn/  training/  data_preprocessing/    Upstream model, training and preprocessing code
   archive/                      Historical one-offs — provenance only, not runnable
 docs/
   DATASET.md                    Measured schema and per-feature statistics
+  portfolio_data_story/         Deep read of the corpus + derived web assets
   CORRIGENDUM.md                Post-submission corrections, including C7
   UQ_SUMMARY.md                 April 2026 summary, partly superseded
   verified/                     Audit reports and the figures behind them

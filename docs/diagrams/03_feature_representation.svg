@@ -18,12 +18,13 @@
 
   <text class="h" x="34" y="36">What a node is, and what it carries</text>
   <text class="cap" x="34" y="58">Statistics measured over all 31,635,000 node observations in the published corpus. Full detail in docs/DATASET.md.</text>
+  <text class="cap" x="34" y="76">Intervention footprint and the meaning of HIGHWAY &#8722;1 were corrected in September 2026 &#8212; see CORRIGENDUM C8.</text>
 
   <!-- line graph illustration -->
-  <rect x="34" y="82" width="300" height="180" rx="8" fill="#f8fafc" stroke="#e2e8f0"/>
-  <text class="lbl" x="48" y="106">The network is a line graph</text>
-  <text class="sub" x="48" y="126">Nodes are road links, not junctions.</text>
-  <text class="sub" x="48" y="142">An edge means &#8220;these two links meet&#8221;.</text>
+  <rect x="34" y="90" width="300" height="180" rx="8" fill="#f8fafc" stroke="#e2e8f0"/>
+  <text class="lbl" x="48" y="114">The network is a line graph</text>
+  <text class="sub" x="48" y="134">Nodes are road links, not junctions.</text>
+  <text class="sub" x="48" y="150">An edge means &#8220;these two links meet&#8221;.</text>
 
   <line x1="66" y1="186" x2="136" y2="170" stroke="#2563eb" stroke-width="3"/>
   <line x1="136" y1="170" x2="206" y2="196" stroke="#2563eb" stroke-width="3"/>
@@ -37,7 +38,7 @@
   <text class="mono" x="48" y="250">31,635 nodes &#183; 59,851 edges</text>
 
   <!-- feature table -->
-  <text class="lbl" x="360" y="104">Node feature vector x — 6 stored, 5 used</text>
+  <text class="lbl" x="360" y="112">Node feature vector x — 6 stored, 5 used</text>
   <line x1="360" y1="114" x2="946" y2="114" stroke="#cbd5e1"/>
   <text class="th" x="360" y="132">#</text>
   <text class="th" x="386" y="132">Feature</text>
