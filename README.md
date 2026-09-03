@@ -27,6 +27,11 @@ a decision about closing a road, that gap matters more than another point of R²
 **This thesis asks: can a useful, calibrated uncertainty estimate be attached to an already-trained
 GNN surrogate, without retraining it?**
 
+Short answer: yes, for ranking. MC Dropout σ tracks the error well enough to cut MAE by **41%** when
+the least reliable half of the links are handed off, and to flag the worst-predicted links at
+**0.7585 AUROC**. But raw σ is not a usable scale — it covers only 49% of errors at the nominal 90%
+level — so it has to be calibrated first. [Full results below.](#results)
+
 ![Research problem](docs/diagrams/01_research_problem.svg)
 
 ---
@@ -35,7 +40,7 @@ GNN surrogate, without retraining it?**
 
 This repository is a fork, and the distinction matters.
 
-| | |
+| Origin | What it covers |
 | --- | --- |
 | **Inherited** (upstream) | The GNN architectures (`scripts/gnn/`), the MATSim-to-graph preprocessing (`scripts/data_preprocessing/`), the base training pipeline (`scripts/training/`), `help_functions.py` / `plot_functions.py`, and `traffic-gnn.yml`. |
 | **Mine** (this thesis) | The entire uncertainty layer — MC Dropout evaluation, temperature scaling, split and adaptive conformal prediction, selective prediction, error detection, the calibration audits, the deep-ensemble and CQR trials, every result artifact under `results/`, the thesis document, and the verification tooling. |
