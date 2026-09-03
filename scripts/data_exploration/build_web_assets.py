@@ -4,9 +4,9 @@
 Everything written here is an aggregate. The 31,635,000-row observation table is
 never exported, and the .pt corpus is never copied into the repository.
 
-Deterministic: all sampling is seeded, all row orders are sorted or fixed, and
-floats are rounded before serialisation, so re-running produces byte-identical
-files.
+Deterministic: all sampling is seeded, all row orders are sorted or fixed, floats
+are rounded before serialisation, and every file is written with LF endings
+regardless of platform, so re-running produces byte-identical files.
 
 Usage:
     python scripts/data_exploration/build_web_assets.py --corpus DIR --cache DIR
@@ -34,8 +34,11 @@ R = 5  # coordinate rounding: ~1 m at this latitude, ample for a map
 
 
 def jdump(obj, path):
+    # newline="\n" is required: write_text() would otherwise translate to CRLF on
+    # Windows, so a rebuild would not match the committed file byte for byte even
+    # though the content is identical. links.csv already writes LF explicitly.
     path.write_text(json.dumps(obj, indent=2, sort_keys=False) + "\n",
-                    encoding="utf-8")
+                    encoding="utf-8", newline="\n")
     print(f"  {path.name:28s} {path.stat().st_size/1024:8.1f} KB")
 
 
