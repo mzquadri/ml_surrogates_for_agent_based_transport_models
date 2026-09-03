@@ -11,7 +11,7 @@ Analysis 3.5: Temperature scaling verification
 Analysis 3.6: T7 error detection AUROC
 
 Run from the figures/ directory:
-    C:\\Users\\zamin\\miniconda3\\python.exe generate_phase3_figures.py
+    python generate_phase3_figures.py
 
 All outputs saved to the figures/ directory as PDF.
 """

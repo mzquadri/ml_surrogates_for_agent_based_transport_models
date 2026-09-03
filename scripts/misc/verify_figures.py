@@ -1,7 +1,12 @@
 """Verify every \\includegraphics reference resolves to a real file."""
 import re, glob, os
+import os
+from pathlib import Path
 
-DOC = "C:/Users/zamin/Downloads/ml_surrogates_thesis_final/ml_surrogates_thesis_final/document"
+DOC = os.environ.get(
+    "THESIS_DOC_DIR",
+    str(Path(__file__).resolve().parent.parent.parent / "thesis" / "latex_tum_official"),
+)
 
 refs = set()
 pat = re.compile(r"\\includegraphics(?:\[[^\]]*\])?\{([^}]+)\}")

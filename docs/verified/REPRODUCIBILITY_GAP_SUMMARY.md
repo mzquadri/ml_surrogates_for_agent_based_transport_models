@@ -101,7 +101,7 @@
 
 ### Remaining (lower priority)
 - `scripts/evaluation/generate_thesis_charts.py` line 37 — OUTPUT_DIR hardcoded
-- 5 scripts in `evaluation_scripts/` — hardcoded to `C:\Users\zamin\...`
+- 5 scripts in `evaluation_scripts/` — hardcoded to a personal machine path
 - 2 `compare_with_elena.py` scripts in trial directories
 - 10 scripts in `thesis/ARCHIVED_OLD_SCRIPTS/` (dead code)
 - ~22 occurrences in docstrings, JSON metadata, conda prefixes (non-functional)
