@@ -1,7 +1,12 @@
 """Consistency check: verify every key numerical claim appears identically across abstract, body, and appendix."""
 import re, glob, os, sys
+import os
+from pathlib import Path
 
-DOC = "C:/Users/zamin/Downloads/ml_surrogates_thesis_final/ml_surrogates_thesis_final/document"
+DOC = os.environ.get(
+    "THESIS_DOC_DIR",
+    str(Path(__file__).resolve().parent.parent.parent / "thesis" / "latex_tum_official"),
+)
 
 claims = {
     "T8 R2 (0.5957)":               r"0\.5957",

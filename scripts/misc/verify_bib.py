@@ -1,7 +1,12 @@
 """Verify every cited key in the thesis exists in bibliography.bib."""
 import re, glob, os
+import os
+from pathlib import Path
 
-ROOT = "C:/Users/zamin/Downloads/ml_surrogates_thesis_final/ml_surrogates_thesis_final/document"
+ROOT = os.environ.get(
+    "THESIS_DOC_DIR",
+    str(Path(__file__).resolve().parent.parent.parent / "thesis" / "latex_tum_official"),
+)
 
 cited = set()
 for f in glob.glob(f"{ROOT}/chapters/*.tex") + glob.glob(f"{ROOT}/pages/*.tex"):

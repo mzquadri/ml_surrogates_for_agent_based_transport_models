@@ -111,6 +111,6 @@ REFERENCE PAPER:
 - Already cited in thesis: Lakshminarayanan et al. (2017) uses
   heteroscedastic NLL for deep ensembles
 
-REPO ROOT: C:\Users\zamin\OneDrive\Desktop\Nazim_thesis\
+REPO ROOT: <repository root>
            ml_surrogates_for_agent_based_transport_models\
 =============================================================
