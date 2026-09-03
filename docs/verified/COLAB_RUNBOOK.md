@@ -39,6 +39,11 @@ version — if you get errors, check the training environment's requirements.txt
 
 ## Mount Google Drive (Cell 2)
 
+
+> The `Nazim_thesis` folder in the path below was the author's own local/Drive working
+> directory name. It is not a separate person or project. The path is kept verbatim
+> because it records where these runs actually executed.
+
 ```python
 from google.colab import drive
 drive.mount('/content/drive')

@@ -1,9 +1,9 @@
 # Complete Research Summary: GNN Surrogate Models with Uncertainty Quantification
 
-**Author:** Nazim Zameen  
-**Supervisors:** Elena, Dominik  
+**Author:** Mohd Zamin Quadri  
+**Supervisors:** Prof. Dr. Stephan Günnemann; advisors Dominik Fuchsgruber, M.Sc. and Elena Natterer, M.Sc.  
 **Date:** February 2026  
-**Institution:** [Your University]  
+**Institution:** Technical University of Munich  
 
 ---
 

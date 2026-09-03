@@ -3,7 +3,8 @@ Verification script: loads artifacts (NPZ + JSON),
 recomputes key metrics from raw arrays, and cross-checks against
 verified JSON summaries and thesis figure expectations.
 
-Author: Verification script for Nazim's thesis
+Author: Mohd Zamin Quadri
+Purpose: Verification script for the Master's thesis experiments
 """
 
 import json

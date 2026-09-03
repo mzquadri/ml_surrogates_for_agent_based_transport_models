@@ -1,6 +1,6 @@
 # Ensemble Uncertainty Quantification Experiments - Detailed Report
 
-**Author:** Nazim Zameen  
+**Author:** Mohd Zamin Quadri  
 **Date:** February 2026  
 **Runtime:** ~13 hours on CPU  
 **Test Data:** 100 graphs, 3.16 million nodes  
