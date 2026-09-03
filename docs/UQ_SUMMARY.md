@@ -4,6 +4,16 @@
 **Dataset:** 1,000 of 10,000 MATSim scenarios (Paris road network, 10% subset)
 **Test Set:** 100 graphs, 3,163,500 node-level predictions
 
+> **Superseded in part — read [`CORRIGENDUM.md`](CORRIGENDUM.md) C7 first.**
+> This document was generated on 10 April 2026. Three of its numbers did not survive the
+> September 2026 audit: the Trial 8 error-detection AUROC at top-10% (stated 0.7548,
+> verified **0.7585**) and top-20% (stated 0.7324, verified **0.7401**), and the Trial 7
+> Spearman rho (stated 0.4460, replayable **0.4437**). Its "49 numbers verified" claim
+> cites `auroc_corrected.json`, a file that is not present in this repository or its data
+> release, so that claim does not hold for the AUROC rows.
+> The values below are left as generated, so the record of what was reported stays intact.
+> For current verified numbers run `python scripts/verify_headline_results.py`.
+
 ---
 
 ## BASELINE MODEL — Trial 8 (T8)
@@ -154,6 +164,21 @@ Normalises nonconformity score by MC Dropout σ → node-specific interval width
 
 **Note on earlier hardcoded values:** Prior summaries cited T=2.70, ECE 0.269→0.048 — these were from an earlier unrecorded run with a different split. The values above are the verified numbers from the saved JSON.
 
+> **Corrected September 2026.** The sentence above has it the wrong way round. The two
+> figures come from two different protocols, both recorded in
+> [`CORRIGENDUM.md`](CORRIGENDUM.md) C3, and it is the *other* one that is replayable:
+>
+> | Protocol | Split | T | ECE | Replayable |
+> |---|---|---|---|---|
+> | `graph20_80_v1` | first 20 / last 80 graphs | 2.702 | 0.269 → 0.048 | **yes** |
+> | `node30_70_thesis_final` | random 30% / 70% nodes, seed 42 | 2.887 | 0.356 → 0.034 | no — split indices were not saved |
+>
+> `scripts/verify_headline_results.py` recomputes the first from
+> `mc_dropout_full_100graphs_mc30.npz` and obtains T = 2.701, ECE 0.2687 → 0.0478,
+> matching the stored JSON to four decimals. The second cannot be reproduced because the
+> node-level split indices are unavailable. The two protocols answer different questions
+> and must not be pooled.
+
 **Charts:**
 - `fig_temp_scaling_4panel.png` — T optimisation curve + coverage bars + reliability diagrams (before/after)
 - `fig_temp_scaling_reliability.png` — Thesis-ready before/after reliability diagram (ECE annotated)
@@ -256,8 +281,8 @@ Multi-model ensemble is weaker than MC Dropout (ρ=0.4333 vs 0.4908). Averaging 
 - Source: mc_dropout_full_100graphs_mc30.npz
 
 **Error Detection AUROC (T8):**
-- Top-10% error threshold: AUROC = **0.7548** *(source: auroc_corrected.json)*
-- Top-20% error threshold: AUROC = **0.7324** *(source: auroc_corrected.json)*
+- Top-10% error threshold: AUROC = **0.7548** *(as generated; source `auroc_corrected.json` is absent — verified value is **0.7585**, see CORRIGENDUM C7)*
+- Top-20% error threshold: AUROC = **0.7324** *(as generated; source `auroc_corrected.json` is absent — verified value is **0.7401**, see CORRIGENDUM C7)*
 - T7 cross-check (top-10%): AUROC = **0.7416** *(source: t7_auroc.json)*
 
 **Tiered Deployment Workflow:**
@@ -393,10 +418,10 @@ Multi-model ensemble is weaker than MC Dropout (ρ=0.4333 vs 0.4908). Averaging 
 | Metric | T7 | T8 |
 |---|---|---|
 | R² | 0.5471 | 0.5957 |
-| Spearman ρ | 0.4460 | 0.4820 |
+| Spearman ρ | 0.4460 (replayable: 0.4437, C7) | 0.4820 |
 | Selective pred (50% ret.) | −38.3% MAE | −41.2% MAE |
 | k₉₅ | 16.15 | 11.65 |
-| AUROC (top 10% errors) | **0.7416** | **0.7548** |
+| AUROC (top 10% errors) | **0.7416** | **0.7548** (verified: 0.7585, C7) |
 
 Same qualitative conclusions hold across both trials.
 
@@ -467,8 +492,8 @@ Uncertainty-guided filtering is most effective for easy-to-predict majority of t
 | T11 Q̂₉₅ | 3.62258... | 3.6226 | ✓ |
 | T11 Width₉₀ | 17.8250... | 17.825 | ✓ |
 | T11 Width₉₅ | 24.8215... | 24.822 | ✓ |
-| T8 AUROC top-10% | 0.7548 | 0.7548 | ✓ |
-| T8 AUROC top-20% | 0.7324 | 0.7324 | ✓ |
+| T8 AUROC top-10% | 0.7548 | 0.7548 | superseded → 0.7585 (C7) |
+| T8 AUROC top-20% | 0.7324 | 0.7324 | superseded → 0.7401 (C7) |
 | T7 AUROC top-10% | 0.7416 | 0.7416 | ✓ |
 | Winkler MC 90% | 49.68 | 49.68 | ✓ |
 | Winkler std conformal 90% | 35.78 | 35.78 | ✓ |
