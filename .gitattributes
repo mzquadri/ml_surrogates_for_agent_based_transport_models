@@ -1,0 +1,20 @@
+# Checksum manifests must reach the working tree byte for byte.
+#
+# With core.autocrlf=true — the default on Windows — git rewrites LF to CRLF on checkout.
+# sha256sum then reads the trailing carriage return as part of every filename, and
+# `cd data && sha256sum -c MANIFEST.sha256`, the command DATA.md documents, fails on all
+# 1,306 lines while the committed blob is clean.
+data/MANIFEST.sha256 -text
+*.sha256 -text
+SHA256SUMS.txt -text
+
+# The GeoJSON is checksummed in that manifest, so it cannot be rewritten either.
+data/visualisation/districts_paris.geojson -text
+
+# Prediction archives and model weights are binary; mark them so git never inspects them
+# for line endings in the first place.
+*.npz binary
+*.pt binary
+*.pth binary
+*.pkl binary
+*.pdf binary
