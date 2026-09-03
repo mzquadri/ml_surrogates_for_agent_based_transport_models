@@ -32,12 +32,17 @@ Six features are stored. Statistics are over all 31,635,000 node observations.
 
 | # | Feature | Min | Max | Mean | Std | % zero | Distinct |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| 0 | `VOL_BASE_CASE` | 0 | 1,596 | 50.91 | 135.83 | 23.86% | many |
-| 1 | `CAPACITY_BASE_CASE` | 0 | 14,400 | 1,028.96 | 1,264.45 | 10.79% | 26 |
-| 2 | `CAPACITY_REDUCTION` | −7,200 | 0 | −93.33 | 334.03 | 87.94% | 27 |
-| 3 | `FREESPEED` | 0 | 33.33 | 8.15 | 4.01 | 10.79% | 11 |
+| 0 | `VOL_BASE_CASE` | 0 | 1,596 | 50.91 | 135.83 | 23.86% | 5,694 |
+| 1 | `CAPACITY_BASE_CASE` | 0 | 14,400 | 1,028.96 | 1,264.45 | 10.79% | 36 |
+| 2 | `CAPACITY_REDUCTION` | −7,200 | 0 | −93.33 | 334.03 | 87.94% | 29 |
+| 3 | `FREESPEED` | 0 | 33.33 | 8.15 | 4.01 | 10.79% | 16 |
 | 4 | `HIGHWAY` | −1 | 9 | 2.73 | 2.13 | 2.95% | 11 |
-| 5 | `LENGTH` | 4.17 | 2,568.58 | 91.60 | 109.94 | 0.00% | many |
+| 5 | `LENGTH` | 4.17 | 2,568.58 | 91.60 | 109.94 | 0.00% | 23,257 |
+
+`Distinct` counts exact distinct `float64` values over all 31,635,000 node
+observations. An earlier version of this table understated three of these counts
+and wrote "many" for the other two; the values above were recomputed in a single
+streaming pass over all twenty batch files.
 
 There are no NaNs in `x` or `y`.
 
@@ -49,7 +54,7 @@ Notes on individual features:
   graph — the masks are identical, not merely equal in size. These are the non-car links (rail,
   subway, bus-only), which have no vehicle capacity and no free-flow car speed.
 - **`CAPACITY_REDUCTION`** is the intervention, and the only feature that differs between
-  scenarios. It is zero or negative, taking 27 distinct values down to −7,200 veh/h.
+  scenarios. It is zero or negative, taking 29 distinct values down to −7,200 veh/h.
 - **`FREESPEED`** is in m/s; 33.33 m/s is 120 km/h.
 - **`HIGHWAY`** is a label-encoded road class. The −1 category is 10.03% of links and marks an
   unclassified type rather than a road below class 0. Because the encoding is ordinal but the
