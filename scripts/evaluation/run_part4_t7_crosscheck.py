@@ -20,13 +20,11 @@ from scipy import stats
 from pathlib import Path
 
 # ── Paths ─────────────────────────────────────────────────────────────────────
-REPO = Path(__file__).resolve().parent.parent.parent
-T7_DIR = (
-    REPO
-    / "data/TR-C_Benchmarks/point_net_transf_gat_7th_trial_80_10_10_split/uq_results"
-)
-MC_NPZ = T7_DIR / "mc_dropout_full_100graphs_mc30.npz"
-DET_NPZ = T7_DIR / "deterministic_full_100graphs.npz"
+from artifact_paths import REPO, resolve
+
+_T7 = "point_net_transf_gat_7th_trial_80_10_10_split/uq_results"
+MC_NPZ = resolve(f"{_T7}/mc_dropout_full_100graphs_mc30.npz")
+DET_NPZ = resolve(f"{_T7}/deterministic_full_100graphs.npz")
 OUT_MD = REPO / "docs/verified"
 OUT_FIG = REPO / "docs/verified/figures"
 

@@ -23,12 +23,11 @@ from scipy import stats
 from pathlib import Path
 
 # ── Paths ─────────────────────────────────────────────────────────────────────
-REPO = Path(__file__).resolve().parent.parent.parent
-CSV = (
-    REPO
-    / "data/TR-C_Benchmarks"
-    / "point_net_transf_gat_8th_trial_lower_dropout"
-    / "trial8_uq_ablation_results.csv"
+from artifact_paths import REPO, RELEASE_HINT, resolve
+
+CSV = resolve(
+    "point_net_transf_gat_8th_trial_lower_dropout/trial8_uq_ablation_results.csv",
+    hint=RELEASE_HINT,
 )
 OUT_MD = REPO / "docs/verified"
 OUT_FIG = REPO / "docs/verified/figures"
