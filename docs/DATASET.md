@@ -51,14 +51,19 @@ Notes on individual features:
 - **`VOL_BASE_CASE`** is the pre-intervention hourly volume. Its 23.86% zeros are links that
   carry no car traffic in the base simulation.
 - **`CAPACITY_BASE_CASE`** and **`FREESPEED`** are both zero on exactly the same 3,412 links per
-  graph — the masks are identical, not merely equal in size. These are the non-car links (rail,
-  subway, bus-only), which have no vehicle capacity and no free-flow car speed.
+  graph — the masks are identical, not merely equal in size. Both are produced by
+  `np.where(modes.contains("car"), value, 0)`, so these are the links no car may use. This set is
+  *not* the same as `HIGHWAY == -1` (3,173 links): 285 links are −1 yet car-capable, and 524 are
+  non-car with an ordinary road class. See [`CORRIGENDUM.md`](CORRIGENDUM.md) C8a.
 - **`CAPACITY_REDUCTION`** is the intervention, and the only feature that differs between
   scenarios. It is zero or negative, taking 29 distinct values down to −7,200 veh/h.
 - **`FREESPEED`** is in m/s; 33.33 m/s is 120 km/h.
-- **`HIGHWAY`** is a label-encoded road class. The −1 category is 10.03% of links and marks an
-  unclassified type rather than a road below class 0. Because the encoding is ordinal but the
-  categories are nominal, this feature is excluded from the five-feature set the models use.
+- **`HIGHWAY`** is a label-encoded road class. Code **−1 means `pt` (public transport), or an OSM
+  class absent from the mapping** — it is 10.03% of links. `unclassified` is a different category,
+  code 9. The mapping is in `scripts/data_preprocessing/help_functions.py`. Because the encoding is
+  ordinal but the categories are nominal, this feature is excluded from the five-feature set the
+  models use. An earlier version of this document described −1 as "unclassified"; corrected in
+  [`CORRIGENDUM.md`](CORRIGENDUM.md) C8a.
 - **`LENGTH`** is in metres and is never zero.
 
 ### Only one feature varies across scenarios
@@ -78,8 +83,12 @@ Comparing every graph against the first, feature by feature:
 
 This is a property of the experiment design worth stating plainly: five of the six features and
 the whole graph topology are constant context, and the entire scenario-discriminating signal
-enters through `CAPACITY_REDUCTION`. A scenario reduces capacity on 873 to 4,299 links, 2,473 on
-average, which is 7.82% of the network.
+enters through `CAPACITY_REDUCTION`. Measured over all 1,000 scenarios, a scenario reduces
+capacity on **306 to 11,305 links**, a median of 3,317 and a mean of 3,814, which is **12.06% of
+the network**. All 1,000 footprints are distinct, 20,330 links (64.26%) are never intervened at
+all, and the policy only ever touches OSM classes 1, 2 and 3 (primary, secondary, tertiary).
+Earlier versions of this document quoted 873–4,299 and 7.82%, which came from the first batch file
+rather than the full corpus; corrected in [`CORRIGENDUM.md`](CORRIGENDUM.md) C8b.
 
 That does not make the other features useless — they tell the model which links are capable of
 absorbing displaced traffic — but any claim about generalisation is a claim about one network
