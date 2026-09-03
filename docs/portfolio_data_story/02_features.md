@@ -10,8 +10,12 @@ absolute response** across the 1,000 scenarios.
 | 1 | `CAPACITY_BASE_CASE` | veh/h | 0 – 14,400 | 10.79% | 36 | no | ✅ | +0.476 |
 | 2 | `CAPACITY_REDUCTION` | veh/h | −7,200 – 0 | 87.94% | 29 | **yes** | ✅ | +0.336 |
 | 3 | `FREESPEED` | m/s | 0 – 33.33 | 10.79% | 16 | no | ✅ | +0.411 |
-| 4 | `HIGHWAY` | class code | −1 – 9 | 2.95% | 11 | no | ❌ | −0.105 |
+| 4 | `HIGHWAY` | class code | −1 – 9 | 2.95% | 11 | no | ❌ | n/a [^hw] |
 | 5 | `LENGTH` | m | 4.17 – 2,568.58 | 0.00% | 23,257 | no | ✅ | −0.075 |
+
+[^hw]: No correlation is quoted for `HIGHWAY`. It is a nominal category with an
+    ordinal encoding, so a rank correlation against it would treat road-class codes
+    as an ordered quantity. The per-class table below is the honest presentation.
 
 ---
 
@@ -138,7 +142,9 @@ uses `.get(x, -1)` it also catches any OSM value missing from the table. It is
 links respectively in only one of the two. Corrected in `CORRIGENDUM.md` C8a.
 
 **Model** — **no.** Excluded because the codes are nominal but the encoding is
-ordinal: nothing makes `residential = 4` twice `secondary = 2`.
+ordinal: nothing makes `residential = 4` twice `secondary = 2`. For the same
+reason no correlation or numeric binning is reported for this feature anywhere in
+this analysis — only per-class summaries.
 **Best visualisation** — the ladder above: "% ever intervened" against "mean
 response", one row per class.
 **For a visitor** — "Road type. The model ignores it, because numbering road types

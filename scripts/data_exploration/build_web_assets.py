@@ -220,7 +220,20 @@ def main() -> int:
             "share_zero": round(float((col == 0).mean()), 5),
             "n_distinct": int(len(np.unique(col))),
         }
-        if i != 2:
+        if i == 4:
+            # HIGHWAY is a nominal category with an ordinal encoding. Binning it
+            # numerically, or correlating against it, would treat road-class codes
+            # as an ordered quantity, which they are not. Per-class summaries are
+            # the only honest presentation; see highway_classes.json.
+            entry["per_class_vs_abs_response"] = [
+                {"code": int(c), "osm_classes": HIGHWAY_CLASSES[int(c)],
+                 "n_links": int((hw == c).sum()),
+                 "median_abs_y": round(float(np.median(absY[hw == c])), 4),
+                 "mean_abs_y": round(float(absY[hw == c].mean()), 4)}
+                for c in sorted(set(hw.tolist()))]
+            entry["binning_note"] = ("nominal category: summarised per class, not "
+                                     "binned numerically and not correlated")
+        elif i != 2:
             lo, hi = np.percentile(X[car, i], [1, 99])
             edges = (np.unique(np.round(np.linspace(lo, hi, 15), 6))
                      if hi > lo else np.array([lo, lo + 1]))

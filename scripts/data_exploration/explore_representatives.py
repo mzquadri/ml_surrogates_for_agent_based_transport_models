@@ -155,8 +155,12 @@ def main() -> int:
     print("\n" + "=" * 76)
     print("FEATURE -> RESPONSE (Spearman on per-link mean |y|)")
     print("=" * 76)
-    for i2 in [0, 1, 3, 4, 5]:
+    # HIGHWAY (index 4) is omitted on purpose: it is a nominal category with an
+    # ordinal encoding, so a rank correlation against it would treat road-class
+    # codes as an ordered quantity. See the per-class table above.
+    for i2 in [0, 1, 3, 5]:
         print(f"  {FEATURES[i2]:22s} {spearmanr(X[:, i2], absY).statistic:+.3f}")
+    print(f"  {'HIGHWAY':22s}    n/a (nominal category - see per-class summary)")
     car = X[:, 1] > 0
     print(f"  restricted to car-capable links ({int(car.sum()):,}):")
     for i2 in [0, 1, 3, 5]:

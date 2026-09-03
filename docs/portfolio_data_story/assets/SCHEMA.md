@@ -124,6 +124,12 @@ links are dropped. Static features are binned over car-capable links only
 (`capacity_base_case > 0`); `CAPACITY_REDUCTION` is binned node-wise over
 intervened links, which is noted in the file.
 
+`HIGHWAY` is the exception: it carries `per_class_vs_abs_response` instead, and
+**no correlation is reported for it anywhere in this analysis**. It is a nominal
+category with an ordinal encoding, so binning it numerically or correlating
+against it would treat road-class codes as an ordered quantity. Any chart built on
+it must use the per-class form — see also `highway_classes.json`.
+
 ## `narrative_link.json`
 
 Link 18785 — the highest-volume link in the network, a trunk road, never
