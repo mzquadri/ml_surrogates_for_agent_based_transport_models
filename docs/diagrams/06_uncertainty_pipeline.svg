@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 540" width="980" height="540" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif">
+  <rect width="980" height="540" fill="#ffffff"/>
+  <style>
+    .h    { fill:#0f172a; font-size:17px; font-weight:600; }
+    .cap  { fill:#64748b; font-size:12.5px; }
+    .lbl  { fill:#0f172a; font-size:14px; font-weight:600; }
+    .sub  { fill:#64748b; font-size:11.5px; }
+    .mono { font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:11.5px; fill:#334155; }
+    .ar   { stroke:#94a3b8; stroke-width:1.6; fill:none; marker-end:url(#a); }
+  </style>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#94a3b8"/></marker>
+  </defs>
+
+  <text class="h" x="34" y="36">The uncertainty pipeline</text>
+  <text class="cap" x="34" y="58">Everything here is post-hoc. The trained surrogate is loaded and never updated.</text>
+
+  <!-- source -->
+  <rect x="34" y="86" width="196" height="84" rx="8" fill="#f5f3ff" stroke="#ddd6fe"/>
+  <text class="lbl" x="48" y="110">Trained checkpoint</text>
+  <text class="sub" x="48" y="130">Trial 8, dropout p = 0.2</text>
+  <text class="sub" x="48" y="148">loaded, frozen</text>
+  <text class="mono" x="48" y="164">model.pth</text>
+
+  <path class="ar" d="M234,128 L278,128"/>
+
+  <!-- MC dropout -->
+  <rect x="282" y="86" width="240" height="84" rx="8" fill="#fff7ed" stroke="#fed7aa"/>
+  <text class="lbl" x="296" y="110">MC Dropout — S = 30</text>
+  <text class="sub" x="296" y="130">dropout stays active at inference</text>
+  <text class="mono" x="296" y="150">mean &#8594; prediction</text>
+  <text class="mono" x="296" y="166">std  &#8594; sigma</text>
+
+  <path class="ar" d="M526,128 L570,128"/>
+
+  <rect x="574" y="86" width="372" height="84" rx="8" fill="#ffffff" stroke="#cbd5e1"/>
+  <text class="lbl" x="590" y="110">Per-node output over the 100 test graphs</text>
+  <text class="mono" x="590" y="132">3,163,500 &#215; (prediction, sigma, target)</text>
+  <text class="sub" x="590" y="152">mean sigma 1.369 veh/h &#183; S = 30 sits on the convergence plateau</text>
+  <text class="sub" x="590" y="166">(S = 5 &#8594; 30 gains 10.8% in rho; S = 30 &#8594; 50 gains 1.0%)</text>
+
+  <!-- does sigma mean anything -->
+  <path class="ar" d="M760,170 L760,204"/>
+  <rect x="34" y="208" width="912" height="86" rx="8" fill="#f8fafc" stroke="#e2e8f0"/>
+  <text class="lbl" x="50" y="232">First question: does sigma rank errors?</text>
+  <text class="sub" x="50" y="254">Spearman correlation between sigma and absolute error, pooled over all 3,163,500 nodes.</text>
+  <text class="mono" x="50" y="278">Trial 8 rho = 0.482      Trial 7 rho = 0.4437 (replayable; 0.446 reported — see CORRIGENDUM C7)</text>
+  <text class="sub" x="600" y="278">Ranking works. Magnitude does not.</text>
+
+  <!-- second question -->
+  <path class="ar" d="M490,294 L490,326"/>
+  <rect x="34" y="330" width="452" height="120" rx="8" fill="#fef2f2" stroke="#fecaca"/>
+  <text class="lbl" x="50" y="354">Second question: is sigma a calibrated scale?</text>
+  <text class="sub" x="50" y="376">Treating sigma as a Gaussian standard deviation and asking</text>
+  <text class="sub" x="50" y="392">what fraction of errors fall inside sigma &#215; z:</text>
+  <text class="mono" x="50" y="416">nominal 90% &#8594; actual 48.6%</text>
+  <text class="mono" x="50" y="434">nominal 95% &#8594; actual 54.9%</text>
+
+  <rect x="502" y="330" width="444" height="120" rx="8" fill="#ecfdf5" stroke="#a7f3d0"/>
+  <text class="lbl" x="518" y="354">Answer: no — so it is corrected post-hoc</text>
+  <text class="sub" x="518" y="376">Two independent corrections, applied to the same sigma:</text>
+  <text class="mono" x="518" y="400">temperature scaling   T = 2.702, ECE 0.269 &#8594; 0.048</text>
+  <text class="mono" x="518" y="420">split conformal       exact marginal coverage by construction</text>
+  <text class="sub" x="518" y="440">Neither touches the model weights.</text>
+
+  <text class="cap" x="34" y="482">Severe undercoverage is the expected behaviour of raw MC Dropout variance: it captures model uncertainty, not observation noise.</text>
+  <text class="cap" x="34" y="502">That is why the thesis treats sigma as a ranking signal that must be calibrated before it can be read as an interval.</text>
+  <text class="cap" x="34" y="522">Calibration numbers follow the graph20_80_v1 protocol. Protocols must not be pooled — see CORRIGENDUM C3.</text>
+</svg>

@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 560" width="980" height="560" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif">
+  <rect width="980" height="560" fill="#ffffff"/>
+  <style>
+    .h    { fill:#0f172a; font-size:17px; font-weight:600; }
+    .cap  { fill:#64748b; font-size:12.5px; }
+    .lbl  { fill:#0f172a; font-size:14px; font-weight:600; }
+    .sub  { fill:#64748b; font-size:11.5px; }
+    .mono { font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:11.5px; fill:#334155; }
+    .q    { fill:#0f172a; font-size:12.5px; font-style:italic; }
+    .ar   { stroke:#94a3b8; stroke-width:1.6; fill:none; marker-end:url(#a); }
+  </style>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#94a3b8"/></marker>
+  </defs>
+
+  <text class="h" x="34" y="36">Four questions, four different evaluations</text>
+  <text class="cap" x="34" y="58">Each answers something the others cannot. Confusing them is the most common way to overstate an uncertainty result.</text>
+
+  <!-- shared input -->
+  <rect x="330" y="84" width="320" height="52" rx="8" fill="#fff7ed" stroke="#fed7aa"/>
+  <text class="lbl" x="346" y="108">One calibrated sigma per link</text>
+  <text class="sub" x="346" y="126">3,163,500 nodes across 100 held-out scenarios</text>
+
+  <path class="ar" d="M400,136 L150,168"/>
+  <path class="ar" d="M460,136 L400,168"/>
+  <path class="ar" d="M520,136 L610,168"/>
+  <path class="ar" d="M580,136 L858,168"/>
+
+  <!-- 1 ranking -->
+  <rect x="34" y="172" width="216" height="164" rx="8" fill="#ffffff" stroke="#cbd5e1"/>
+  <text class="lbl" x="48" y="196">1 &#183; Ranking quality</text>
+  <text class="q" x="48" y="218">Does sigma order the errors?</text>
+  <text class="sub" x="48" y="242">Spearman rho between sigma</text>
+  <text class="sub" x="48" y="258">and absolute error.</text>
+  <text class="mono" x="48" y="284">T8  0.482</text>
+  <text class="mono" x="48" y="302">T7  0.4437</text>
+  <text class="sub" x="48" y="324">Says nothing about scale.</text>
+
+  <!-- 2 calibration -->
+  <rect x="264" y="172" width="216" height="164" rx="8" fill="#ffffff" stroke="#cbd5e1"/>
+  <text class="lbl" x="278" y="196">2 &#183; Calibration</text>
+  <text class="q" x="278" y="218">Is sigma the right size?</text>
+  <text class="sub" x="278" y="242">Expected calibration error over</text>
+  <text class="sub" x="278" y="258">ten nominal levels.</text>
+  <text class="mono" x="278" y="284">before  0.269</text>
+  <text class="mono" x="278" y="302">after   0.048  (T = 2.702)</text>
+  <text class="sub" x="278" y="324">Fixes average width, not per-node.</text>
+
+  <!-- 3 conformal -->
+  <rect x="494" y="172" width="216" height="164" rx="8" fill="#ffffff" stroke="#cbd5e1"/>
+  <text class="lbl" x="508" y="196">3 &#183; Conformal coverage</text>
+  <text class="q" x="508" y="218">Can coverage be guaranteed?</text>
+  <text class="sub" x="508" y="242">Split conformal on absolute</text>
+  <text class="sub" x="508" y="258">residuals, graph20_80_v1.</text>
+  <text class="mono" x="508" y="284">90% &#8594; 90.17%</text>
+  <text class="mono" x="508" y="302">95% &#8594; 95.09%</text>
+  <text class="sub" x="508" y="324">Marginal, not per-scenario.</text>
+
+  <!-- 4 utility -->
+  <rect x="724" y="172" width="222" height="164" rx="8" fill="#ffffff" stroke="#cbd5e1"/>
+  <text class="lbl" x="738" y="196">4 &#183; Operational utility</text>
+  <text class="q" x="738" y="218">Does it change a decision?</text>
+  <text class="sub" x="738" y="242">Selective prediction and</text>
+  <text class="sub" x="738" y="258">error detection.</text>
+  <text class="mono" x="738" y="284">MAE &#8722;41.2% at 50% kept</text>
+  <text class="mono" x="738" y="302">AUROC 0.7585 (top-10%)</text>
+  <text class="sub" x="738" y="324">The result that matters in use.</text>
+
+  <!-- relationship band -->
+  <rect x="34" y="360" width="912" height="94" rx="8" fill="#f8fafc" stroke="#e2e8f0"/>
+  <text class="lbl" x="50" y="384">How they relate</text>
+  <text class="sub" x="50" y="406">Good ranking (1) is what makes selective prediction and error detection (4) work — they only need the order of sigma, not its scale.</text>
+  <text class="sub" x="50" y="424">Calibration (2) and conformal prediction (3) are what make sigma readable as an interval. Conformal buys an exact marginal guarantee;</text>
+  <text class="sub" x="50" y="442">temperature scaling does not, but it keeps a single interpretable sigma per node. A method can rank well and still be badly calibrated, which is exactly what raw MC Dropout does here.</text>
+
+  <rect x="34" y="470" width="912" height="66" rx="8" fill="#fef2f2" stroke="#fecaca"/>
+  <text class="lbl" x="50" y="494">What none of them establish</text>
+  <text class="sub" x="50" y="514">Coverage is marginal over the evaluated split, not per scenario, link, city or policy. The evidence covers one Paris network, one</text>
+  <text class="sub" x="50" y="530">capacity-reduction family, a 1,000-scenario subset and the PointNetTransfGAT family. See CORRIGENDUM C6.</text>
+</svg>

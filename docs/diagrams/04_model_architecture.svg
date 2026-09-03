@@ -1,0 +1,124 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 620" width="980" height="620" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif">
+  <rect width="980" height="620" fill="#ffffff"/>
+  <style>
+    .h    { fill:#0f172a; font-size:17px; font-weight:600; }
+    .cap  { fill:#64748b; font-size:12.5px; }
+    .lbl  { fill:#0f172a; font-size:14px; font-weight:600; }
+    .sub  { fill:#64748b; font-size:11.5px; }
+    .mono { font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:11.5px; fill:#334155; }
+    .monod{ font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:11px; fill:#64748b; }
+    .ar   { stroke:#94a3b8; stroke-width:1.6; fill:none; marker-end:url(#a); }
+    .dash { stroke:#ea580c; stroke-width:1.4; fill:none; stroke-dasharray:4 3; marker-end:url(#o); }
+  </style>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#94a3b8"/></marker>
+    <marker id="o" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#ea580c"/></marker>
+  </defs>
+
+  <text class="h" x="34" y="36">PointNetTransfGAT — the architecture as built</text>
+  <text class="cap" x="34" y="58">Layer shapes read from the Trial 8 checkpoint (models/point_net_transf_gat_8th_trial_lower_dropout/trained_model/model.pth),
+  not from the code defaults. Total 1,416,835 parameters. Architecture is upstream work; see the attribution note below.</text>
+
+  <!-- inputs -->
+  <rect x="34" y="92" width="180" height="98" rx="8" fill="#eff6ff" stroke="#bfdbfe"/>
+  <text class="lbl" x="48" y="116">Graph input</text>
+  <text class="mono" x="48" y="137">x    [N, 5]</text>
+  <text class="monod" x="48" y="152">5 of 6 stored features</text>
+  <text class="mono" x="48" y="169">pos  [N, 3, 2]</text>
+  <text class="monod" x="48" y="184">start / end / midpoint</text>
+
+  <text class="monod" x="48" y="210">N = 31,635 links per graph</text>
+  <text class="monod" x="48" y="226">edge_index [2, 59,851]</text>
+
+  <path class="ar" d="M218,141 L262,141"/>
+
+  <!-- pointnet 1 -->
+  <rect x="266" y="92" width="200" height="98" rx="8" fill="#f5f3ff" stroke="#ddd6fe"/>
+  <text class="lbl" x="280" y="116">PointNetConv 1</text>
+  <text class="sub" x="280" y="133">uses pos[:, 0] — start point</text>
+  <text class="mono" x="280" y="152">local  Linear(7 &#8594; 256)</text>
+  <text class="mono" x="280" y="168">global Linear(256 &#8594; 512)</text>
+  <text class="mono" x="280" y="184">       Linear(512 &#8594; 512)</text>
+
+  <path class="ar" d="M470,141 L514,141"/>
+
+  <!-- pointnet 2 -->
+  <rect x="518" y="92" width="200" height="98" rx="8" fill="#f5f3ff" stroke="#ddd6fe"/>
+  <text class="lbl" x="532" y="116">PointNetConv 2</text>
+  <text class="sub" x="532" y="133">uses pos[:, 1] — end point</text>
+  <text class="mono" x="532" y="152">local  Linear(514 &#8594; 256)</text>
+  <text class="mono" x="532" y="168">global Linear(256 &#8594; 512)</text>
+  <text class="mono" x="532" y="184">       Linear(512 &#8594; 128)</text>
+
+  <text class="monod" x="266" y="210">7 = 5 features + 2 relative coordinates</text>
+  <text class="monod" x="518" y="210">514 = 512 hidden + 2 relative coordinates</text>
+
+  <!-- wrap down -->
+  <path class="ar" d="M722,141 L760,141 L760,246 L96,246 L96,286"/>
+
+  <!-- transformer 1 -->
+  <rect x="34" y="290" width="212" height="92" rx="8" fill="#f5f3ff" stroke="#ddd6fe"/>
+  <text class="lbl" x="48" y="314">TransformerConv 1</text>
+  <text class="mono" x="48" y="335">128 &#8594; 4 heads &#215; 64</text>
+  <text class="mono" x="48" y="351">concat &#8594; 256</text>
+  <text class="sub" x="48" y="371">key / query / value / skip</text>
+
+  <path class="ar" d="M250,336 L294,336"/>
+  <rect x="298" y="304" width="96" height="64" rx="8" fill="#fff7ed" stroke="#fed7aa"/>
+  <text class="lbl" x="312" y="328">ReLU</text>
+  <text class="lbl" x="312" y="350">Dropout</text>
+  <text class="sub" x="312" y="364">p = 0.2</text>
+
+  <path class="ar" d="M398,336 L442,336"/>
+
+  <!-- transformer 2 -->
+  <rect x="446" y="290" width="212" height="92" rx="8" fill="#f5f3ff" stroke="#ddd6fe"/>
+  <text class="lbl" x="460" y="314">TransformerConv 2</text>
+  <text class="mono" x="460" y="335">256 &#8594; 4 heads &#215; 128</text>
+  <text class="mono" x="460" y="351">concat &#8594; 512</text>
+  <text class="sub" x="460" y="371">key / query / value / skip</text>
+
+  <path class="ar" d="M662,336 L706,336"/>
+  <rect x="710" y="304" width="96" height="64" rx="8" fill="#fff7ed" stroke="#fed7aa"/>
+  <text class="lbl" x="724" y="328">ReLU</text>
+  <text class="lbl" x="724" y="350">Dropout</text>
+  <text class="sub" x="724" y="364">p = 0.2</text>
+
+  <path class="ar" d="M810,336 L848,336 L848,418 L156,418 L156,452"/>
+
+  <!-- GAT -->
+  <rect x="34" y="456" width="212" height="76" rx="8" fill="#f5f3ff" stroke="#ddd6fe"/>
+  <text class="lbl" x="48" y="480">GATConv</text>
+  <text class="mono" x="48" y="502">512 &#8594; 64</text>
+  <text class="sub" x="48" y="521">single attention head</text>
+
+  <path class="ar" d="M250,494 L294,494"/>
+
+  <rect x="298" y="456" width="212" height="76" rx="8" fill="#f5f3ff" stroke="#ddd6fe"/>
+  <text class="lbl" x="312" y="480">GATConv — output head</text>
+  <text class="mono" x="312" y="502">64 &#8594; 1</text>
+  <text class="sub" x="312" y="521">one value per link</text>
+
+  <path class="ar" d="M514,494 L558,494"/>
+
+  <rect x="562" y="456" width="212" height="76" rx="8" fill="#eff6ff" stroke="#bfdbfe"/>
+  <text class="lbl" x="576" y="480">Prediction</text>
+  <text class="mono" x="576" y="502">y&#770; [N, 1]</text>
+  <text class="sub" x="576" y="521">change in link volume, veh/h</text>
+
+  <!-- MC dropout callout -->
+  <rect x="790" y="440" width="156" height="108" rx="8" fill="#fff7ed" stroke="#fed7aa"/>
+  <text class="lbl" x="804" y="464">MC Dropout</text>
+  <text class="sub" x="804" y="484">The two dropout layers</text>
+  <text class="sub" x="804" y="500">stay active at inference.</text>
+  <text class="sub" x="804" y="516">S = 30 passes give a</text>
+  <text class="sub" x="804" y="532">mean and a sigma.</text>
+  <path class="dash" d="M346,368 C346,400 700,404 800,440"/>
+  <path class="dash" d="M758,368 C790,392 830,410 852,440"/>
+
+  <text class="cap" x="34" y="572">The two dropout layers are the only stochastic elements, and they are what makes post-hoc MC Dropout possible without retraining.</text>
+  <text class="cap" x="34" y="592">Architecture and training code originate from enatterer/ml_surrogates_for_agent_based_transport_models (MIT, &#169; 2024 Elena Natterer).</text>
+  <text class="cap" x="34" y="610">This thesis takes the trained surrogate as given; the contribution is the uncertainty layer built on top of it.</text>
+</svg>

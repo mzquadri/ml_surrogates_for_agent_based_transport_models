@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 460" width="980" height="460" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif">
+  <rect width="980" height="460" fill="#ffffff"/>
+  <style>
+    .t   { fill:#0f172a; font-size:14px; }
+    .lbl { fill:#0f172a; font-size:14.5px; font-weight:600; }
+    .sub { fill:#64748b; font-size:12px; }
+    .mono{ font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:11.5px; fill:#475569; }
+    .h   { fill:#0f172a; font-size:17px; font-weight:600; }
+    .cap { fill:#64748b; font-size:12.5px; }
+    .ar  { stroke:#94a3b8; stroke-width:1.6; fill:none; marker-end:url(#a); }
+  </style>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#94a3b8"/>
+    </marker>
+  </defs>
+
+  <text class="h" x="34" y="38">What the thesis is about</text>
+  <text class="cap" x="34" y="60">A transport simulator answers policy questions accurately but slowly. A surrogate answers them fast.
+  The open question is when to trust the fast answer.</text>
+
+  <!-- Row 1: the simulator -->
+  <rect x="34" y="96" width="196" height="86" rx="8" fill="#eff6ff" stroke="#bfdbfe"/>
+  <text class="lbl" x="50" y="123">MATSim simulation</text>
+  <text class="sub" x="50" y="143">Agent-based, Paris</text>
+  <text class="sub" x="50" y="160">Ile-de-France, 1% pop.</text>
+  <text class="mono" x="50" y="176">hours per scenario</text>
+
+  <path class="ar" d="M234,139 L296,139"/>
+  <text class="sub" x="240" y="131">trains</text>
+
+  <rect x="300" y="96" width="196" height="86" rx="8" fill="#eff6ff" stroke="#bfdbfe"/>
+  <text class="lbl" x="316" y="123">Graph representation</text>
+  <text class="sub" x="316" y="143">Road links become nodes</text>
+  <text class="mono" x="316" y="160">31,635 nodes</text>
+  <text class="mono" x="316" y="176">59,851 edges</text>
+
+  <path class="ar" d="M500,139 L562,139"/>
+
+  <rect x="566" y="96" width="196" height="86" rx="8" fill="#f5f3ff" stroke="#ddd6fe"/>
+  <text class="lbl" x="582" y="123">GNN surrogate</text>
+  <text class="sub" x="582" y="143">PointNet + Transformer</text>
+  <text class="sub" x="582" y="160">+ GAT, 1.42 M params</text>
+  <text class="mono" x="582" y="176">seconds per scenario</text>
+
+  <path class="ar" d="M766,139 L828,139"/>
+
+  <rect x="832" y="96" width="114" height="86" rx="8" fill="#f5f3ff" stroke="#ddd6fe"/>
+  <text class="lbl" x="848" y="123">Prediction</text>
+  <text class="sub" x="848" y="143">change in link</text>
+  <text class="sub" x="848" y="160">volume, veh/h</text>
+  <text class="mono" x="848" y="176">R&#178; = 0.596</text>
+
+  <!-- the gap -->
+  <rect x="300" y="214" width="646" height="52" rx="8" fill="#fff7ed" stroke="#fed7aa"/>
+  <text class="lbl" x="318" y="238">The gap</text>
+  <text class="t" x="392" y="238">a point prediction carries no indication of when it is wrong.</text>
+  <text class="sub" x="318" y="256">Policy decisions need to know which links the surrogate is guessing at.</text>
+
+  <path class="ar" d="M889,182 L889,214"/>
+
+  <!-- Row 2: the contribution -->
+  <text class="h" x="34" y="308">What this thesis adds</text>
+  <text class="cap" x="34" y="328">A post-hoc uncertainty layer. The trained surrogate is not modified and not retrained.</text>
+
+  <rect x="34" y="346" width="220" height="82" rx="8" fill="#fff7ed" stroke="#fed7aa"/>
+  <text class="lbl" x="50" y="372">Uncertainty estimate</text>
+  <text class="sub" x="50" y="392">MC Dropout, S = 30 passes</text>
+  <text class="sub" x="50" y="409">gives a per-link sigma</text>
+
+  <path class="ar" d="M258,387 L316,387"/>
+
+  <rect x="320" y="346" width="220" height="82" rx="8" fill="#ecfdf5" stroke="#a7f3d0"/>
+  <text class="lbl" x="336" y="372">Calibration</text>
+  <text class="sub" x="336" y="392">temperature scaling and</text>
+  <text class="sub" x="336" y="409">split conformal intervals</text>
+
+  <path class="ar" d="M544,387 L602,387"/>
+
+  <rect x="606" y="346" width="340" height="82" rx="8" fill="#ecfdf5" stroke="#a7f3d0"/>
+  <text class="lbl" x="622" y="372">Decisions the estimate supports</text>
+  <text class="sub" x="622" y="392">hand off the least reliable links (selective prediction),</text>
+  <text class="sub" x="622" y="409">flag likely-wrong links before they are used (error detection)</text>
+
+  <text class="cap" x="34" y="452">Every number shown is reproduced by scripts/verify_headline_results.py from the artifacts in this repository.</text>
+</svg>
