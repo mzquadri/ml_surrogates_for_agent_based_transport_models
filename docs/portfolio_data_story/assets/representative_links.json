@@ -1,0 +1,71 @@
+{
+  "selection": "rule-based extrema of measured quantities",
+  "links": [
+    {
+      "link_row": 20093,
+      "selection_rule": "most_often_intervened",
+      "selection_reason": "intervened in the most scenarios",
+      "highway_code": 1,
+      "times_intervened": 660,
+      "mean_abs_response_vehh": 28.8621,
+      "std_response_vehh": 21.7605,
+      "mid_lon": 2.32556,
+      "mid_lat": 48.86949
+    },
+    {
+      "link_row": 9884,
+      "selection_rule": "most_volatile_response",
+      "selection_reason": "largest standard deviation of response",
+      "highway_code": 1,
+      "times_intervened": 334,
+      "mean_abs_response_vehh": 75.6281,
+      "std_response_vehh": 98.7808,
+      "mid_lon": 2.30402,
+      "mid_lat": 48.89005
+    },
+    {
+      "link_row": 18785,
+      "selection_rule": "busiest_base_volume",
+      "selection_reason": "highest base-case car volume",
+      "highway_code": 0,
+      "times_intervened": 0,
+      "mean_abs_response_vehh": 54.431,
+      "std_response_vehh": 62.8256,
+      "mid_lon": 2.3193,
+      "mid_lat": 48.82133
+    },
+    {
+      "link_row": 18785,
+      "selection_rule": "most_reactive_never_intervened",
+      "selection_reason": "largest mean response among links never intervened",
+      "highway_code": 0,
+      "times_intervened": 0,
+      "mean_abs_response_vehh": 54.431,
+      "std_response_vehh": 62.8256,
+      "mid_lon": 2.3193,
+      "mid_lat": 48.82133
+    },
+    {
+      "link_row": 30244,
+      "selection_rule": "longest_link",
+      "selection_reason": "greatest length",
+      "highway_code": -1,
+      "times_intervened": 0,
+      "mean_abs_response_vehh": 0.0,
+      "std_response_vehh": 0.0,
+      "mid_lon": 2.35969,
+      "mid_lat": 48.8521
+    },
+    {
+      "link_row": 8483,
+      "selection_rule": "highest_capacity",
+      "selection_reason": "highest base capacity",
+      "highway_code": 1,
+      "times_intervened": 515,
+      "mean_abs_response_vehh": 25.5743,
+      "std_response_vehh": 33.6574,
+      "mid_lon": 2.29419,
+      "mid_lat": 48.87389
+    }
+  ]
+}

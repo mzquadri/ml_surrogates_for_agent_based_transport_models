@@ -1,0 +1,102 @@
+{
+  "n_representatives": 12,
+  "selection": "rule-based extrema and quantiles of measured quantities; no manual choice",
+  "items": [
+    {
+      "scenario_id": 199,
+      "selection_rule": "smallest_footprint",
+      "selection_reason": "fewest links with reduced capacity",
+      "links_intervened": 306,
+      "offsite_response_share": 0.91763,
+      "asset": "scenario_199.json"
+    },
+    {
+      "scenario_id": 95,
+      "selection_rule": "largest_footprint",
+      "selection_reason": "most links with reduced capacity",
+      "links_intervened": 11305,
+      "offsite_response_share": 0.3356,
+      "asset": "scenario_95.json"
+    },
+    {
+      "scenario_id": 279,
+      "selection_rule": "median_footprint",
+      "selection_reason": "median number of links intervened",
+      "links_intervened": 3318,
+      "offsite_response_share": 0.64452,
+      "asset": "scenario_279.json"
+    },
+    {
+      "scenario_id": 565,
+      "selection_rule": "q25_footprint",
+      "selection_reason": "25th percentile footprint",
+      "links_intervened": 2224,
+      "offsite_response_share": 0.75491,
+      "asset": "scenario_565.json"
+    },
+    {
+      "scenario_id": 130,
+      "selection_rule": "q75_footprint",
+      "selection_reason": "75th percentile footprint",
+      "links_intervened": 4889,
+      "offsite_response_share": 0.54366,
+      "asset": "scenario_130.json"
+    },
+    {
+      "scenario_id": 199,
+      "selection_rule": "highest_offsite_share",
+      "selection_reason": "largest share of response away from the intervention",
+      "links_intervened": 306,
+      "offsite_response_share": 0.91763,
+      "asset": "scenario_199.json"
+    },
+    {
+      "scenario_id": 94,
+      "selection_rule": "lowest_offsite_share",
+      "selection_reason": "smallest share of response away from the intervention",
+      "links_intervened": 11101,
+      "offsite_response_share": 0.33539,
+      "asset": "scenario_94.json"
+    },
+    {
+      "scenario_id": 94,
+      "selection_rule": "largest_total_response",
+      "selection_reason": "largest total absolute response",
+      "links_intervened": 11101,
+      "offsite_response_share": 0.33539,
+      "asset": "scenario_94.json"
+    },
+    {
+      "scenario_id": 990,
+      "selection_rule": "smallest_total_response",
+      "selection_reason": "smallest total absolute response",
+      "links_intervened": 1200,
+      "offsite_response_share": 0.8722,
+      "asset": "scenario_990.json"
+    },
+    {
+      "scenario_id": 199,
+      "selection_rule": "most_response_per_capacity",
+      "selection_reason": "most response per unit capacity removed",
+      "links_intervened": 306,
+      "offsite_response_share": 0.91763,
+      "asset": "scenario_199.json"
+    },
+    {
+      "scenario_id": 409,
+      "selection_rule": "least_response_per_capacity",
+      "selection_reason": "least response per unit capacity removed",
+      "links_intervened": 8144,
+      "offsite_response_share": 0.46349,
+      "asset": "scenario_409.json"
+    },
+    {
+      "scenario_id": 95,
+      "selection_rule": "most_capacity_removed",
+      "selection_reason": "largest total capacity reduction",
+      "links_intervened": 11305,
+      "offsite_response_share": 0.3356,
+      "asset": "scenario_95.json"
+    }
+  ]
+}

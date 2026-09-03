@@ -1,0 +1,116 @@
+{
+  "source": "highway_mapping in scripts/data_preprocessing/help_functions.py",
+  "note": "-1 is both the explicit code for 'pt' and the fallback for any OSM value absent from the mapping",
+  "classes": [
+    {
+      "code": -1,
+      "osm_classes": "pt (public transport) or unmapped",
+      "n_links": 3173,
+      "share_of_network": 0.1003,
+      "share_ever_intervened": 0.0,
+      "mean_abs_response_vehh": 0.3511,
+      "mean_vol_base_case": 6.35,
+      "mean_capacity_base_case": 533.12
+    },
+    {
+      "code": 0,
+      "osm_classes": "trunk / trunk_link / motorway_link",
+      "n_links": 933,
+      "share_of_network": 0.02949,
+      "share_ever_intervened": 0.0,
+      "mean_abs_response_vehh": 9.1471,
+      "mean_vol_base_case": 484.6,
+      "mean_capacity_base_case": 3527.44
+    },
+    {
+      "code": 1,
+      "osm_classes": "primary / primary_link",
+      "n_links": 5295,
+      "share_of_network": 0.16738,
+      "share_ever_intervened": 0.85042,
+      "mean_abs_response_vehh": 9.6937,
+      "mean_vol_base_case": 114.9,
+      "mean_capacity_base_case": 2496.63
+    },
+    {
+      "code": 2,
+      "osm_classes": "secondary / secondary_link",
+      "n_links": 4328,
+      "share_of_network": 0.13681,
+      "share_ever_intervened": 0.79136,
+      "mean_abs_response_vehh": 5.3079,
+      "mean_vol_base_case": 51.16,
+      "mean_capacity_base_case": 1274.49
+    },
+    {
+      "code": 3,
+      "osm_classes": "tertiary / tertiary_link",
+      "n_links": 3792,
+      "share_of_network": 0.11987,
+      "share_ever_intervened": 0.89056,
+      "mean_abs_response_vehh": 4.1124,
+      "mean_vol_base_case": 35.35,
+      "mean_capacity_base_case": 581.11
+    },
+    {
+      "code": 4,
+      "osm_classes": "residential",
+      "n_links": 11796,
+      "share_of_network": 0.37288,
+      "share_ever_intervened": 0.0,
+      "mean_abs_response_vehh": 2.2686,
+      "mean_vol_base_case": 13.27,
+      "mean_capacity_base_case": 498.83
+    },
+    {
+      "code": 5,
+      "osm_classes": "living_street",
+      "n_links": 732,
+      "share_of_network": 0.02314,
+      "share_ever_intervened": 0.0,
+      "mean_abs_response_vehh": 1.0648,
+      "mean_vol_base_case": 4.81,
+      "mean_capacity_base_case": 242.87
+    },
+    {
+      "code": 6,
+      "osm_classes": "pedestrian",
+      "n_links": 29,
+      "share_of_network": 0.00092,
+      "share_ever_intervened": 0.0,
+      "mean_abs_response_vehh": 0.0,
+      "mean_vol_base_case": 0.0,
+      "mean_capacity_base_case": 0.0
+    },
+    {
+      "code": 7,
+      "osm_classes": "service",
+      "n_links": 471,
+      "share_of_network": 0.01489,
+      "share_ever_intervened": 0.0,
+      "mean_abs_response_vehh": 0.0,
+      "mean_vol_base_case": 0.0,
+      "mean_capacity_base_case": 0.0
+    },
+    {
+      "code": 8,
+      "osm_classes": "construction",
+      "n_links": 8,
+      "share_of_network": 0.00025,
+      "share_ever_intervened": 0.0,
+      "mean_abs_response_vehh": 0.0,
+      "mean_vol_base_case": 0.0,
+      "mean_capacity_base_case": 0.0
+    },
+    {
+      "code": 9,
+      "osm_classes": "unclassified",
+      "n_links": 1078,
+      "share_of_network": 0.03408,
+      "share_ever_intervened": 0.0,
+      "mean_abs_response_vehh": 2.2614,
+      "mean_vol_base_case": 13.26,
+      "mean_capacity_base_case": 526.09
+    }
+  ]
+}
