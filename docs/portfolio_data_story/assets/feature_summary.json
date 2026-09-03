@@ -404,80 +404,86 @@
       "std": 2.1322,
       "share_zero": 0.02949,
       "n_distinct": 11,
-      "binned_vs_abs_response": [
+      "per_class_vs_abs_response": [
         {
-          "bin_lo": -1.0,
-          "bin_hi": -0.2857,
-          "n_links": 285,
+          "code": -1,
+          "osm_classes": "pt (public transport) or unmapped",
+          "n_links": 3173,
           "median_abs_y": 0.0,
-          "p25_abs_y": 0.0,
-          "p75_abs_y": 7.254,
-          "mean_abs_y": 3.9093
+          "mean_abs_y": 0.3511
         },
         {
-          "bin_lo": -0.2857,
-          "bin_hi": 0.4286,
+          "code": 0,
+          "osm_classes": "trunk / trunk_link / motorway_link",
           "n_links": 933,
           "median_abs_y": 8.3052,
-          "p25_abs_y": 3.0066,
-          "p75_abs_y": 13.471,
           "mean_abs_y": 9.1471
         },
         {
-          "bin_lo": 0.4286,
-          "bin_hi": 1.1429,
+          "code": 1,
+          "osm_classes": "primary / primary_link",
           "n_links": 5295,
           "median_abs_y": 6.53,
-          "p25_abs_y": 2.5084,
-          "p75_abs_y": 12.5945,
           "mean_abs_y": 9.6937
         },
         {
-          "bin_lo": 1.8571,
-          "bin_hi": 2.5714,
+          "code": 2,
+          "osm_classes": "secondary / secondary_link",
           "n_links": 4328,
           "median_abs_y": 4.2859,
-          "p25_abs_y": 1.8488,
-          "p75_abs_y": 7.1463,
           "mean_abs_y": 5.3079
         },
         {
-          "bin_lo": 2.5714,
-          "bin_hi": 3.2857,
+          "code": 3,
+          "osm_classes": "tertiary / tertiary_link",
           "n_links": 3792,
           "median_abs_y": 3.5749,
-          "p25_abs_y": 1.7939,
-          "p75_abs_y": 5.5823,
           "mean_abs_y": 4.1124
         },
         {
-          "bin_lo": 4.0,
-          "bin_hi": 4.7143,
-          "n_links": 11785,
+          "code": 4,
+          "osm_classes": "residential",
+          "n_links": 11796,
           "median_abs_y": 1.4216,
-          "p25_abs_y": 0.4223,
-          "p75_abs_y": 3.3075,
-          "mean_abs_y": 2.2707
+          "mean_abs_y": 2.2686
         },
         {
-          "bin_lo": 4.7143,
-          "bin_hi": 5.4286,
-          "n_links": 730,
-          "median_abs_y": 0.6017,
-          "p25_abs_y": 0.0253,
-          "p75_abs_y": 1.368,
-          "mean_abs_y": 1.0678
+          "code": 5,
+          "osm_classes": "living_street",
+          "n_links": 732,
+          "median_abs_y": 0.6003,
+          "mean_abs_y": 1.0648
         },
         {
-          "bin_lo": 8.2857,
-          "bin_hi": 9.0,
-          "n_links": 1075,
+          "code": 6,
+          "osm_classes": "pedestrian",
+          "n_links": 29,
+          "median_abs_y": 0.0,
+          "mean_abs_y": 0.0
+        },
+        {
+          "code": 7,
+          "osm_classes": "service",
+          "n_links": 471,
+          "median_abs_y": 0.0,
+          "mean_abs_y": 0.0
+        },
+        {
+          "code": 8,
+          "osm_classes": "construction",
+          "n_links": 8,
+          "median_abs_y": 0.0,
+          "mean_abs_y": 0.0
+        },
+        {
+          "code": 9,
+          "osm_classes": "unclassified",
+          "n_links": 1078,
           "median_abs_y": 0.8733,
-          "p25_abs_y": 0.001,
-          "p75_abs_y": 3.2266,
-          "mean_abs_y": 2.2678
+          "mean_abs_y": 2.2614
         }
-      ]
+      ],
+      "binning_note": "nominal category: summarised per class, not binned numerically and not correlated"
     },
     {
       "index": 5,
