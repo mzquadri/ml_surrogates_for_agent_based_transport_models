@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 520" width="980" height="520" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif">
+  <rect width="980" height="520" fill="#ffffff"/>
+  <style>
+    .h    { fill:#0f172a; font-size:17px; font-weight:600; }
+    .cap  { fill:#64748b; font-size:12.5px; }
+    .lbl  { fill:#0f172a; font-size:14px; font-weight:600; }
+    .sub  { fill:#64748b; font-size:11.5px; }
+    .mono { font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:11.5px; fill:#334155; }
+    .ar   { stroke:#94a3b8; stroke-width:1.6; fill:none; marker-end:url(#a); }
+    .tag  { font-size:10.5px; font-weight:600; }
+  </style>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#94a3b8"/></marker>
+  </defs>
+
+  <text class="h" x="34" y="36">From simulation to model input</text>
+  <text class="cap" x="34" y="58">Grey stages are upstream and their raw outputs were not retained (see CORRIGENDUM C5). Blue stages are published in this project.</text>
+
+  <!-- stage 1 not retained -->
+  <rect x="34" y="86" width="200" height="104" rx="8" fill="#f1f5f9" stroke="#cbd5e1" stroke-dasharray="4 3"/>
+  <text class="tag" x="48" y="106" fill="#64748b">NOT RETAINED</text>
+  <text class="lbl" x="48" y="128">MATSim scenarios</text>
+  <text class="sub" x="48" y="147">Paris Ile-de-France</text>
+  <text class="sub" x="48" y="163">1% population sample</text>
+  <text class="sub" x="48" y="179">capacity-reduction policies</text>
+
+  <path class="ar" d="M238,138 L282,138"/>
+
+  <rect x="286" y="86" width="200" height="104" rx="8" fill="#f1f5f9" stroke="#cbd5e1" stroke-dasharray="4 3"/>
+  <text class="tag" x="300" y="106" fill="#64748b">NOT RETAINED</text>
+  <text class="lbl" x="300" y="128">Graph construction</text>
+  <text class="sub" x="300" y="147">network to line graph:</text>
+  <text class="sub" x="300" y="163">each road link becomes</text>
+  <text class="sub" x="300" y="179">a node, adjacency an edge</text>
+
+  <path class="ar" d="M490,138 L534,138"/>
+
+  <!-- published corpus -->
+  <rect x="538" y="86" width="408" height="104" rx="8" fill="#eff6ff" stroke="#bfdbfe"/>
+  <text class="tag" x="552" y="106" fill="#1d4ed8">PUBLISHED — train-data-v1 release</text>
+  <text class="lbl" x="552" y="128">Training corpus</text>
+  <text class="mono" x="552" y="149">20 files &#215; 50 graphs = 1,000 scenarios</text>
+  <text class="mono" x="552" y="166">torch.save(list[Data]), 2.44 GiB</text>
+  <text class="sub" x="552" y="183">every scenario is the same network under a different intervention</text>
+
+  <!-- per graph object -->
+  <path class="ar" d="M742,190 L742,222"/>
+  <rect x="286" y="226" width="660" height="118" rx="8" fill="#ffffff" stroke="#cbd5e1"/>
+  <text class="lbl" x="302" y="250">One scenario = one PyG Data object</text>
+  <text class="mono" x="302" y="274">x           [31635, 6]   float64   node features (5 used by the model)</text>
+  <text class="mono" x="302" y="292">pos         [31635, 3, 2] float32  start, end, midpoint — WGS84 lon/lat</text>
+  <text class="mono" x="302" y="310">edge_index  [2, 59851]   int64     identical across all 1,000 scenarios</text>
+  <text class="mono" x="302" y="328">y           [31635, 1]   float32   target: change in link volume, veh/h</text>
+
+  <!-- split -->
+  <path class="ar" d="M616,344 L616,376"/>
+  <rect x="286" y="380" width="660" height="60" rx="8" fill="#ecfdf5" stroke="#a7f3d0"/>
+  <text class="lbl" x="302" y="404">Split — 80 / 10 / 10 by scenario (Trial 8)</text>
+  <text class="sub" x="302" y="424">Splitting on whole scenarios, not nodes, keeps a graph&#8217;s 31,635 correlated links on one side of the boundary.</text>
+
+  <!-- note on scalers -->
+  <rect x="34" y="226" width="228" height="118" rx="8" fill="#fff7ed" stroke="#fed7aa"/>
+  <text class="lbl" x="48" y="250">Known preprocessing caveat</text>
+  <text class="sub" x="48" y="272">The historical pipeline fits</text>
+  <text class="sub" x="48" y="288">separate scalers per partition</text>
+  <text class="sub" x="48" y="304">rather than one fitted on train.</text>
+  <text class="sub" x="48" y="320">No test targets are used, but</text>
+  <text class="sub" x="48" y="336">see CORRIGENDUM C2.</text>
+
+  <text class="cap" x="34" y="470">Because raw MATSim outputs were not retained, the pipeline is reproducible from the published corpus onward, not from raw simulation.</text>
+  <text class="cap" x="34" y="490">Measured schema and per-feature statistics: docs/DATASET.md. Preprocessing code is upstream (scripts/data_preprocessing/).</text>
+</svg>

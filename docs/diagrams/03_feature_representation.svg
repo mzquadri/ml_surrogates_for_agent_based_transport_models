@@ -1,0 +1,98 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 560" width="980" height="560" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif">
+  <rect width="980" height="560" fill="#ffffff"/>
+  <style>
+    .h    { fill:#0f172a; font-size:17px; font-weight:600; }
+    .cap  { fill:#64748b; font-size:12.5px; }
+    .lbl  { fill:#0f172a; font-size:14px; font-weight:600; }
+    .sub  { fill:#64748b; font-size:11.5px; }
+    .mono { font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:11.5px; fill:#334155; }
+    .th   { fill:#334155; font-size:11.5px; font-weight:600; }
+    .td   { fill:#334155; font-size:11.5px; }
+    .tdm  { font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:11px; fill:#334155; }
+    .ar   { stroke:#94a3b8; stroke-width:1.6; fill:none; marker-end:url(#a); }
+  </style>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#94a3b8"/></marker>
+  </defs>
+
+  <text class="h" x="34" y="36">What a node is, and what it carries</text>
+  <text class="cap" x="34" y="58">Statistics measured over all 31,635,000 node observations in the published corpus. Full detail in docs/DATASET.md.</text>
+
+  <!-- line graph illustration -->
+  <rect x="34" y="82" width="300" height="180" rx="8" fill="#f8fafc" stroke="#e2e8f0"/>
+  <text class="lbl" x="48" y="106">The network is a line graph</text>
+  <text class="sub" x="48" y="126">Nodes are road links, not junctions.</text>
+  <text class="sub" x="48" y="142">An edge means &#8220;these two links meet&#8221;.</text>
+
+  <line x1="66" y1="186" x2="136" y2="170" stroke="#2563eb" stroke-width="3"/>
+  <line x1="136" y1="170" x2="206" y2="196" stroke="#2563eb" stroke-width="3"/>
+  <line x1="206" y1="196" x2="286" y2="176" stroke="#2563eb" stroke-width="3"/>
+  <circle cx="101" cy="178" r="6" fill="#1d4ed8"/>
+  <circle cx="171" cy="183" r="6" fill="#1d4ed8"/>
+  <circle cx="246" cy="186" r="6" fill="#1d4ed8"/>
+  <path d="M101,178 L171,183" stroke="#f97316" stroke-width="1.6" stroke-dasharray="3 3"/>
+  <path d="M171,183 L246,186" stroke="#f97316" stroke-width="1.6" stroke-dasharray="3 3"/>
+  <text class="sub" x="48" y="228"><tspan fill="#2563eb">&#9473;</tspan> road link   <tspan fill="#1d4ed8">&#9679;</tspan> graph node   <tspan fill="#f97316">&#9476;</tspan> graph edge</text>
+  <text class="mono" x="48" y="250">31,635 nodes &#183; 59,851 edges</text>
+
+  <!-- feature table -->
+  <text class="lbl" x="360" y="104">Node feature vector x — 6 stored, 5 used</text>
+  <line x1="360" y1="114" x2="946" y2="114" stroke="#cbd5e1"/>
+  <text class="th" x="360" y="132">#</text>
+  <text class="th" x="386" y="132">Feature</text>
+  <text class="th" x="548" y="132">Range</text>
+  <text class="th" x="666" y="132">% zero</text>
+  <text class="th" x="730" y="132">Distinct</text>
+  <text class="th" x="800" y="132">Varies by scenario</text>
+  <line x1="360" y1="140" x2="946" y2="140" stroke="#e2e8f0"/>
+
+  <text class="tdm" x="360" y="160">0</text><text class="tdm" x="386" y="160">VOL_BASE_CASE</text>
+  <text class="tdm" x="548" y="160">0 – 1,596</text><text class="tdm" x="666" y="160">23.86</text>
+  <text class="tdm" x="730" y="160">5,694</text><text class="td" x="800" y="160">no</text>
+
+  <text class="tdm" x="360" y="180">1</text><text class="tdm" x="386" y="180">CAPACITY_BASE_CASE</text>
+  <text class="tdm" x="548" y="180">0 – 14,400</text><text class="tdm" x="666" y="180">10.79</text>
+  <text class="tdm" x="730" y="180">36</text><text class="td" x="800" y="180">no</text>
+
+  <rect x="356" y="188" width="594" height="22" fill="#fff7ed"/>
+  <text class="tdm" x="360" y="204">2</text><text class="tdm" x="386" y="204" fill="#9a3412">CAPACITY_REDUCTION</text>
+  <text class="tdm" x="548" y="204">&#8722;7,200 – 0</text><text class="tdm" x="666" y="204">87.94</text>
+  <text class="tdm" x="730" y="204">29</text><text class="td" x="800" y="204" fill="#9a3412">yes — the intervention</text>
+
+  <text class="tdm" x="360" y="224">3</text><text class="tdm" x="386" y="224">FREESPEED</text>
+  <text class="tdm" x="548" y="224">0 – 33.33 m/s</text><text class="tdm" x="666" y="224">10.79</text>
+  <text class="tdm" x="730" y="224">16</text><text class="td" x="800" y="224">no</text>
+
+  <text class="tdm" x="360" y="244">4</text><text class="tdm" x="386" y="244" fill="#94a3b8">HIGHWAY</text>
+  <text class="tdm" x="548" y="244" fill="#94a3b8">&#8722;1 – 9</text><text class="tdm" x="666" y="244" fill="#94a3b8">2.95</text>
+  <text class="tdm" x="730" y="244" fill="#94a3b8">11</text><text class="td" x="800" y="244" fill="#94a3b8">excluded from model</text>
+
+  <text class="tdm" x="360" y="264">5</text><text class="tdm" x="386" y="264">LENGTH</text>
+  <text class="tdm" x="548" y="264">4.17 – 2,568 m</text><text class="tdm" x="666" y="264">0.00</text>
+  <text class="tdm" x="730" y="264">23,257</text><text class="td" x="800" y="264">no</text>
+  <line x1="360" y1="274" x2="946" y2="274" stroke="#cbd5e1"/>
+
+  <!-- notes -->
+  <rect x="34" y="300" width="452" height="128" rx="8" fill="#fff7ed" stroke="#fed7aa"/>
+  <text class="lbl" x="48" y="324">Only one feature moves</text>
+  <text class="sub" x="48" y="346">Five of six features and the entire topology are identical</text>
+  <text class="sub" x="48" y="362">across all 1,000 scenarios. The whole scenario-discriminating</text>
+  <text class="sub" x="48" y="378">signal enters through CAPACITY_REDUCTION, which is non-zero</text>
+  <text class="sub" x="48" y="394">on 7.82% of links on average (873 to 4,299 per scenario).</text>
+  <text class="sub" x="48" y="414">The other features tell the model which links can absorb the displaced traffic.</text>
+
+  <rect x="502" y="300" width="444" height="128" rx="8" fill="#f8fafc" stroke="#e2e8f0"/>
+  <text class="lbl" x="516" y="324">Why HIGHWAY is dropped</text>
+  <text class="sub" x="516" y="346">It is a label-encoded road class: the categories are nominal</text>
+  <text class="sub" x="516" y="362">but the encoding is ordinal, so distance between codes is</text>
+  <text class="sub" x="516" y="378">meaningless. The &#8722;1 category covers 10.03% of links and</text>
+  <text class="sub" x="516" y="394">marks &#8220;unclassified&#8221;, not a class below 0.</text>
+  <text class="sub" x="516" y="414">The model therefore takes in_channels = 5.</text>
+
+  <!-- target -->
+  <rect x="34" y="444" width="912" height="76" rx="8" fill="#ecfdf5" stroke="#a7f3d0"/>
+  <text class="lbl" x="48" y="468">Target y — change in link volume (veh/h)</text>
+  <text class="mono" x="48" y="492">mean 0.4189   std 10.7099   min &#8722;237.38   max 180.00   exact zeros 27.62%</text>
+  <text class="sub" x="48" y="510">Centred near zero and heavy-tailed both ways: capacity removed in one place pushes traffic elsewhere, so gains and losses roughly cancel.</text>
+</svg>
