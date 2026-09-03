@@ -2,8 +2,8 @@
   "experiment": "point_net_transf_gat_11th_trial_cqr_frozen",
   "trial": 11,
   "strategy": "frozen_backbone_cqr",
-  "t8_backbone": "C:\\Users\\MohdZaminQuadri\\Downloads\\Nazim\\ml_surrogates_thesis_final\\code\\data\\TR-C_Benchmarks\\point_net_transf_gat_8th_trial_lower_dropout\\trained_model\\model.pth",
-  "t8_test_dl": "C:\\Users\\MohdZaminQuadri\\Downloads\\Nazim\\ml_surrogates_thesis_final\\code\\data\\TR-C_Benchmarks\\point_net_transf_gat_8th_trial_lower_dropout\\data_created_during_training\\test_dl.pt",
+  "t8_backbone": "data/TR-C_Benchmarks/point_net_transf_gat_8th_trial_lower_dropout/trained_model/model.pth",
+  "t8_test_dl": "data/TR-C_Benchmarks/point_net_transf_gat_8th_trial_lower_dropout/data_created_during_training/test_dl.pt",
   "hyperparameters": {
     "lr": 0.0005,
     "batch_size": 8,

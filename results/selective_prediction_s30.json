@@ -1,7 +1,7 @@
 {
   "description": "Selective prediction (risk-coverage) from S=30 MC Dropout NPZ",
-  "data_source": "C:\\Users\\zamin\\OneDrive\\Desktop\\Nazim_thesis\\ml_surrogates_for_agent_based_transport_models\\data\\TR-C_Benchmarks\\point_net_transf_gat_8th_trial_lower_dropout\\uq_results\\mc_dropout_full_100graphs_mc30.npz",
-  "deterministic_source": "C:\\Users\\zamin\\OneDrive\\Desktop\\Nazim_thesis\\ml_surrogates_for_agent_based_transport_models\\data\\TR-C_Benchmarks\\point_net_transf_gat_8th_trial_lower_dropout\\uq_results\\deterministic_full_100graphs.npz",
+  "data_source": "data/TR-C_Benchmarks/point_net_transf_gat_8th_trial_lower_dropout/uq_results/mc_dropout_full_100graphs_mc30.npz",
+  "deterministic_source": "data/TR-C_Benchmarks/point_net_transf_gat_8th_trial_lower_dropout/uq_results/deterministic_full_100graphs.npz",
   "mc_samples": 30,
   "n_total_nodes": 3163500,
   "n_graphs": 100,

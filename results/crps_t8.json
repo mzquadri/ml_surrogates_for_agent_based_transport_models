@@ -2,7 +2,7 @@
   "metric": "CRPS (Gaussian closed-form)",
   "reference": "Gneiting & Raftery (2007), JASA 102(477), Eq. 21",
   "model": "T8 MC Dropout S=30",
-  "data_source": "C:\\Users\\zamin\\OneDrive\\Desktop\\Nazim_thesis\\ml_surrogates_for_agent_based_transport_models\\data\\TR-C_Benchmarks\\point_net_transf_gat_8th_trial_lower_dropout\\uq_results\\mc_dropout_full_100graphs_mc30.npz",
+  "data_source": "data/TR-C_Benchmarks/point_net_transf_gat_8th_trial_lower_dropout/uq_results/mc_dropout_full_100graphs_mc30.npz",
   "n_nodes": 3163500,
   "n_graphs": 100,
   "crps_mean": 3.383,
