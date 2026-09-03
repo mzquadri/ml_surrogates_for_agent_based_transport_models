@@ -133,6 +133,100 @@ The submitted PDF at `thesis/submission_2026-05-15/` is unchanged and still read
 reports the verified values, and `scripts/verify_headline_results.py` asserts them against
 their source artifacts on every run.
 
+## C8: Dataset Documentation — HIGHWAY Semantics and Intervention Footprint
+
+Found during the September 2026 deep dataset exploration, by reading every feature
+back to the preprocessing code that produced it and re-measuring every published
+statistic over the complete 1,000-scenario corpus. Both corrections are to
+`docs/DATASET.md` and the figures derived from it. Neither affects any model,
+metric, or result: they concern how the input data was described.
+
+### C8a: The meaning of `HIGHWAY == -1`
+
+**Previous interpretation.** `docs/DATASET.md` stated that the `-1` category
+"marks an unclassified type rather than a road below class 0", and separately
+described the links with zero `CAPACITY_BASE_CASE` and zero `FREESPEED` as "the
+non-car links (rail, subway, bus-only)" in a way that implied the two sets
+coincide.
+
+**Verified mapping.** `highway_mapping` in
+`scripts/data_preprocessing/help_functions.py` is explicit:
+
+| Code | OSM classes |
+|---|---|
+| −1 | `pt` |
+| 0 | `trunk`, `trunk_link`, `motorway_link` |
+| 1 | `primary`, `primary_link` |
+| 2 | `secondary`, `secondary_link` |
+| 3 | `tertiary`, `tertiary_link` |
+| 4 | `residential` |
+| 5 | `living_street` |
+| 6 | `pedestrian` |
+| 7 | `service` |
+| 8 | `construction` |
+| 9 | `unclassified` |
+
+**Correct interpretation.** `-1` is the code for **`pt`, public transport**.
+`unclassified` is code **9**, a different category entirely. Because the encoding
+is applied as `highway_mapping.get(x, -1)`, `-1` is also the fallback for any OSM
+value absent from the table, so the precise reading is **"`pt`, or an OSM class
+not present in the mapping"**.
+
+**`HIGHWAY == -1` is not the non-car set.** Measured over the corpus:
+
+| Set | Links |
+|---|---|
+| `HIGHWAY == -1` | 3,173 |
+| `CAPACITY_BASE_CASE == 0` (the non-car set) | 3,412 |
+| `-1` **and** car-capable | 285 |
+| non-car **and** not `-1` | 524 |
+
+The two sets overlap heavily but are not equal, and no document should treat one
+as a proxy for the other. The zero-capacity set is produced by a separate
+operation — `np.where(modes.str.contains("car"), capacity, 0)` in
+`get_basic_edge_attributes` — which is why it does not align exactly with the OSM
+class.
+
+### C8b: The intervention footprint
+
+**Previous numbers.** `docs/DATASET.md` stated that "a scenario reduces capacity
+on 873 to 4,299 links, 2,473 on average, which is 7.82% of the network", and
+`docs/diagrams/03_feature_representation.svg` carried the same 7.82%.
+
+**Verified numbers**, measured over all 1,000 scenarios in the published
+`train-data-v1` release:
+
+| Quantity | Previously stated | Verified (full corpus) |
+|---|---|---|
+| Minimum links intervened | 873 | **306** |
+| Maximum links intervened | 4,299 | **11,305** |
+| Mean links intervened | 2,473 | **3,814** |
+| Median links intervened | not stated | **3,317** |
+| Share of network (mean) | 7.82% | **12.06%** |
+
+**Why the old values were wrong.** They were computed from an incomplete sample
+rather than the published corpus. The stated minimum, 873, is exactly the minimum
+of `datalist_batch_1.pt` — the first of twenty batch files — which is what a
+first-batch-only pass returns. The corpus-wide range is roughly three times wider
+in both directions. The error is one of scope, not of arithmetic: the numbers
+were correct for the subset they were computed on and were then presented as
+properties of the whole dataset.
+
+**Related facts established at the same time**, none of which were previously
+recorded: all 1,000 intervention footprints are unique; 20,330 links (64.26%) are
+never intervened in any scenario; there are 28 distinct non-zero reduction
+magnitudes, all negative; and the policy only ever touches OSM classes 1, 2 and 3
+(primary, secondary, tertiary), leaving every other class untouched in all 1,000
+scenarios.
+
+### Scope of this correction
+
+No result changes. The models consumed the tensors, not the prose, so the reported
+metrics are unaffected. `docs/DATASET.md` and the affected diagram now carry the
+verified values with a reference to this entry, and
+`scripts/data_exploration/` regenerates every number here from the published
+corpus.
+
 ## Provenance
 
 - Immutable submitted artifact baseline: canonical commit `4b95a3d8aca5929bb88b84bb7f7ae86c48e2f428`.

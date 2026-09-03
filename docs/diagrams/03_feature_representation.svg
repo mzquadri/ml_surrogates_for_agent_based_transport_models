@@ -79,15 +79,15 @@
   <text class="sub" x="48" y="346">Five of six features and the entire topology are identical</text>
   <text class="sub" x="48" y="362">across all 1,000 scenarios. The whole scenario-discriminating</text>
   <text class="sub" x="48" y="378">signal enters through CAPACITY_REDUCTION, which is non-zero</text>
-  <text class="sub" x="48" y="394">on 7.82% of links on average (873 to 4,299 per scenario).</text>
+  <text class="sub" x="48" y="394">on 12.06% of links on average (306 to 11,305 per scenario).</text>
   <text class="sub" x="48" y="414">The other features tell the model which links can absorb the displaced traffic.</text>
 
   <rect x="502" y="300" width="444" height="128" rx="8" fill="#f8fafc" stroke="#e2e8f0"/>
   <text class="lbl" x="516" y="324">Why HIGHWAY is dropped</text>
   <text class="sub" x="516" y="346">It is a label-encoded road class: the categories are nominal</text>
   <text class="sub" x="516" y="362">but the encoding is ordinal, so distance between codes is</text>
-  <text class="sub" x="516" y="378">meaningless. The &#8722;1 category covers 10.03% of links and</text>
-  <text class="sub" x="516" y="394">marks &#8220;unclassified&#8221;, not a class below 0.</text>
+  <text class="sub" x="516" y="378">meaningless. Code &#8722;1 is &#8220;pt&#8221; (public transport), 10.03% of</text>
+  <text class="sub" x="516" y="394">links; &#8220;unclassified&#8221; is a different code, 9.</text>
   <text class="sub" x="516" y="414">The model therefore takes in_channels = 5.</text>
 
   <!-- target -->
