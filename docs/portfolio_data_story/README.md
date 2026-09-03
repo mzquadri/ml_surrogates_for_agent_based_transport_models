@@ -16,6 +16,7 @@ an uncertainty estimate; for those see `scripts/verify_headline_results.py` and
 | [04_intervention.md](04_intervention.md) | Footprints, magnitudes, which road classes are targeted |
 | [05_spillover.md](05_spillover.md) | How far the response travels, and the controls behind that claim |
 | [06_anomalies.md](06_anomalies.md) | Eight data-quality observations and what each does or does not affect |
+| [07_representatives.md](07_representatives.md) | The rule-selected example scenarios and links, and why each was picked |
 | [assets/SCHEMA.md](assets/SCHEMA.md) | Field-by-field contract for the derived web assets |
 
 ## The four findings worth knowing
@@ -24,9 +25,11 @@ an uncertainty estimate; for those see `scripts/verify_headline_results.py` and
    |response| is 13.06 veh/h on intervened links against 2.91 elsewhere, but the
    untouched links are so numerous that they carry roughly two-thirds of the
    total effect.
-2. **The response does not fade with graph distance.** It drops 4.4× at the first
-   hop and is then flat out to eight hops. This survives its reachability control
-   and holds for both directed and undirected traversal — see
+2. **The graph-distance pattern is flat beyond the first hop.** Response drops 4.4×
+   at hop 1 and is then level out to eight hops — an observed redistribution across
+   the network rather than a gradient that fades with distance. It survives its
+   reachability control and holds under both directed and undirected traversal. It
+   is an association, not evidence of a mechanism — see
    [05_spillover.md](05_spillover.md).
 3. **The policy only ever touches three road classes** — primary, secondary and
    tertiary. Motorways are never intervened in any of the 1,000 scenarios, yet
