@@ -128,14 +128,27 @@ def fig_sigma_vs_error(t, pmc, sig):
     fig, axes = plt.subplots(1, 2, figsize=(11.8, 4.4))
 
     ax = axes[0]
-    xl, yl = np.percentile(sig, 99.5), np.percentile(err, 99)
-    hb = ax.hexbin(sig, err, gridsize=110, extent=(0, xl, 0, yl), bins="log",
+    # Clip to the bulk of the joint distribution: the long thin tails otherwise
+    # leave most of the panel empty and wash the dense region out.
+    xl, yl = np.percentile(sig, 98), np.percentile(err, 96)
+    hb = ax.hexbin(sig, err, gridsize=90, extent=(0, xl, 0, yl), bins="log",
                    cmap="Oranges", mincnt=1, linewidths=0)
+    # Binned median makes the trend legible rather than merely present.
+    edges = np.linspace(0, xl, 31)
+    idx = np.clip(np.digitize(sig, edges) - 1, 0, len(edges) - 2)
+    cx = 0.5 * (edges[:-1] + edges[1:])
+    med = np.array([np.median(err[idx == b]) if (idx == b).any() else np.nan
+                    for b in range(len(cx))])
+    ax.plot(cx, med, color=COLORS["blue_dk"], lw=2.2, label="median |error| per σ bin")
+    ax.legend(fontsize=8.4, loc="upper left")
+    ax.set_xlim(0, xl); ax.set_ylim(0, yl)
     ax.set_xlabel("MC Dropout σ (veh/h)")
     ax.set_ylabel("|error| (veh/h)")
-    ax.set_title("Uncertainty against error", fontweight="600", color=COLORS["dgray"])
-    ax.text(0.96, 0.94, f"Spearman ρ = {rho:.4f}", transform=ax.transAxes,
-            ha="right", va="top", fontsize=9, family="monospace", color=COLORS["slate"])
+    ax.set_title("Uncertainty against error  (central 98% of σ)",
+                 fontweight="600", color=COLORS["dgray"])
+    ax.text(0.96, 0.06, f"Spearman ρ = {rho:.4f}\n(all 3,163,500 links)",
+            transform=ax.transAxes, ha="right", va="bottom", fontsize=8.6,
+            family="monospace", color=COLORS["slate"])
     plt.colorbar(hb, ax=ax, fraction=0.045, pad=0.02, label="links (log)")
 
     ax = axes[1]
