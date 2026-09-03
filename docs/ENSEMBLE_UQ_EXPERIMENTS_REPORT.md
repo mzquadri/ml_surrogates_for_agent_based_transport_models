@@ -1,6 +1,6 @@
 # Ensemble-based Uncertainty Quantification Experiments Report
 
-**Author:** Nazim Zameen  
+**Author:** Mohd Zamin Quadri  
 **Date:** December 2024  
 **Thesis:** ML Surrogates for Agent-Based Transport Models  
 

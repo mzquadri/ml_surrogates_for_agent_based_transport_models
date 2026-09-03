@@ -9,7 +9,7 @@ Method:
 2. Scale uncertainties: calibrated_σ = raw_σ * T
 3. Evaluate on test data
 
-Author: Nazim Zaman
+Author: Mohd Zamin Quadri
 Date: February 2026
 """
 
