@@ -1,137 +1,283 @@
 # Uncertainty Quantification for GNN Surrogates of Agent-Based Transport Models
 
-**Master's Thesis** | Technical University of Munich | School of Computation, Information and Technology
+**M.Sc. thesis** · Technical University of Munich · School of Computation, Information and Technology
 
-|               |                                      |
-| ------------- | ------------------------------------ |
-| **Author**    | Mohd Zamin Quadri                    |
-| **Programme** | M.Sc. Mathematics in Science and Engineering |
-| **Supervisor**| Prof. Dr. Stephan Günnemann           |
-| **Advisor**   | Dominik Fuchsgruber, M.Sc., Elena Natterer, M.Sc. |
-| **Date**      | May 15, 2026                          |
+|               |                                                   |
+| ------------- | ------------------------------------------------- |
+| **Author**    | Mohd Zamin Quadri                                  |
+| **Programme** | M.Sc. Mathematics in Science and Engineering       |
+| **Supervisor**| Prof. Dr. Stephan Günnemann                        |
+| **Advisors**  | Dominik Fuchsgruber, M.Sc. · Elena Natterer, M.Sc. |
+| **Submitted** | 15 May 2026                                        |
 
-**[Read the thesis (PDF)](thesis/latex_tum_official/main.pdf)**
-
----
-
-## Abstract
-
-Agent-based transport simulations like MATSim are powerful but computationally expensive. GNN surrogates approximate them orders of magnitude faster, yet lack confidence estimates -- a critical gap for policy decisions.
-
-This thesis develops a post-hoc uncertainty quantification framework for a GNN surrogate trained on 10,000 MATSim simulations of the Paris Ile-de-France road network (31,635 road segments), combining MC Dropout, conformal prediction, calibration diagnostics, selective prediction, and error detection. No retraining is required.
+**[Read the thesis (PDF)](thesis/submission_2026-05-15/)** · **[Verified results](#results)** · **[Reproduce them](#reproducing-the-results)** · **[Corrigendum](docs/CORRIGENDUM.md)**
 
 ---
 
-## Key Results
+## The problem
+
+Agent-based transport simulators such as MATSim answer policy questions well but slowly — hours per
+scenario. A graph neural network trained on their output answers the same question in seconds, which
+is what makes large policy sweeps feasible at all.
+
+The catch is that the surrogate returns a bare number. Nothing in it says which of the 31,635 road
+links it is confident about and which it is guessing at. For a model whose output is meant to inform
+a decision about closing a road, that gap matters more than another point of R².
+
+**This thesis asks: can a useful, calibrated uncertainty estimate be attached to an already-trained
+GNN surrogate, without retraining it?**
+
+![Research problem](docs/diagrams/01_research_problem.svg)
+
+---
+
+## What is mine and what is inherited
+
+This repository is a fork, and the distinction matters.
+
+| | |
+| --- | --- |
+| **Inherited** (upstream) | The GNN architectures (`scripts/gnn/`), the MATSim-to-graph preprocessing (`scripts/data_preprocessing/`), the base training pipeline (`scripts/training/`), `help_functions.py` / `plot_functions.py`, and `traffic-gnn.yml`. |
+| **Mine** (this thesis) | The entire uncertainty layer — MC Dropout evaluation, temperature scaling, split and adaptive conformal prediction, selective prediction, error detection, the calibration audits, the deep-ensemble and CQR trials, every result artifact under `results/`, the thesis document, and the verification tooling. |
+
+Upstream is **[`enatterer/ml_surrogates_for_agent_based_transport_models`](https://github.com/enatterer/ml_surrogates_for_agent_based_transport_models)**
+by **Elena Natterer**, with contributions from **Saini Rohan Rao** and **Thua Duc Nguyen**. Their full
+commit history is preserved unmodified on the [`zamin_uq`](../../tree/zamin_uq) branch of this
+repository — 266 commits, none of them mine. The `main` branch carries this thesis's work.
+
+The trained surrogate itself is taken as given from that work. This thesis does not claim the
+architecture, the preprocessing, or the base training procedure.
+
+> Natterer et al. (2025). *Machine Learning Surrogates for Agent-Based Models in Transportation
+> Policy Analysis.* Transportation Research Part C, 180, 105360.
+
+---
+
+## Data
+
+1,000 MATSim scenarios of the Paris Île-de-France network at 1% population sampling. Each scenario is
+the **same** road network under a different capacity-reduction policy.
+
+![Dataset pipeline](docs/diagrams/02_dataset_pipeline.svg)
+
+The network is expressed as a **line graph**: each road link is a node, and an edge means two links
+meet. Every scenario has 31,635 nodes and 59,851 edges, and the topology is byte-identical across all
+1,000 of them.
+
+![Feature representation](docs/diagrams/03_feature_representation.svg)
+
+Six features are stored and five are used — `HIGHWAY` is dropped because it is an ordinally-encoded
+nominal category. The single most important property of this dataset is that **only
+`CAPACITY_REDUCTION` varies between scenarios**; everything else is constant context.
+
+![Feature distributions](docs/figures/dataset/01_feature_distributions.png)
+
+![Spatial view](docs/figures/dataset/04_spatial_intervention_response.png)
+
+Measured schema, per-feature statistics and the scenario-invariance analysis:
+**[`docs/DATASET.md`](docs/DATASET.md)**. Further figures in [`docs/figures/dataset/`](docs/figures/dataset/).
+
+---
+
+## Model
+
+`PointNetTransfGAT` — two PointNet convolutions that fold in link geometry, two graph-transformer
+layers, and two attention layers that reduce to one value per link. **1,416,835 parameters**, read
+from the Trial 8 checkpoint rather than from code defaults.
+
+![Model architecture](docs/diagrams/04_model_architecture.svg)
+
+The two dropout layers are the only stochastic elements, and they are what makes post-hoc MC Dropout
+possible without touching the weights.
+
+![Training and evaluation](docs/diagrams/05_training_evaluation.svg)
+
+Sixteen trials are retained under `models/`. Trial 8 (dropout 0.2, 80/10/10 scenario split) is the
+best of the directly comparable ones and is the baseline for all uncertainty work.
+
+![Trial comparison](docs/figures/results/05_trial_comparison.png)
+
+---
+
+## Uncertainty quantification
+
+Everything below is **post-hoc**: the checkpoint is loaded, frozen, and never updated.
+
+![Uncertainty pipeline](docs/diagrams/06_uncertainty_pipeline.svg)
+
+MC Dropout keeps dropout active at inference and runs S = 30 forward passes; the mean is the
+prediction and the standard deviation is σ. Two questions follow, and they have different answers:
+
+- **Does σ rank errors?** Yes — Spearman ρ = 0.482, and error rises monotonically across σ deciles.
+- **Is σ a calibrated scale?** No — raw σ covers only 48.6% of errors at the nominal 90% level.
+
+![Uncertainty vs error](docs/figures/results/02_uncertainty_vs_error.png)
+
+So σ is corrected post-hoc, two independent ways: **temperature scaling** (one scalar, keeps a single
+interpretable σ per link) and **split conformal prediction** (exact marginal coverage by
+construction, at the cost of one shared interval width).
+
+![Calibration](docs/figures/results/03_calibration.png)
+
+---
+
+## Evaluation
+
+Four questions, four evaluations. Conflating them is the usual way to overstate an uncertainty result.
+
+![Evaluation framework](docs/diagrams/07_evaluation_framework.svg)
+
+![Selective prediction and conformal coverage](docs/figures/results/04_selective_and_conformal.png)
+
+---
+
+## Results
+
+Every number here is recomputed from its source artifact by
+[`scripts/verify_headline_results.py`](scripts/verify_headline_results.py), which exits non-zero if
+any of them drifts.
+
+### Surrogate accuracy — Trial 8, 100 held-out scenarios, 3,163,500 links
+
+| Metric | Value | Source |
+| --- | --- | --- |
+| R² | 0.5957 | `deterministic_full_100graphs.npz` |
+| MAE | 3.96 veh/h | `deterministic_full_100graphs.npz` |
+| RMSE | 7.12 veh/h | `deterministic_full_100graphs.npz` |
+
+![Accuracy](docs/figures/results/01_accuracy.png)
+
+### Uncertainty quality
 
 | Analysis | Trial 8 | Trial 7 |
-| -------- | ------- | ------- |
-| Deterministic MAE / RMSE | 3.96 / 7.12 veh/h | -- |
-| R^2 | 0.5957 | -- |
-| MC Dropout Spearman rho | 0.482 | 0.446 |
-| Conformal 90% / 95% coverage | 90.02% / 95.01% | 89.98% / 95.03% |
-| ECE (before / after temp. scaling) | 0.269 / 0.048 | -- |
-| Selective prediction MAE reduction @50% | 41.2% | -- |
-| Error detection AUROC (top-10%) | 0.7548 | -- |
+| --- | --- | --- |
+| MC Dropout Spearman ρ (σ vs abs. error) | **0.482** | **0.4437** [^t7] |
+| ECE, before → after temperature scaling | 0.269 → 0.048 (T = 2.702) | — |
+| Selective prediction, MAE reduction at 50% retained | **−41.2%** | −38.3% |
+| Error detection AUROC, top-10% errors | **0.7585** [^auroc] | 0.7416 |
+| Error detection AUROC, top-20% errors | **0.7401** [^auroc] | — |
+| Split conformal coverage, 90% / 95% nominal | 90.17% / 95.09% [^prot] | 90.18% / 95.11% |
 
-All numbers verified against raw artifacts. See [`docs/verified/`](docs/verified/) for audit reports and JSON results, and `results/` for the canonical result set.
+[^t7]: The thesis reports 0.446 for Trial 7. That value is not reproducible from the retained
+    archive, which yields 0.4437 under the definition that reproduces Trial 8 exactly. Recorded as
+    [CORRIGENDUM C7b](docs/CORRIGENDUM.md).
 
----
+[^auroc]: **Corrected after submission.** The submitted thesis reports 0.7548 and 0.7324, citing a
+    file that is not present in this repository. Recomputation from the cited source artifact —
+    `trial8_uq_ablation_results.csv` — gives 0.7585 and 0.7401, matching
+    `docs/verified/UQ_ERROR_DETECTION_T8.md` exactly. See [CORRIGENDUM C7a](docs/CORRIGENDUM.md).
+    The figure above reports 0.7561 / 0.7378 for the same metric because it is computed from the
+    tracked NPZ archive, which is a **different stochastic MC Dropout replay** of the same model.
+    Both are correct for the artifact they name; MC Dropout is not bit-reproducible across replays,
+    which is why every number in this repository states its archive. See
+    [CORRIGENDUM C4](docs/CORRIGENDUM.md).
 
-## Repository Structure
+[^prot]: Protocol `graph20_80_v1` — calibrate on the first 20 test graphs, evaluate on the remaining
+    80. This is the replayable protocol. The thesis reports 90.02% / 95.01% under a 50/50 scenario
+    split whose indices were not retained. The two must not be pooled; see
+    [CORRIGENDUM C3](docs/CORRIGENDUM.md).
 
-```
-thesis/latex_tum_official/    Working thesis document (LaTeX source + compiled PDF + DOCX)
-thesis/submission_2026-05-15/ Frozen as-submitted thesis (PDF + ZIP + LaTeX) -- do not edit
-thesis/variants/              Earlier document snapshots, kept for provenance
-models/                       Trained model checkpoints (16 trials, PyTorch .pth)
-data/                         Dataloaders, training corpus, Paris network layer -- lives in the
-                              companion data repository, see DATA.md (7.8 GB, not tracked here)
-scripts/gnn/                  GNN architectures (PointNet + Transformer + GAT, incl. heteroscedastic + CQR variants)
-scripts/evaluation/           UQ analysis and plotting scripts
-scripts/training/             Model training pipeline (incl. deep ensemble and CQR training)
-scripts/data_preprocessing/   MATSim --> PyG graph conversion
-scripts/misc/                 Figure generation and analysis helpers
-scripts/archive/              Superseded one-off scripts, kept for provenance
-notebooks/                    Colab notebooks (training, UQ, baselines)
-docs/                         Documentation and verified results
-docs/figures/                 Thesis figures, EDA plots, and hand-picked diagrams
-results/                      Canonical result JSONs, pre-computed predictions (.npz), metrics, training logs
-analysis_outputs/             Generated analysis figures and intelligence reports
-thesis_dashboard/             Streamlit dashboard over the result set
-policy-dashboard/             Policy confidence desk
-web_exports/                  Exported web artifacts (JSON + WebP)
-presentation/                 Defence slide decks
-tests/                        Test suite
-run_part{2,3,4}_*.py          Reproducibility verification scripts
-environment-minimal.yml       Conda environment (cross-platform)
-```
+### What this does not establish
 
-> **The thesis that was examined is `thesis/submission_2026-05-15/`, not `thesis/latex_tum_official/`.** The working LaTeX has been edited since submission and compiles to a different PDF. See that folder's `README.md` for the details.
-
-> Included: all reported result JSONs, the trained model checkpoints, and the key pre-computed prediction archives (.npz) that back the reported numbers. Not tracked here: the 7.8 GB `data/` tree — 39 of its files exceed GitHub's 100 MB per-file limit — along with the presentation decks and the Colab-side training outputs.
->
-> The data lives in the companion repository **[mzquadri/ml-surrogates-thesis-data](https://github.com/mzquadri/ml-surrogates-thesis-data)**, in the layout the training scripts wrote: `data_created_during_training/` for the split scalers, test set and loader parameters, `trained_model/` for `model.pth`. Clone it into `data/` and the evaluation scripts find everything where they expect it. See [`DATA.md`](DATA.md) for the full account, including the nineteen files published as release assets because they exceed the file-size limit.
+One Paris network, one capacity-reduction intervention family, a fixed 1,000-scenario subset, and one
+model family. Conformal coverage is marginal over the evaluated split — it is not a guarantee for any
+individual scenario, link, city, or policy. The submitted thesis also overstated the target's zero
+mass; that is corrected in [CORRIGENDUM C1](docs/CORRIGENDUM.md).
 
 ---
 
-## Reproducing Results
+## Reproducing the results
 
 ```bash
 git clone https://github.com/mzquadri/ml_surrogates_for_agent_based_transport_models.git
 cd ml_surrogates_for_agent_based_transport_models
 
-# The artifacts the analyses read. data/ is gitignored here, so this nests cleanly.
-git clone https://github.com/mzquadri/ml-surrogates-thesis-data.git data
-
 conda env create -f environment-minimal.yml
 conda activate traffic-gnn
 
-python scripts/evaluation/run_part2_uq_analyses.py       # Selective prediction + error detection
-python scripts/evaluation/run_part3_calibration_audit.py # Calibration and conformal coverage
-python scripts/evaluation/run_part4_t7_crosscheck.py     # Trial 7 cross-check
+python scripts/verify_headline_results.py        # recompute every headline number
 ```
 
-The clone above covers the 1,267 tracked artifacts, which is everything `run_part4_t7_crosscheck.py` reads. The other two both need one more file — `trial8_uq_ablation_results.csv`, 199 MB and so over GitHub's per-file limit:
+That runs against artifacts tracked in this repository and needs no downloads. Two of the thirteen
+checks — the AUROC pair — report `SKIP` until the 209 MB ablation CSV is fetched:
 
 ```bash
-cd data && gh release download large-files-v1 \
-  --repo mzquadri/ml-surrogates-thesis-data \
-  --pattern '*trial8_uq_ablation_results.csv' --dir /tmp/large \
-  && python restore_large_files.py /tmp/large && cd ..
+gh release download large-files-v1 --repo mzquadri/ml-surrogates-thesis-data \
+  --pattern '*trial8_uq_ablation_results.csv' \
+  --dir data/TR-C_Benchmarks/point_net_transf_gat_8th_trial_lower_dropout/
 ```
 
-[`DATA.md`](DATA.md) lists the rest of the oversized files and the training corpus.
+The full analyses and the figures:
 
-The scripts reproduce analyses from versioned prediction artifacts; they do not retrain the models or rerun MATSim simulations. The prediction archives are also mirrored under `results/predictions/`, so the scripts' `data/` paths can be pointed there instead. See [`docs/verified/REPRODUCIBILITY_GAP_SUMMARY.md`](docs/verified/REPRODUCIBILITY_GAP_SUMMARY.md) for a precise account of included artifacts and known limitations.
+```bash
+python scripts/evaluation/run_part4_t7_crosscheck.py      # Trial 7 cross-check (no downloads)
+python scripts/evaluation/run_part2_uq_analyses.py        # selective prediction + error detection
+python scripts/evaluation/run_part3_calibration_audit.py  # calibration and conformal coverage
+python scripts/figure_generation/generate_results_figures.py
+python scripts/figure_generation/generate_dataset_figures.py --corpus <corpus dir>
+```
 
-To compile the thesis: `cd thesis/latex_tum_official && pdflatex main.tex && biber main && pdflatex main.tex && pdflatex main.tex`
+Parts 2 and 3 need the ablation CSV above. The dataset figures need the training corpus, published on
+the [`train-data-v1`](../../releases/tag/train-data-v1) release (20 files, 2.44 GiB). Set
+`THESIS_DATA_ROOT` to point at a data tree you already have, and the scripts will find it.
+
+**What is reproducible and what is not.** These commands replay the analyses from cached prediction
+arrays. They do not retrain the models and do not rerun MATSim — the raw simulation outputs were not
+retained. [`docs/CORRIGENDUM.md`](docs/CORRIGENDUM.md) C5 states the replay boundaries precisely, and
+[`DATA.md`](DATA.md) covers artifact availability.
 
 ---
 
-## Builds On
+## Repository layout
 
-> Natterer et al. (2025). *Machine Learning Surrogates for Agent-Based Models in Transportation Policy Analysis.* Transportation Research Part C, 180, 105360.
+```
+scripts/
+  verify_headline_results.py    Recomputes every published number; non-zero exit on drift
+  evaluation/                   UQ analyses, calibration audit, cross-checks
+  figure_generation/            Dataset and results figures
+  gnn/  training/  data_preprocessing/    Upstream model, training and preprocessing code
+  archive/                      Historical one-offs — provenance only, not runnable
+docs/
+  DATASET.md                    Measured schema and per-feature statistics
+  CORRIGENDUM.md                Post-submission corrections, including C7
+  UQ_SUMMARY.md                 April 2026 summary, partly superseded
+  verified/                     Audit reports and the figures behind them
+  diagrams/  figures/           Explanatory diagrams and generated figures
+models/                         16 trial checkpoints
+results/                        Result JSONs, prediction archives, per-trial metrics
+thesis/
+  submission_2026-05-15/        The examined document — frozen, do not edit
+  latex_tum_official/           Working LaTeX, edited since submission
+tests/                          Test suite (pytest)
+```
 
-This thesis takes the trained models from the above work as given and contributes the UQ framework, calibration analysis, and cross-replication study.
+> The examined thesis is `thesis/submission_2026-05-15/`. The working LaTeX in
+> `thesis/latex_tum_official/` has been edited since and compiles to a different PDF.
+
+Large artifacts live on releases rather than in the tree: the training corpus
+([`train-data-v1`](../../releases/tag/train-data-v1)), per-trial evaluation outputs
+([`benchmarks-v1`](../../releases/tag/benchmarks-v1)), and oversized prediction archives
+([`results-large-v1`](../../releases/tag/results-large-v1)). The companion repository
+[`mzquadri/ml-surrogates-thesis-data`](https://github.com/mzquadri/ml-surrogates-thesis-data) holds
+the data tree in its original per-trial layout. See [`DATA.md`](DATA.md).
 
 ---
 
-## License
+## Licence and attribution
 
-This repository is a fork of [`enatterer/ml_surrogates_for_agent_based_transport_models`](https://github.com/enatterer/ml_surrogates_for_agent_based_transport_models), released under the **MIT License, Copyright (c) 2024 Elena Natterer**.
+Upstream code is under the **MIT Licence, © 2024 Elena Natterer**, reproduced in
+[`LICENSE`](LICENSE). Those terms govern `scripts/gnn/`, `scripts/data_preprocessing/`,
+`scripts/training/`, `scripts/evaluation/help_functions.py`, `scripts/evaluation/plot_functions.py`,
+the upstream notebooks, and `traffic-gnn.yml`, and anything derived from them.
 
-That license governs the upstream code kept and extended here — `scripts/data_preprocessing/`, `scripts/gnn/`, `scripts/training/`, `scripts/evaluation/help_functions.py`, `scripts/evaluation/plot_functions.py`, the upstream notebooks, and `traffic-gnn.yml`. Its terms, including the copyright and permission notice reproduced in [`LICENSE`](LICENSE), continue to apply to that code and to anything derived from it.
+Material added by this fork — the thesis text and figures, the trained checkpoints, and the result
+artifacts — is **not** covered by that grant. Reuse requires prior permission from the author and,
+where applicable, the original data and model owners.
 
-The material added by this fork — the thesis text and figures, the trained model checkpoints, and the result artifacts — is **not** covered by that MIT grant. Reuse of those requires prior permission from the author and, where applicable, the original data and model owners.
+Citation metadata: [`CITATION.cff`](CITATION.cff).
 
 ## Tooling
 
-AI coding assistants were used during this work for code review, refactoring, and
-repository maintenance. All research design, modelling decisions, analysis, and
-written content are the author's own, and every reported result was verified
-against the artifacts in this repository.
-
-## Citation
-
-See [`CITATION.cff`](CITATION.cff) for citation metadata.
+AI coding assistants were used for code review, refactoring, and repository maintenance. All research
+design, modelling decisions, analysis, and written content are the author's own, and every reported
+number is verified against the artifacts in this repository by a script that anyone can run.
