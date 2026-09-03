@@ -17,8 +17,8 @@
   </defs>
 
   <text class="h" x="34" y="36">Training and evaluation</text>
-  <text class="cap" x="34" y="58">Trial 8 configuration, read from results/trials/point_net_transf_gat_8th_trial_lower_dropout/test_evaluation_complete.json.
-  Training code is upstream; the trials and the evaluation below are this thesis&#8217;s work.</text>
+  <text class="cap" x="34" y="58">Trial 8 configuration, read from its test_evaluation_complete.json.</text>
+  <text class="cap" x="34" y="76">Training code is upstream; the trials and the evaluation below are this thesis&#8217;s work.</text>
 
   <!-- training loop -->
   <rect x="34" y="96" width="912" height="152" rx="8" fill="#faf5ff" stroke="#e9d5ff"/>

@@ -16,8 +16,8 @@
   </defs>
 
   <text class="h" x="34" y="38">What the thesis is about</text>
-  <text class="cap" x="34" y="60">A transport simulator answers policy questions accurately but slowly. A surrogate answers them fast.
-  The open question is when to trust the fast answer.</text>
+  <text class="cap" x="34" y="60">A transport simulator answers policy questions accurately but slowly. A surrogate answers them fast.</text>
+  <text class="cap" x="34" y="78">The open question is when to trust the fast answer.</text>
 
   <!-- Row 1: the simulator -->
   <rect x="34" y="96" width="196" height="86" rx="8" fill="#eff6ff" stroke="#bfdbfe"/>
@@ -53,8 +53,8 @@
 
   <!-- the gap -->
   <rect x="300" y="214" width="646" height="52" rx="8" fill="#fff7ed" stroke="#fed7aa"/>
-  <text class="lbl" x="318" y="238">The gap</text>
-  <text class="t" x="392" y="238">a point prediction carries no indication of when it is wrong.</text>
+  <text class="lbl" x="318" y="238">The gap:</text>
+  <text class="t" x="378" y="238">a point prediction carries no indication of when it is wrong.</text>
   <text class="sub" x="318" y="256">Policy decisions need to know which links the surrogate is guessing at.</text>
 
   <path class="ar" d="M889,182 L889,214"/>
