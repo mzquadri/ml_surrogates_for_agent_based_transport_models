@@ -3,8 +3,8 @@
   "trial": 9,
   "version": "v2_frozen_backbone",
   "strategy": "frozen_backbone_heteroscedastic",
-  "t8_backbone": "C:\\Users\\MohdZaminQuadri\\Downloads\\Nazim\\ml_surrogates_thesis_final\\code\\data\\TR-C_Benchmarks\\point_net_transf_gat_8th_trial_lower_dropout\\trained_model\\model.pth",
-  "t8_test_dl": "C:\\Users\\MohdZaminQuadri\\Downloads\\Nazim\\ml_surrogates_thesis_final\\code\\data\\TR-C_Benchmarks\\point_net_transf_gat_8th_trial_lower_dropout\\data_created_during_training\\test_dl.pt",
+  "t8_backbone": "data/TR-C_Benchmarks/point_net_transf_gat_8th_trial_lower_dropout/trained_model/model.pth",
+  "t8_test_dl": "data/TR-C_Benchmarks/point_net_transf_gat_8th_trial_lower_dropout/data_created_during_training/test_dl.pt",
   "fixes_applied": [
     "frozen_backbone_prevents_nll_collapse",
     "stronger_var_reg_lambda_0.1",
