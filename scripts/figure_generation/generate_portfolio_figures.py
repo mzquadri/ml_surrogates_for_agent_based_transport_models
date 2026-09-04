@@ -45,7 +45,7 @@ def save(fig, name, face=ps.PAPER):
 
 
 # ---------------------------------------------------------------------------
-def fig_hero(pos, X):
+def fig_hero(pos, X, polys):
     """The network itself, coloured by how much traffic it already carries."""
     vol = X[:, 0]
     fig = plt.figure(figsize=(13.2, 10.4))
@@ -53,6 +53,8 @@ def fig_hero(pos, X):
     ax = fig.add_axes([0.03, 0.075, 0.94, 0.755])
     ps.network(ax, pos, values=np.log10(vol + 1), cmap=ps.FLOW, lw=0.6,
                background=NIGHT)
+    ps.districts(ax, polys, colour="#93A4B8", lw=1.0, alpha=0.62, label=True,
+                 label_size=7.6, label_colour="#E8EEF6", label_bg="#16233A")
 
     fig.text(0.055, 0.972, "31,635 streets, one city", ha="left", va="top",
              fontsize=27, color="#F8FAFC", fontweight="600")
@@ -186,7 +188,7 @@ def fig_inverted_u(X, absy):
     save(fig, "03_inverted_u")
 
 
-def fig_policy_vs_response(pos, red, y, absy):
+def fig_policy_vs_response(pos, red, y, absy, polys):
     """Where the policy lands, and where the traffic actually moves."""
     times = (red != 0).sum(0)
     fig = plt.figure(figsize=(13.6, 7.9))
@@ -197,10 +199,13 @@ def fig_policy_vs_response(pos, red, y, absy):
     ps.network(axL, pos, color="#1E293B", lw=0.35, background=NIGHT)
     m = times > 0
     ps.network(axL, pos[m], values=times[m], cmap=ps.HEAT, lw=0.75, background=NIGHT)
+    ps.districts(axL, polys, colour="#8595AA", lw=0.8, alpha=0.60)
     ps.focus_on(axL, pos)
 
     ps.network(axR, pos, values=np.log10(absy + 0.05), cmap=ps.HEAT, lw=0.6,
                background=NIGHT)
+    ps.districts(axR, polys, colour="#8595AA", lw=0.8, alpha=0.60, label=True,
+                 label_size=6.9, label_colour="#E8EEF6", label_bg="#16233A")
 
     for ax, head, sub in (
         (axL, "Where the policy is applied",
@@ -339,7 +344,7 @@ def fig_model_inputs(X, red, absy):
     save(fig, "06_model_inputs")
 
 
-def fig_arrondissements(pos, red, y, absy, cache):
+def fig_arrondissements(pos, red, y, absy, cache, polys):
     """The policy units, and the mismatch between treatment and effect."""
     import json
     ar = np.load(cache / "arrondissement_of_link.npy")
@@ -358,6 +363,8 @@ def fig_arrondissements(pos, red, y, absy, cache):
     ps.network(axM, pos, color="#E9EDF3", lw=0.30)
     ps.network(axM, pos[inside], values=absy[inside], cmap=ps.HEAT_LIGHT, lw=0.62,
                vmax=float(np.percentile(absy[inside], 99)))
+    ps.districts(axM, polys, colour=ps.MUTED, lw=0.9, alpha=0.85, label=True,
+                 label_size=7.2, label_colour=ps.INK, label_bg=ps.PAPER)
     ps.focus_on(axM, pos)
     axM.text(0, 1.045, "Response inside the city", transform=axM.transAxes,
              fontsize=13.4, color=ps.INK, fontweight="600", va="bottom")
@@ -403,14 +410,15 @@ def main() -> int:
     ps.apply()
     red, y, X, pos, ei = load(args.corpus, args.cache)
     absy = np.abs(y).mean(0)
+    polys = ps.load_districts(REPO)
     print(f"corpus {y.shape[0]:,} scenarios x {y.shape[1]:,} links\n")
-    fig_hero(pos, X)
+    fig_hero(pos, X, polys)
     fig_features(X, red, absy)
     fig_inverted_u(X, absy)
-    fig_policy_vs_response(pos, red, y, absy)
+    fig_policy_vs_response(pos, red, y, absy, polys)
     fig_road_classes(X, red, absy)
     fig_model_inputs(X, red, absy)
-    fig_arrondissements(pos, red, y, absy, args.cache)
+    fig_arrondissements(pos, red, y, absy, args.cache, polys)
     print(f"\nfigures written to {OUT}")
     return 0
 

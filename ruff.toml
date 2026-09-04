@@ -37,6 +37,7 @@ include = [
     "scripts/figure_generation/portfolio_style.py",
     "scripts/figure_generation/generate_feature_cards.py",
     "scripts/figure_generation/generate_model_diagram.py",
+    "scripts/figure_generation/generate_five_features_figure.py",
 ]
 
 [lint]
