@@ -17,6 +17,7 @@ an uncertainty estimate; for those see `scripts/verify_headline_results.py` and
 | [05_spillover.md](05_spillover.md) | How far the response travels, and the controls behind that claim |
 | [06_anomalies.md](06_anomalies.md) | Eight data-quality observations and what each does or does not affect |
 | [07_representatives.md](07_representatives.md) | The rule-selected example scenarios and links, and why each was picked |
+| [08_models_and_experiments.md](08_models_and_experiments.md) | All 16 checkpoints, the trial timeline, and the UQ method matrix |
 | [assets/SCHEMA.md](assets/SCHEMA.md) | Field-by-field contract for the derived web assets |
 
 ## The four findings worth knowing
