@@ -66,6 +66,28 @@
       "std_response_vehh": 33.6574,
       "mid_lon": 2.29419,
       "mid_lat": 48.87389
+    },
+    {
+      "link_row": 6608,
+      "selection_rule": "highest_degree",
+      "selection_reason": "meets the most other links (10 incident edges)",
+      "highway_code": 2,
+      "times_intervened": 326,
+      "mean_abs_response_vehh": 5.0203,
+      "std_response_vehh": 4.3184,
+      "mid_lon": 2.35388,
+      "mid_lat": 48.89077
+    },
+    {
+      "link_row": 31559,
+      "selection_rule": "isolated",
+      "selection_reason": "degree zero: one of 76 links in no edge at all",
+      "highway_code": -1,
+      "times_intervened": 0,
+      "mean_abs_response_vehh": 0.0,
+      "std_response_vehh": 0.0,
+      "mid_lon": 2.26894,
+      "mid_lat": 48.85397
     }
   ]
 }

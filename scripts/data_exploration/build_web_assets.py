@@ -298,7 +298,7 @@ def main() -> int:
                       "std_response_vehh": round(float(stdY[idx]), 4),
                       "mid_lon": round(float(pos[idx, 2, 0]), R),
                       "mid_lat": round(float(pos[idx, 2, 1]), R)}
-                     for nm, (idx, reason) in link_rules(red, y, X).items()]},
+                     for nm, (idx, reason) in link_rules(red, y, X, ei).items()]},
           OUT / "representative_links.json")
 
     total = sum(f.stat().st_size for f in OUT.glob("*") if f.is_file())

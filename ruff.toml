@@ -31,6 +31,8 @@ include = [
     "scripts/figure_generation/generate_results_figures.py",
     "scripts/figure_generation/generate_arrondissement_figures.py",
     "scripts/figure_generation/generate_isometric_diagrams.py",
+    "scripts/figure_generation/generate_data_exploration_figures.py",
+    "scripts/figure_generation/generate_data_anatomy_diagrams.py",
 ]
 
 [lint]
