@@ -47,7 +47,32 @@ REQUIRED = {
     "narrative_link.json": ["link_row", "why", "identity_check"],
     "representative_scenarios.json": ["items"],
     "representative_links.json": ["links"],
+    "tensor_anatomy.json": ["stored_fields", "node_accounting",
+                            "invariants_checked_over_all_scenarios"],
+    "feature_statistics.json": ["corpus", "features", "static_vs_dynamic"],
+    "model_inputs.json": ["node_features_used", "node_features_excluded",
+                          "also_consumed_by_the_architecture", "precise_statement"],
+    "graph_topology.json": ["nodes", "edges", "degree", "components"],
+    "auxiliary_tensors.json": ["mode_stats_diff", "mode_stats_diff_perc"],
 }
+
+#: Claims a website would state as fact; if the data stops supporting them, the
+#: page would start lying. Cheap to check here, so checked here.
+INVARIANTS = [
+    ("model_inputs.json", lambda d: len(d["node_features_used"]) == 5,
+     "node_features_used must list exactly five columns"),
+    ("model_inputs.json", lambda d: d["node_features_excluded"] == ["HIGHWAY"],
+     "HIGHWAY must be the only excluded column"),
+    ("feature_statistics.json", lambda d: len(d["features"]) == 6,
+     "x has six columns; feature_statistics must describe all six"),
+    ("feature_statistics.json",
+     lambda d: d["features"]["HIGHWAY"]["treatment"] == "categorical",
+     "HIGHWAY must be treated categorically, never as a continuous variable"),
+    ("tensor_anatomy.json", lambda d: d["n_scenarios"] == 1000,
+     "the corpus is 1,000 scenarios"),
+    ("graph_topology.json", lambda d: d["nodes"] == 31635 and d["edges"] == 59851,
+     "line graph is 31,635 nodes and 59,851 directed edges"),
+]
 
 #: A single asset above this is too heavy for a web page to fetch eagerly.
 MAX_ASSET_MB = 4.0
@@ -81,6 +106,23 @@ def main() -> int:
         for k in keys:
             if k not in obj:
                 problems.append(f"{name} has no top-level '{k}'")
+
+    # --- claims the published pages depend on --------------------------------------------
+    for name, predicate, message in INVARIANTS:
+        path = ASSETS / name
+        if not path.exists():
+            continue
+        try:
+            obj = json.loads(path.read_text(encoding="utf-8"))
+        except json.JSONDecodeError:
+            continue
+        try:
+            ok = predicate(obj)
+        except (KeyError, TypeError, IndexError) as exc:
+            problems.append(f"{name}: cannot check '{message}' ({exc})")
+            continue
+        if not ok:
+            problems.append(f"{name}: {message}")
 
     # --- the links.csv join contract ---------------------------------------------------
     links = ASSETS / "links.csv"

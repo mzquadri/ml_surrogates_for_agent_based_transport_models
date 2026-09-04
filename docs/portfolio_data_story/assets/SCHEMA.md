@@ -191,6 +191,48 @@ Per nominal level: `empirical_coverage`, `half_width_vehh`, `full_width_vehh`. N
 width cost — coverage is bought with interval width, and a chart showing only coverage
 tells half the story.
 
+## `tensor_anatomy.json`
+
+The stored schema of the corpus, verified by streaming all 1,000 scenarios.
+`stored_fields` gives shape, dtype and bytes per scenario for each entry;
+`invariants_checked_over_all_scenarios` records which fields were proved constant;
+`node_accounting` holds the 31,635-vs-31,559 discrepancy and its explanation.
+Use this to describe the dataset without re-reading 2.6 GB.
+
+## `feature_statistics.json`
+
+Full-corpus statistics for the six columns of `x`. Continuous columns carry
+`stats` (min, p01, q1, median, q3, p99, max, mean, std, iqr, n_unique, zero_pct,
+nan_pct, negative_pct), a `spearman_vs_mean_abs_response`, and a
+`response_curve_vs_abs_target` of quantile bins with median, mean and p90
+response. `HIGHWAY` instead carries `treatment: "categorical"` and a `classes`
+array — it has no mean and no correlation, deliberately. `CAPACITY_REDUCTION`
+additionally carries `nonzero_only` stats and per-scenario footprint figures.
+`static_vs_dynamic` is the field-by-field table of what changes between scenarios.
+
+## `model_inputs.json`
+
+Which columns the trained model consumed, with the checkpoint evidence that
+settles it (`point_net_conv_1.local_nn.0.weight` of shape `[256, 7]`).
+`node_features_used`, `node_features_excluded`,
+`also_consumed_by_the_architecture` and `not_consumed` are the four lists a
+website needs to state this correctly. `precise_statement` is a sentence that can
+be quoted as-is.
+
+## `graph_topology.json`
+
+Line-graph structure: node and edge counts, self-loops, reciprocity, degree
+histogram, weak and strong component counts, and `response_by_degree`. Enough to
+draw a degree chart and to state the connectivity facts without recomputing them.
+
+## `auxiliary_tensors.json`
+
+`mode_stats_diff` and `mode_stats_diff_perc` cell-by-cell (mean, std, min, max,
+and for the percentages `share_minus_100`). Published so the two unused tensors
+are documented rather than silently dropped. **Do not chart these**: the values
+are dominated by a scale mismatch explained in CORRIGENDUM C12, and a chart would
+invite a reader to interpret -99.99% as a simulation result.
+
 ## Display guidance
 
 All fields are safe to publish: this is simulation output over a public road

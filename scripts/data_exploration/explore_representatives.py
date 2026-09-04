@@ -65,11 +65,17 @@ def selection_rules(red, y):
     }
 
 
-def link_rules(red, y, X):
+def link_rules(red, y, X, edge_index=None):
+    """Objectively selected example links, one per rule.
+
+    Every rule is an argmax over the corpus, so the choice is reproducible and
+    nobody picked a link because its map looked good. Two of the rules describe
+    the graph rather than the traffic, which is why edge_index is accepted here.
+    """
     M = red != 0
     per_link = M.sum(0)
     absY = np.abs(y).mean(0)
-    return {
+    rules = {
         "most_often_intervened": (int(np.argmax(per_link)),
                                   "intervened in the most scenarios"),
         "most_volatile_response": (int(np.argmax(y.std(0))),
@@ -82,6 +88,21 @@ def link_rules(red, y, X):
         "longest_link": (int(np.argmax(X[:, 5])), "greatest length"),
         "highest_capacity": (int(np.argmax(X[:, 1])), "highest base capacity"),
     }
+    if edge_index is not None:
+        n = X.shape[0]
+        deg = (np.bincount(edge_index[0], minlength=n)
+               + np.bincount(edge_index[1], minlength=n))
+        rules["highest_degree"] = (
+            int(np.argmax(deg)),
+            f"meets the most other links ({int(deg.max())} incident edges)")
+        # Ties are broken by taking the first isolated row, which is stable because
+        # edge_index is identical in every scenario.
+        iso = np.flatnonzero(deg == 0)
+        if iso.size:
+            rules["isolated"] = (
+                int(iso[0]),
+                f"degree zero: one of {iso.size} links in no edge at all")
+    return rules
 
 
 def main() -> int:
@@ -148,7 +169,7 @@ def main() -> int:
     per_link = M.sum(0); absY = np.abs(y).mean(0)
     print(f"  {'rule':34s} {'row':>6} {'hw':>3} {'timesInt':>9} "
           f"{'mean|y|':>8} {'std(y)':>8}")
-    for name, (idx, _) in link_rules(red, y, X).items():
+    for name, (idx, _) in link_rules(red, y, X, ei).items():
         print(f"  {name:34s} {idx:6d} {int(X[idx,4]):3d} {per_link[idx]:9,} "
               f"{absY[idx]:8.2f} {y[:,idx].std():8.2f}")
 
