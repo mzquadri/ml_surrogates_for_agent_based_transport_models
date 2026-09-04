@@ -15,6 +15,8 @@ python scripts/data_exploration/explore_tensors.py  --corpus $CORPUS --cache $CA
 python scripts/figure_generation/generate_feature_cards.py --corpus $CORPUS --cache $CACHE
 ```
 
+![Field reference](../portfolio/10_field_reference.png)
+
 | # | Field | Where it lives | Model input |
 |---|---|---|---|
 | 1 | `VOL_BASE_CASE` | `x[:, 0]` | yes |
