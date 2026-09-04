@@ -48,7 +48,7 @@ def batch_paths(data_dir: Path) -> list[Path]:
         raise SystemExit(
             f"No datalist_batch_*.pt under {data_dir}.\n"
             "Fetch them first:\n"
-            "  gh release download train-data-v1 --repo mzquadri/ml-surrogates-thesis \\\n"
+            "  gh release download train-data-v1 --repo mzquadri/ml_surrogates_for_agent_based_transport_models \\\n"
             "    --pattern 'datalist_batch_*.pt' --dir <dir>"
         )
     return sorted(paths, key=lambda p: int(p.stem.rsplit("_", 1)[1]))
