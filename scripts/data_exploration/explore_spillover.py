@@ -33,8 +33,13 @@ from pathlib import Path
 import numpy as np
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from common import (add_common_args, directed_adjacency, hop_distance,  # noqa: E402
-                    load, undirected_adjacency)
+from common import (  # noqa: E402
+    add_common_args,
+    directed_adjacency,
+    hop_distance,
+    load,
+    undirected_adjacency,
+)
 
 MAX_HOPS = 8
 
@@ -42,7 +47,6 @@ MAX_HOPS = 8
 def profile(adj, red, y, sample):
     """Mean |y| per hop band, share of total |y|, and reachability."""
     M = red != 0
-    n = red.shape[1]
     acc = np.zeros(MAX_HOPS + 1); cnt = np.zeros(MAX_HOPS + 1)
     share = np.zeros(MAX_HOPS + 1); cum = np.zeros(MAX_HOPS + 1)
     unre_absy, unre_share, unre_cnt = 0.0, 0.0, 0

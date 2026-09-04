@@ -269,7 +269,7 @@ def main() -> int:
     print("-" * len(header))
 
     failures = skips = 0
-    for label, documented, fn, tol, unit, source in CHECKS:
+    for label, documented, fn, tol, _unit, source in CHECKS:
         short = source if args.verbose else Path(source).name
         try:
             got = fn()

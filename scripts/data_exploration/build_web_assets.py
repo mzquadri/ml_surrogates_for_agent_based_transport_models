@@ -23,10 +23,16 @@ from pathlib import Path
 import numpy as np
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from common import (FEATURES, HIGHWAY_CLASSES, add_common_args,  # noqa: E402
-                    directed_adjacency, hop_distance, load, undirected_adjacency)
-from explore_representatives import (NARRATIVE_LINK, link_rules,  # noqa: E402
-                                     selection_rules)
+from common import (  # noqa: E402
+    FEATURES,
+    HIGHWAY_CLASSES,
+    add_common_args,
+    directed_adjacency,
+    hop_distance,
+    load,
+    undirected_adjacency,
+)
+from explore_representatives import NARRATIVE_LINK, link_rules, selection_rules  # noqa: E402
 
 REPO = Path(__file__).resolve().parent.parent.parent
 OUT = REPO / "docs" / "portfolio_data_story" / "assets"

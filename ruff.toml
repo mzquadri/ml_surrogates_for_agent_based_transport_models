@@ -1,0 +1,47 @@
+# Linting is scoped deliberately narrowly.
+#
+# Running ruff across the whole repository reports ~1,600 findings and rewrites 86
+# files. Almost none of that is worth doing:
+#
+#   * scripts/gnn, scripts/training, scripts/data_preprocessing and the two shared
+#     help/plot modules are upstream. Reformatting them would destroy the diff
+#     against enatterer/ml_surrogates_for_agent_based_transport_models and
+#     misrepresent which lines are inherited. Attribution beats tidiness.
+#   * scripts/archive is a historical record and is documented as not runnable.
+#   * the thesis-era evaluation and figure scripts produced the committed results.
+#     Reformatting them now would be a large diff with no bearing on whether any
+#     number is still correct, which is what verify_headline_results.py is for.
+#
+# So the gate covers the tooling written to make this repository verifiable. Those
+# files are new, actively maintained, and are the ones a reader is most likely to
+# run. `ruff check .` uses this list; nothing outside it is linted.
+
+line-length = 100
+target-version = "py310"
+
+include = [
+    "scripts/verify_headline_results.py",
+    "scripts/check_docs.py",
+    "scripts/check_web_assets.py",
+    "scripts/restore_large_files.py",
+    "scripts/data_exploration/*.py",
+    "scripts/evaluation/artifact_paths.py",
+    "scripts/figure_generation/generate_dataset_figures.py",
+    "scripts/figure_generation/generate_results_figures.py",
+    "scripts/figure_generation/generate_arrondissement_figures.py",
+    "scripts/figure_generation/generate_isometric_diagrams.py",
+]
+
+[lint]
+# Real errors, undefined and unused names, import order, and the bugbear checks
+# that catch genuine mistakes. No stylistic rewrites.
+select = ["E", "F", "I", "B"]
+ignore = [
+    "E501",  # long lines are a judgement call, not a gate
+    "B008",  # argparse and Path defaults in signatures are fine here
+    "E702",  # compact "a = 1; b = 2" setup lines in plotting code are deliberate
+]
+
+[lint.per-file-ignores]
+# These scripts insert sys.path before importing siblings; that is intentional.
+"scripts/**" = ["E402"]
