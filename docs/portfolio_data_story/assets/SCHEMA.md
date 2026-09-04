@@ -138,6 +138,59 @@ block recording that it is the unique maximum, that no other row shares its
 geometry, and that **no MATSim/OSM id is available**. `response_sorted_vehh`
 holds its 1,000 responses sorted ascending, ready to plot directly.
 
+## `arrondissements.json`
+
+Per-district aggregates from the point-in-polygon join of link midpoints against the 20
+arrondissement polygons. Fields per entry: `arrondissement` (0 means the midpoint falls
+outside every polygon — the network extends past the city boundary), `links`,
+`share_links_ever_intervened`, `mean_intervention_severity_vehh`,
+`mean_abs_response_vehh`, `mean_vol_base_case`, `mean_capacity_base_case`,
+`total_intervention_events`. Join to `links.csv` on geography, not on an id.
+
+**The polygons are administrative boundaries, never the road network.**
+
+## `trials.json`
+
+Inventory of all 16 checkpoints. Per trial: `checkpoints` (paths), `checkpoint_mb`,
+`architecture` (`params`, `in_channels`, `transformer_layers`, `output_dim`,
+`extra_heads` — all derived from tensor shapes), `test_metrics` (or `null`), and
+`metrics_source` naming which file the metrics came from, since the filename is not
+consistent across trials.
+
+**Carries a `caveat` field**: trials were not all scored on the same test split, so R² is
+not comparable across the T6/T7 boundary. See CORRIGENDUM C9.
+
+## `experiment_timeline.json`
+
+One entry per stage T1 → T11 plus the ensemble, each with `change`, `test_graphs`,
+`metrics`, and a one-line `lesson`. Carries the same `comparability_warning` at the top
+level. A chart built from this **must not** place 50-graph and 100-graph R² on one axis
+without saying so.
+
+## `uq_methods.json`
+
+One entry per implemented method with `question` (what it answers), `post_hoc` (whether
+the model was retrained), `metric`, `result`, and `limitation`. The `limitation` field is
+not decoration — each method has one, and a page that shows the results without them
+overstates the work.
+
+## `calibration_curve.json`
+
+Reliability curve under protocol `graph20_80_v1`: `nominal_levels` with
+`empirical_coverage_raw` and `empirical_coverage_scaled` as parallel arrays, plus
+`temperature`, `ece_before`, `ece_after`. Plot raw against scaled on the diagonal.
+
+## `selective_prediction.json`
+
+Risk-coverage curve: `curve` holds `retained` (0.05–1.00), `mae`, and
+`mae_reduction_pct` against `baseline_mae_vehh`. Ranked by MC Dropout σ ascending.
+
+## `conformal_coverage.json`
+
+Per nominal level: `empirical_coverage`, `half_width_vehh`, `full_width_vehh`. Note the
+width cost — coverage is bought with interval width, and a chart showing only coverage
+tells half the story.
+
 ## Display guidance
 
 All fields are safe to publish: this is simulation output over a public road

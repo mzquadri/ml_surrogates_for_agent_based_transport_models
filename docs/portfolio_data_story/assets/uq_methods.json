@@ -1,0 +1,118 @@
+{
+  "note": "Only methods actually implemented. Every value is asserted by scripts/verify_headline_results.py or read from a tracked artifact.",
+  "methods": [
+    {
+      "method": "MC Dropout",
+      "question": "Does sigma rank errors?",
+      "post_hoc": true,
+      "metric": "Spearman rho",
+      "result": {
+        "t8_rho": 0.482,
+        "t7_rho_replayable": 0.4437,
+        "S": 30
+      },
+      "limitation": "A ranking signal, not a calibrated scale."
+    },
+    {
+      "method": "Temperature scaling",
+      "question": "Is sigma the right size?",
+      "post_hoc": true,
+      "metric": "expected calibration error",
+      "result": {
+        "temperature_thesis": 2.702,
+        "temperature_recomputed": 2.701,
+        "temperature_note": "The thesis reports the archived optimum 2.7025; re-fitting here finds 2.7010. See docs/UQ_SUMMARY.md.",
+        "ece_before": 0.269,
+        "ece_after": 0.048
+      },
+      "limitation": "Fixes average width, not per-node width."
+    },
+    {
+      "method": "Split conformal",
+      "question": "Can coverage be guaranteed?",
+      "post_hoc": true,
+      "metric": "empirical marginal coverage",
+      "result": {
+        "coverage_90": 90.17,
+        "coverage_95": 95.09
+      },
+      "limitation": "Marginal only; one shared width for every link."
+    },
+    {
+      "method": "Adaptive conformal",
+      "question": "Can coverage hold across uncertainty levels?",
+      "post_hoc": true,
+      "metric": "conditional coverage by sigma decile",
+      "result": {
+        "range_adaptive": [
+          83.7,
+          96.4
+        ],
+        "range_standard": [
+          59.0,
+          98.1
+        ]
+      },
+      "limitation": "Wider intervals overall."
+    },
+    {
+      "method": "Selective prediction",
+      "question": "Does it change a decision?",
+      "post_hoc": true,
+      "metric": "MAE reduction at a retention level",
+      "result": {
+        "mae_reduction_pct_at_50": 41.2,
+        "at_90": 18.3
+      },
+      "limitation": "Needs the ranking only; says nothing about scale."
+    },
+    {
+      "method": "Error detection",
+      "question": "Can bad links be flagged?",
+      "post_hoc": true,
+      "metric": "AUROC",
+      "result": {
+        "auroc_top10": 0.7585,
+        "auroc_top20": 0.7401,
+        "source": "trial8_uq_ablation_results.csv"
+      },
+      "limitation": "Ranking quality, not precision at an operating point."
+    },
+    {
+      "method": "CQR",
+      "question": "Can the interval itself be learned?",
+      "post_hoc": false,
+      "metric": "PICP and interval width",
+      "result": {
+        "t10_gate": "FAIL",
+        "t11_gate": "PASS",
+        "t11_picp_90": 89.822,
+        "t11_picp_95": 94.908
+      },
+      "limitation": "A full retrain (T10) can lose the backbone's accuracy."
+    },
+    {
+      "method": "Deep ensemble",
+      "question": "Does more capacity help?",
+      "post_hoc": false,
+      "metric": "R2 and Spearman rho",
+      "result": {
+        "r2": 0.6841,
+        "rho": 0.3997,
+        "rho_vs_mc_dropout_pct": -17.07
+      },
+      "limitation": "Best accuracy, worse uncertainty ranking than MC Dropout."
+    },
+    {
+      "method": "Heteroscedastic regression",
+      "question": "Can the model predict its own variance?",
+      "post_hoc": false,
+      "metric": "validation NLL",
+      "result": {
+        "best_val_nll": 3.2489,
+        "epoch": 290
+      },
+      "limitation": "No test metrics were recorded."
+    }
+  ]
+}

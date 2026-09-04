@@ -1,0 +1,36 @@
+{
+  "protocol": "graph20_80_v1",
+  "score": "absolute residual of the deterministic prediction",
+  "levels": [
+    {
+      "nominal": 0.5,
+      "empirical_coverage": 0.50396,
+      "half_width_vehh": 1.9442,
+      "full_width_vehh": 3.8884
+    },
+    {
+      "nominal": 0.7,
+      "empirical_coverage": 0.70354,
+      "half_width_vehh": 4.0621,
+      "full_width_vehh": 8.1242
+    },
+    {
+      "nominal": 0.8,
+      "empirical_coverage": 0.80332,
+      "half_width_vehh": 6.0829,
+      "full_width_vehh": 12.1658
+    },
+    {
+      "nominal": 0.9,
+      "empirical_coverage": 0.90148,
+      "half_width_vehh": 9.999,
+      "full_width_vehh": 19.998
+    },
+    {
+      "nominal": 0.95,
+      "empirical_coverage": 0.95066,
+      "half_width_vehh": 14.5693,
+      "full_width_vehh": 29.1387
+    }
+  ]
+}

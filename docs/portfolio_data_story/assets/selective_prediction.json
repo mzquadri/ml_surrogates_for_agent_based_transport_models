@@ -1,0 +1,107 @@
+{
+  "baseline_mae_vehh": 3.9483,
+  "ranking_signal": "MC Dropout sigma, ascending",
+  "note": "uses only the ordering of sigma, not its magnitude, which is why it works despite sigma being uncalibrated",
+  "curve": [
+    {
+      "retained": 0.05,
+      "mae": 0.3111,
+      "mae_reduction_pct": 92.121
+    },
+    {
+      "retained": 0.1,
+      "mae": 1.0512,
+      "mae_reduction_pct": 73.377
+    },
+    {
+      "retained": 0.15,
+      "mae": 1.4075,
+      "mae_reduction_pct": 64.351
+    },
+    {
+      "retained": 0.2,
+      "mae": 1.6323,
+      "mae_reduction_pct": 58.658
+    },
+    {
+      "retained": 0.25,
+      "mae": 1.7949,
+      "mae_reduction_pct": 54.541
+    },
+    {
+      "retained": 0.3,
+      "mae": 1.926,
+      "mae_reduction_pct": 51.221
+    },
+    {
+      "retained": 0.35,
+      "mae": 2.037,
+      "mae_reduction_pct": 48.408
+    },
+    {
+      "retained": 0.4,
+      "mae": 2.1364,
+      "mae_reduction_pct": 45.89
+    },
+    {
+      "retained": 0.45,
+      "mae": 2.2315,
+      "mae_reduction_pct": 43.483
+    },
+    {
+      "retained": 0.5,
+      "mae": 2.321,
+      "mae_reduction_pct": 41.215
+    },
+    {
+      "retained": 0.55,
+      "mae": 2.4123,
+      "mae_reduction_pct": 38.902
+    },
+    {
+      "retained": 0.6,
+      "mae": 2.5008,
+      "mae_reduction_pct": 36.662
+    },
+    {
+      "retained": 0.65,
+      "mae": 2.5931,
+      "mae_reduction_pct": 34.325
+    },
+    {
+      "retained": 0.7,
+      "mae": 2.6907,
+      "mae_reduction_pct": 31.852
+    },
+    {
+      "retained": 0.75,
+      "mae": 2.7952,
+      "mae_reduction_pct": 29.204
+    },
+    {
+      "retained": 0.8,
+      "mae": 2.9134,
+      "mae_reduction_pct": 26.211
+    },
+    {
+      "retained": 0.85,
+      "mae": 3.0513,
+      "mae_reduction_pct": 22.719
+    },
+    {
+      "retained": 0.9,
+      "mae": 3.2264,
+      "mae_reduction_pct": 18.284
+    },
+    {
+      "retained": 0.95,
+      "mae": 3.4806,
+      "mae_reduction_pct": 11.845
+    },
+    {
+      "retained": 1.0,
+      "mae": 3.9483,
+      "mae_reduction_pct": -0.0
+    }
+  ]
+}
