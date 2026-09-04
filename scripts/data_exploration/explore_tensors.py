@@ -98,6 +98,11 @@ def main() -> int:
 
     msd = np.stack(msd)      # [S, 6, 3]
     msdp = np.stack(msdp)
+    # Tiny (about 300 KB the pair), and the only place these two tensors are read
+    # off the corpus. Caching them lets the figure scripts draw the auxiliary
+    # fields without streaming 2.6 GB again.
+    np.save(args.cache / "mode_stats_diff.npy", msd.astype(np.float64))
+    np.save(args.cache / "mode_stats_diff_perc.npy", msdp.astype(np.float64))
     x0, ei = first["x"], first["ei"]
     n_rows = x0.shape[0]
     nn = first["num_nodes"]
