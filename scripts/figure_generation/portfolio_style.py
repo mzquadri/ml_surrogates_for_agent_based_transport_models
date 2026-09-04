@@ -54,13 +54,29 @@ HEAT = LinearSegmentedColormap.from_list(
 DIVERGE = LinearSegmentedColormap.from_list(
     "diverge", ["#1D4ED8", "#60A5FA", "#E5E7EB", "#F87171", "#B91C1C"])
 
-#: The same idea as HEAT, for maps drawn on white. FLOW and HEAT begin near black
-#: so quiet links sink into a dark ground; on paper that reads as scribble, so
-#: this one begins near the paper instead and darkens as the value rises.
+#: Every figure is drawn on paper. These two ramps begin near the background so
+#: quiet links recede into it, and darken as the value rises. FLOW and HEAT above
+#: are the dark-ground equivalents and are kept only for reference; nothing in the
+#: published set uses them.
 HEAT_LIGHT = LinearSegmentedColormap.from_list(
     "heat_light", ["#EEF2F7", "#C7D2FE", "#F59E0B", "#DC2626", "#7F1D1D"])
+FLOW_LIGHT = LinearSegmentedColormap.from_list(
+    "flow_light", ["#EDF2F7", "#BAE6FD", "#38BDF8", "#2563EB", "#1E1B4B"])
 
 FAMILY = ["Segoe UI", "Corbel", "DejaVu Sans"]
+
+
+def truncate(cmap, lo=0.0, hi=1.0, n=256):
+    """A colour ramp restricted to part of its range.
+
+    A light-ground ramp starts at almost the background colour, which is right when
+    most of the data is low and should recede. It is wrong when every drawn value
+    matters -- a link intervened once still needs to be visible. Truncating lifts
+    the floor without inventing a different palette. Pass the returned ramp to
+    `gradient_key` as well, so the key and the map stay the same ramp.
+    """
+    return LinearSegmentedColormap.from_list(
+        f"{cmap.name}_{lo:.2f}_{hi:.2f}", cmap(np.linspace(lo, hi, n)))
 
 
 def apply():

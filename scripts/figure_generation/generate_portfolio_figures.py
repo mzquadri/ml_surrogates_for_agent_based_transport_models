@@ -34,7 +34,9 @@ from common import HIGHWAY_CLASSES, MODEL_COLS, add_common_args, load  # noqa: E
 from matplotlib.patches import Rectangle  # noqa: E402
 
 OUT = REPO / "docs" / "figures" / "portfolio"
-NIGHT = "#0B1220"
+#: Kept as a named colour for the district badges, which still need a dark
+#: chip to sit on a light map. No figure uses it as a background.
+INK_CHIP = "#16233A"
 
 
 def save(fig, name, face=ps.PAPER):
@@ -49,29 +51,27 @@ def fig_hero(pos, X, polys):
     """The network itself, coloured by how much traffic it already carries."""
     vol = X[:, 0]
     fig = plt.figure(figsize=(13.2, 10.4))
-    fig.patch.set_facecolor(NIGHT)
     ax = fig.add_axes([0.03, 0.075, 0.94, 0.755])
-    ps.network(ax, pos, values=np.log10(vol + 1), cmap=ps.FLOW, lw=0.6,
-               background=NIGHT)
-    ps.districts(ax, polys, colour="#93A4B8", lw=1.0, alpha=0.62, label=True,
-                 label_size=7.6, label_colour="#E8EEF6", label_bg="#16233A")
+    ps.network(ax, pos, values=np.log10(vol + 1), cmap=ps.FLOW_LIGHT, lw=0.6)
+    ps.districts(ax, polys, colour=ps.MUTED, lw=0.9, alpha=0.70, label=True,
+                 label_size=7.6, label_colour=ps.PAPER, label_bg=INK_CHIP)
 
     fig.text(0.055, 0.972, "31,635 streets, one city", ha="left", va="top",
-             fontsize=27, color="#F8FAFC", fontweight="600")
+             fontsize=27, color=ps.INK, fontweight="600")
     fig.text(0.055, 0.930,
              "Every line is one road link in the MATSim model of Paris, drawn from its own "
              "stored start and end coordinates\nand shaded by the car volume it carries "
              "before any policy is applied.",
-             ha="left", va="top", fontsize=12.6, color="#94A3B8", linespacing=1.6)
+             ha="left", va="top", fontsize=12.6, color=ps.MUTED, linespacing=1.6)
 
-    ps.gradient_key(fig, [0.055, 0.862, 0.20, 0.011], ps.FLOW,
+    ps.gradient_key(fig, [0.055, 0.862, 0.20, 0.011], ps.FLOW_LIGHT,
                     "quiet", "1,596 veh/h")
     fig.text(0.055, 0.052,
              "The ring is the Périphérique; the dark band through the middle is the Seine. "
              "23.9% of links carry no car traffic at all.\n"
              "Source: train-data-v1 release, 1,000 scenarios × 31,635 links.",
-             ha="left", va="top", fontsize=9.8, color="#64748B", linespacing=1.7)
-    save(fig, "01_the_network", face=NIGHT)
+             ha="left", va="top", fontsize=9.8, color=ps.FAINT, linespacing=1.7)
+    save(fig, "01_the_network")
 
 
 def fig_features(X, red, absy):
@@ -192,20 +192,23 @@ def fig_policy_vs_response(pos, red, y, absy, polys):
     """Where the policy lands, and where the traffic actually moves."""
     times = (red != 0).sum(0)
     fig = plt.figure(figsize=(13.6, 7.9))
-    fig.patch.set_facecolor(NIGHT)
     axL = fig.add_axes([0.025, 0.115, 0.465, 0.685])
     axR = fig.add_axes([0.508, 0.115, 0.465, 0.685])
 
-    ps.network(axL, pos, color="#1E293B", lw=0.35, background=NIGHT)
+    ps.network(axL, pos, color="#E4E9F0", lw=0.35)
     m = times > 0
-    ps.network(axL, pos[m], values=times[m], cmap=ps.HEAT, lw=0.75, background=NIGHT)
-    ps.districts(axL, polys, colour="#8595AA", lw=0.8, alpha=0.60)
+    # Only 11,305 of 31,635 links are ever intervened, and many just once. On a
+    # light ground the bottom of the ramp is nearly the paper colour, so the ramp
+    # is lifted for this panel and the key below uses the same lifted ramp.
+    hot = ps.truncate(ps.HEAT_LIGHT, 0.30, 1.0)
+    ps.network(axL, pos[m], values=times[m], cmap=hot, lw=0.85)
+    ps.districts(axL, polys, colour=ps.MUTED, lw=0.8, alpha=0.68)
     ps.focus_on(axL, pos)
 
-    ps.network(axR, pos, values=np.log10(absy + 0.05), cmap=ps.HEAT, lw=0.6,
-               background=NIGHT)
-    ps.districts(axR, polys, colour="#8595AA", lw=0.8, alpha=0.60, label=True,
-                 label_size=6.9, label_colour="#E8EEF6", label_bg="#16233A")
+    ps.network(axR, pos, values=np.log10(absy + 0.05), cmap=ps.HEAT_LIGHT,
+               lw=0.6)
+    ps.districts(axR, polys, colour=ps.MUTED, lw=0.8, alpha=0.68, label=True,
+                 label_size=6.9, label_colour=ps.PAPER, label_bg=INK_CHIP)
 
     for ax, head, sub in (
         (axL, "Where the policy is applied",
@@ -213,27 +216,29 @@ def fig_policy_vs_response(pos, red, y, absy, polys):
         (axR, "Where the traffic actually moves",
          "every link responds, including the 20,330 no policy ever touches")):
         ax.text(0, 1.075, head, transform=ax.transAxes, fontsize=15.5,
-                color="#F8FAFC", fontweight="600", va="bottom")
+                color=ps.INK, fontweight="600", va="bottom")
         ax.text(0, 1.028, sub, transform=ax.transAxes, fontsize=10.6,
                 color="#94A3B8", va="bottom")
 
-    ps.gradient_key(fig, [0.025, 0.072, 0.16, 0.010], ps.HEAT, "once", "660 scenarios")
-    ps.gradient_key(fig, [0.508, 0.072, 0.16, 0.010], ps.HEAT, "still", "large change")
+    ps.gradient_key(fig, [0.025, 0.072, 0.16, 0.010], hot, "once",
+                    "660 scenarios")
+    ps.gradient_key(fig, [0.508, 0.072, 0.16, 0.010], ps.HEAT_LIGHT, "still",
+                    "large change")
 
     fig.text(0.055, 0.955, "The effect is not where the policy is",
-             ha="left", va="top", fontsize=25, color="#F8FAFC", fontweight="600")
+             ha="left", va="top", fontsize=25, color=ps.INK, fontweight="600")
     fig.text(0.055, 0.912,
              "Capacity is only ever removed from three road classes. The response spreads "
              "across the whole network — which is why a\nsurrogate has to model the graph "
              "rather than each street on its own.",
-             ha="left", va="top", fontsize=12.4, color="#94A3B8", linespacing=1.6)
+             ha="left", va="top", fontsize=12.4, color=ps.MUTED, linespacing=1.6)
     fig.text(0.025, 0.040,
              "Left: how often each link had capacity removed across the 1,000 scenarios. "
              "Right: mean absolute change in link volume, log-shaded.\n"
              "Trunk roads are never intervened and still carry the second-highest mean "
              "response of any road class.",
-             ha="left", va="top", fontsize=9.8, color="#64748B", linespacing=1.7)
-    save(fig, "04_policy_vs_response", face=NIGHT)
+             ha="left", va="top", fontsize=9.8, color=ps.FAINT, linespacing=1.7)
+    save(fig, "04_policy_vs_response")
 
 
 def fig_road_classes(X, red, absy):

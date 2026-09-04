@@ -100,9 +100,14 @@ and `feature_statistics.json`, so the table cannot drift from the data.
 
 - **Colour carries meaning, not decoration.** Amber marks what the policy can touch,
   blue what it never does, red the response.
-- **Two map palettes.** `FLOW` and `HEAT` begin near black for dark-ground maps;
-  `HEAT_LIGHT` begins near the paper, because a dark-ground ramp on white reads as
-  scribble.
+- **Every figure is on paper.** The maps were first drawn on a near-black ground,
+  which looked striking and is not what these are for. `FLOW_LIGHT` and
+  `HEAT_LIGHT` begin near the background and darken as the value rises, so quiet
+  links recede instead of glowing.
+- **The key is always the ramp the map used.** Where a ramp is lifted off its
+  floor so that rare values stay visible — the intervention map, where many links
+  are touched only once — the same lifted ramp is passed to the colour key, so the
+  two cannot drift apart.
 - **Framing.** Maps are framed on a percentile of the endpoints. A handful of links run
   far south of Paris, and framing on the raw extent shrinks the city to a smudge.
 - **Districts come from the data.** Arrondissement boundaries are read from
