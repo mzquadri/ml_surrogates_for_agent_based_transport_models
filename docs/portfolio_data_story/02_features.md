@@ -178,3 +178,130 @@ describe the city; the fifth describes the policy. Everything the surrogate
 learns about *which* scenario it is looking at arrives through
 `CAPACITY_REDUCTION` — and everything it knows about how the city will absorb
 that change comes from the four static ones, above all `VOL_BASE_CASE`.
+
+---
+
+# The other five stored fields
+
+`x` is six of the eleven fields each `Data` object stores. The remaining five are
+tensors in their own right, and two of them are not features at all.
+
+## 7 · `pos` — link geometry
+
+**What** — three points per link: start, end, and midpoint.
+**From** — `help_functions.get_link_geometries`, stacking `geom.coords[0]`,
+`geom.coords[-1]`, and their arithmetic mean.
+**Shape / type** — `[31635, 3, 2]` float32. Axis 1 is start / end / midpoint,
+axis 2 is `[longitude, latitude]`.
+**Unit** — decimal degrees, **EPSG:4326 (WGS84)**, set explicitly in
+`process_simulations_for_gnn.main`. Never a projected metric system.
+**Values** — longitude 2.15293–2.49007, latitude 48.75772–48.92620.
+**Dynamic** — no. Byte-identical in all 1,000 scenarios.
+**Model** — yes. `PointNetConv` consumes `pos[:, 0]` (start) in the first layer
+and `pos[:, 1]` (end) in the second, appending the relative offset `pos_j − pos_i`
+to the features — which is why the first Linear takes 7 inputs, not 5.
+**Data quality** — the midpoint is the straight-line midpoint, verified to a
+maximum deviation of 3.8e-6 degrees from `mean(start, end)`; for a curved link it
+does not lie on the road. 1,756 links have identical start and end, so their
+relative offset is exactly zero and the geometric signal is empty for them.
+**Best visualisation** — the network drawn on a map with an equirectangular
+aspect; at 48.8°N a degree of longitude is ~73 km against ~111 km for latitude.
+**For a visitor** — "Where each road segment starts and ends, in ordinary GPS
+coordinates."
+
+## 8 · `y` — the target
+
+**What** — the policy-induced change in car volume on each link.
+**From** — `compute_target_tensor_only_edge_features`:
+`gdf["vol_car"] − vol_base_case`.
+**Shape / type** — `[31635, 1]` float32. Unit veh/h.
+**Values** — mean 0.4189, std 10.7099, min −237.38, max 180.00, **27.62% exactly
+zero**, no NaNs.
+**Dynamic** — yes, by construction.
+**Model** — this is what is predicted.
+**Interpretation** — positive means more traffic than the base case, negative
+less. Near-symmetric with heavy tails, because capacity removed in one place
+displaces traffic to another and the two largely cancel.
+**Data quality** — 7,471 links (23.62%) are exactly zero in *every* scenario, and
+only 3,412 of those are structurally inert. Any metric averaged over all nodes is
+flattered by that fixed subset.
+**Best visualisation** — log-scale histogram of non-zero values beside a box plot;
+the zero share stated separately rather than drawn.
+**For a visitor** — "How much the traffic on this road changed because of the
+policy."
+
+## 9 · `edge_index` — the graph
+
+**What** — which links are adjacent in the line graph.
+**From** — `get_link_geometries` builds `from_idx → to_idx` pairs; PyG's
+`LineGraph()` transform inverts them.
+**Shape / type** — `[2, 59851]` int64, source row over target row.
+**Dynamic** — no. Byte-identical across all 1,000 scenarios, so it can be loaded
+once and reused.
+**Model** — yes; every convolution reads it.
+**Structure** — **directed and not reciprocal**: 53,955 unique undirected pairs
+against 59,851 entries. Direction encodes that traffic can pass from one link into
+the other. 766 self-loops, 76 isolated nodes, 121 components with the largest
+holding 92.70%.
+**Data quality** — the 76 isolated nodes are exactly why `Data.num_nodes` reads
+31,559 while `x` has 31,635 rows.
+**Best visualisation** — degree histogram, plus the isometric lifting diagram
+showing geography and graph as two planes.
+**For a visitor** — "Which roads feed into which. The model passes information
+along these connections."
+
+## 10 · `mode_stats_diff` — transport-mode statistics
+
+**What** — how the scenario's trips differ from the base case, per transport mode.
+**From** — `calculate_avg_mode_stats`, grouping the trip table by mode.
+**Shape / type** — `[6, 3]` float32. **Rows** are the six transport modes in
+pandas `groupby("mode")` order, which is alphabetical; the mode labels themselves
+are not stored, so the row-to-mode mapping cannot be recovered from the published
+tensors alone. **Columns** are average total travel time, average total routed
+distance, average trip count.
+**Dynamic** — yes, per scenario.
+**Model** — **no.** Consumed only when `predict_mode_stats=True`, which defaults
+to `False`; no retained trial configuration enables it, and the architecture
+docstring records that mode-statistics prediction was never finetuned.
+**Best visualisation** — none recommended while the row-to-mode mapping is
+unrecoverable.
+**For a visitor** — omit; it is carried by the preprocessing and never used.
+
+## 11 · `mode_stats_diff_perc` — the same, as a percentage
+
+**What** — `mode_stats_diff` divided by the base case, times 100.
+**Shape / type** — `[6, 3]` float64 — the only float64 tensor besides `x`.
+**Dynamic** — yes.
+**Model** — no.
+**Data quality — do not use.** Columns 0 and 1 sit between **−100.00% and
+−99.97%** in every scenario, implying travel time and routed distance collapsed to
+nearly zero under every policy, which is not physically possible for a capacity
+reduction. The construction subtracts two independently-derived column lists
+**positionally**, so any difference in column order, count or aggregation scale
+between the scenario frame and the base-case frame misaligns silently. That is a
+plausible explanation consistent with the output, not a confirmed diagnosis — the
+base-case table is not part of the release, so it cannot be checked.
+**Impact** — none. No reported number depends on it.
+
+---
+
+## The six columns that were designed and never built
+
+`EdgeFeatures` declares twelve members, indices 0–11:
+
+```python
+VOL_BASE_CASE = 0   CAPACITY_BASE_CASE = 1   CAPACITY_REDUCTION = 2
+FREESPEED     = 3   HIGHWAY            = 4   LENGTH             = 5
+ALLOWED_MODE_CAR = 6   ALLOWED_MODE_BUS   = 7   ALLOWED_MODE_PT     = 8
+ALLOWED_MODE_TRAIN = 9 ALLOWED_MODE_RAIL = 10   ALLOWED_MODE_SUBWAY = 11
+```
+
+Indices 6–11 would have one-hot encoded which transport modes each link permits.
+They are **never written**: `use_allowed_modes = False` at module scope in both
+`process_simulations_for_gnn.py` and `process_simulations_for_eign.py`, and the
+tensor is assembled only from the keys present in `edge_feature_dict`.
+
+Measured on the published corpus, `x` has **six columns**. It has never had twelve.
+The mode information is not entirely absent from the data, though — the car mask
+survives indirectly, because `CAPACITY_BASE_CASE` and `FREESPEED` are both zeroed
+on exactly the 3,412 links no car may use.
