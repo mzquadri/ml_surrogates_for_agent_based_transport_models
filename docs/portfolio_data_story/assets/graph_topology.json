@@ -1,0 +1,135 @@
+{
+  "representation": "line graph of the road network",
+  "nodes": 31635,
+  "nodes_are": "road links",
+  "edges": 59851,
+  "edges_mean": "the two road links meet at an intersection",
+  "directed": true,
+  "unique_src_dst_pairs": 59851,
+  "duplicate_edges": 0,
+  "self_loops": 766,
+  "self_loop_pct": 1.2798,
+  "bidirectional_pairs": 5896,
+  "reciprocity_pct_of_non_loop_edges": 19.96,
+  "isolated_nodes": 76,
+  "degree": {
+    "min": 0,
+    "median": 4,
+    "mean": 3.7838,
+    "max": 10,
+    "max_in": 6,
+    "max_out": 6,
+    "histogram": [
+      {
+        "degree": 0,
+        "n_links": 76
+      },
+      {
+        "degree": 1,
+        "n_links": 33
+      },
+      {
+        "degree": 2,
+        "n_links": 6065
+      },
+      {
+        "degree": 3,
+        "n_links": 7197
+      },
+      {
+        "degree": 4,
+        "n_links": 9901
+      },
+      {
+        "degree": 5,
+        "n_links": 4839
+      },
+      {
+        "degree": 6,
+        "n_links": 2658
+      },
+      {
+        "degree": 7,
+        "n_links": 733
+      },
+      {
+        "degree": 8,
+        "n_links": 128
+      },
+      {
+        "degree": 9,
+        "n_links": 4
+      },
+      {
+        "degree": 10,
+        "n_links": 1
+      }
+    ]
+  },
+  "components": {
+    "weakly_connected": 121,
+    "strongly_connected": 1820,
+    "largest_weak_size": 29327,
+    "largest_weak_pct": 92.7,
+    "largest_10_sizes": [
+      29327,
+      319,
+      148,
+      110,
+      103,
+      103,
+      100,
+      75,
+      61,
+      61
+    ]
+  },
+  "response_by_degree": [
+    {
+      "degree": 0,
+      "n_links": 76,
+      "mean_abs_response": 0.0
+    },
+    {
+      "degree": 1,
+      "n_links": 33,
+      "mean_abs_response": 3.524778
+    },
+    {
+      "degree": 2,
+      "n_links": 6065,
+      "mean_abs_response": 4.517714
+    },
+    {
+      "degree": 3,
+      "n_links": 7197,
+      "mean_abs_response": 4.239134
+    },
+    {
+      "degree": 4,
+      "n_links": 9901,
+      "mean_abs_response": 3.733643
+    },
+    {
+      "degree": 5,
+      "n_links": 4839,
+      "mean_abs_response": 4.187418
+    },
+    {
+      "degree": 6,
+      "n_links": 2658,
+      "mean_abs_response": 4.021489
+    },
+    {
+      "degree": 7,
+      "n_links": 733,
+      "mean_abs_response": 4.186024
+    },
+    {
+      "degree": 8,
+      "n_links": 128,
+      "mean_abs_response": 3.843136
+    }
+  ],
+  "note": "num_nodes is stored as 31,559 because the preprocessing set it from the road-network edge count before the line-graph transform and never updated it. x, pos and y all carry 31,635 rows; the 76 extra rows are public-transport links that appear in no edge."
+}
