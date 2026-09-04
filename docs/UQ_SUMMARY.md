@@ -174,8 +174,12 @@ Normalises nonconformity score by MC Dropout σ → node-specific interval width
 > | `node30_70_thesis_final` | random 30% / 70% nodes, seed 42 | 2.887 | 0.356 → 0.034 | no — split indices were not saved |
 >
 > `scripts/verify_headline_results.py` recomputes the first from
-> `mc_dropout_full_100graphs_mc30.npz` and obtains T = 2.701, ECE 0.2687 → 0.0478,
-> matching the stored JSON to four decimals. The second cannot be reproduced because the
+> `mc_dropout_full_100graphs_mc30.npz` and obtains T = 2.7010, ECE 0.26874 → 0.04783.
+> The ECE reproduces exactly: the archived audit records 0.26874 for the same quantity.
+> The temperature does not reproduce exactly — the archive's optimum is 2.7025 (reported
+> as 2.702) against 2.7010 here, a 0.0015 difference that comes from the search grid and
+> the ECE objective used to locate the optimum, not from different data. Coverage at the
+> two temperatures is indistinguishable, so the verifier accepts a 0.05 tolerance on T. The second cannot be reproduced because the
 > node-level split indices are unavailable. The two protocols answer different questions
 > and must not be pooled.
 

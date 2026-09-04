@@ -1,0 +1,45 @@
+{
+  "protocol": "graph20_80_v1",
+  "protocol_note": "temperature fitted on the first 20 test graphs, scored on the remaining 80. Not the 50/50 scenario split the thesis reports; see docs/CORRIGENDUM.md C3.",
+  "temperature": 2.701,
+  "nominal_levels": [
+    0.1,
+    0.2,
+    0.3,
+    0.4,
+    0.5,
+    0.6,
+    0.7,
+    0.8,
+    0.9,
+    0.95
+  ],
+  "empirical_coverage_raw": [
+    0.04781,
+    0.09501,
+    0.14151,
+    0.18749,
+    0.23409,
+    0.28324,
+    0.33754,
+    0.40124,
+    0.486,
+    0.54868
+  ],
+  "empirical_coverage_scaled": [
+    0.12562,
+    0.23703,
+    0.33872,
+    0.43404,
+    0.52252,
+    0.60136,
+    0.67038,
+    0.73255,
+    0.79503,
+    0.83301
+  ],
+  "ece_before": 0.26874,
+  "ece_after": 0.04783,
+  "calibration_nodes": 632700,
+  "evaluation_nodes": 2530800
+}

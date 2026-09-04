@@ -1,0 +1,155 @@
+{
+  "comparability_warning": "Trials T1-T6 were scored on 50 test graphs (1,581,750 nodes) and T7 onward on 100 (3,163,500). R2 is not comparable across that boundary. See docs/CORRIGENDUM.md C9.",
+  "uq_baseline": "T8",
+  "stages": [
+    {
+      "trial": "T1",
+      "directory": "pointnet_transf_gat_1st_bs32_5feat_seed42",
+      "change": "Linear output head, no dropout",
+      "test_graphs": 50,
+      "metrics": {
+        "r2": 0.7859956622123718,
+        "mae": 2.9715771675109863,
+        "rmse": 5.395548200499291
+      },
+      "lesson": "Highest R2 of any trial, but excluded from all UQ work: sigma is zero everywhere without dropout, and it used a different head and split."
+    },
+    {
+      "trial": "T2",
+      "directory": "point_net_transf_gat_2nd_try",
+      "change": "GATConv output head, dropout on",
+      "test_graphs": 50,
+      "metrics": {
+        "r2": 0.5116643905639648,
+        "mae": 4.327726364135742,
+        "rmse": 8.150483998162127
+      },
+      "lesson": "Accuracy drops sharply against T1; becomes the baseline of the comparable family."
+    },
+    {
+      "trial": "T3",
+      "directory": "point_net_transf_gat_3rd_trial_weighted_loss",
+      "change": "Weighted loss",
+      "test_graphs": 50,
+      "metrics": {
+        "r2": 0.22463977336883545,
+        "mae": 5.989744186401367,
+        "rmse": 10.270130393919324
+      },
+      "lesson": "Worst result recorded."
+    },
+    {
+      "trial": "T4",
+      "directory": "point_net_transf_gat_4th_trial_weighted_loss",
+      "change": "Weighted loss again",
+      "test_graphs": 50,
+      "metrics": {
+        "r2": 0.24255573749542236,
+        "mae": 6.079549789428711,
+        "rmse": 10.150785446166992
+      },
+      "lesson": "Confirms T3; weighted loss abandoned."
+    },
+    {
+      "trial": "T5",
+      "directory": "point_net_transf_gat_5th_try",
+      "change": "Back to unweighted",
+      "test_graphs": 50,
+      "metrics": {
+        "r2": 0.5552933216094971,
+        "mae": 4.2421159744262695,
+        "rmse": 7.777878284454346
+      },
+      "lesson": "Recovers."
+    },
+    {
+      "trial": "T6",
+      "directory": "point_net_transf_gat_6th_trial_lower_lr",
+      "change": "Lower learning rate",
+      "test_graphs": 50,
+      "metrics": {
+        "r2": 0.5223422050476074,
+        "mae": 4.324154376983643,
+        "rmse": 8.060885429382324
+      },
+      "lesson": "No gain; not pursued."
+    },
+    {
+      "trial": "T7",
+      "directory": "point_net_transf_gat_7th_trial_80_10_10_split",
+      "change": "80/10/10 split, 100-graph test",
+      "test_graphs": 100,
+      "metrics": {
+        "r2": 0.5471095442771912,
+        "mae": 4.060104846954346,
+        "rmse": 7.534329891204834
+      },
+      "lesson": "Test split doubles here. R2 either side of this point is not comparable."
+    },
+    {
+      "trial": "T8",
+      "directory": "point_net_transf_gat_8th_trial_lower_dropout",
+      "change": "Dropout 0.3 -> 0.2",
+      "test_graphs": 100,
+      "metrics": {
+        "r2": 0.5957479476928711,
+        "mae": 3.957288980484009,
+        "rmse": 7.118265151977539
+      },
+      "lesson": "Best comparable trial and the baseline for every uncertainty method."
+    },
+    {
+      "trial": "T9",
+      "directory": "point_net_transf_gat_9th_trial_heteroscedastic",
+      "change": "Freeze T8, add a heteroscedastic head",
+      "test_graphs": 100,
+      "metrics": null,
+      "best_val_nll": 3.2489,
+      "training_minutes": 873,
+      "lesson": "Checkpoint retained; verified test metrics not recorded."
+    },
+    {
+      "trial": "T10",
+      "directory": "point_net_transf_gat_10th_trial_cqr",
+      "change": "Full CQR retrain from scratch",
+      "test_graphs": 100,
+      "metrics": {
+        "r2_midpoint": 0.4057,
+        "mae_midpoint": 4.1305
+      },
+      "picp_90": 89.473,
+      "picp_95": 91.779,
+      "training_minutes": 5219,
+      "gate_status": "FAIL",
+      "lesson": "87 hours of retraining lost most of the backbone's accuracy and failed its own acceptance gates."
+    },
+    {
+      "trial": "T11",
+      "directory": "point_net_transf_gat_11th_trial_cqr_frozen",
+      "change": "Freeze T8, train a quantile head only",
+      "test_graphs": 100,
+      "metrics": {
+        "r2_midpoint": 0.5835,
+        "mae_midpoint": 4.3015
+      },
+      "picp_90": 89.822,
+      "picp_95": 94.908,
+      "training_minutes": 2385,
+      "gate_status": "PASS",
+      "lesson": "Same method as T10, opposite outcome, decided by what was allowed to move."
+    },
+    {
+      "trial": "Ensemble",
+      "directory": "deep_ensemble_results",
+      "change": "5 seeds, dropout off at inference",
+      "test_graphs": 100,
+      "metrics": {
+        "r2": 0.6841,
+        "mae": 3.4853,
+        "rmse": 6.2927
+      },
+      "spearman_rho": 0.3997,
+      "lesson": "Most accurate model here, yet its sigma ranks errors worse than MC Dropout (0.400 vs 0.482). Better predictions did not mean better uncertainty."
+    }
+  ]
+}
