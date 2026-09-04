@@ -82,11 +82,9 @@ def main() -> int:
     args = ap.parse_args()
     red, y, X, pos, ei = load(args.corpus, args.cache)
     mid = pos[:, 2, :]
-    M = red != 0
     polys = load_polys()
     A = aspect(mid[:, 1].mean())
     absY = np.abs(y).mean(0)
-    touch = M.sum(0)
     ar = np.load(args.cache / "arrondissement_of_link.npy")
     summ = {r["arrondissement"]: r for r in json.loads(
         (REPO / "docs/portfolio_data_story/assets/arrondissements.json")
@@ -110,16 +108,24 @@ def main() -> int:
 
     ax = axes[1]
     hw = X[:, 4].astype(int)
+    # Trunk is drawn because it is the other major-road class, but no scenario ever
+    # touches it. The legend says so per class rather than leaving the reader to infer
+    # from the panel title that one of the four colours behaves differently.
+    ever = (red != 0).any(0)
     pal = {1: COLORS["coral"], 2: COLORS["amber"], 3: COLORS["green"], 0: COLORS["purple"]}
     ax.scatter(mid[:, 0], mid[:, 1], s=0.10, c="#e2e8f0", linewidths=0)
     for code, col in pal.items():
         s = hw == code
+        n_ev = int(ever[s].sum())
+        tag = f"{n_ev:,} intervened" if n_ev else "never intervened"
         ax.scatter(mid[s, 0], mid[s, 1], s=0.9, c=col, linewidths=0,
-                   label=f"{HIGHWAY_CLASSES[code].split(' /')[0]} ({s.sum():,})")
+                   label=f"{HIGHWAY_CLASSES[code].split(' /')[0]} "
+                         f"({s.sum():,} links, {tag})")
     draw_boundaries(ax, polys, label=False)
     ax.legend(fontsize=7.5, markerscale=6, loc="lower left")
     ax.set_title("Road classes the policy can touch\n"
-                 "primary / secondary / tertiary are the only ones ever intervened",
+                 f"only primary, secondary and tertiary are ever intervened "
+                 f"({int(ever.sum()):,} of {ever.size:,} links)",
                  fontweight="600", color=COLORS["dgray"])
     fig.suptitle("The network and the twenty arrondissements", fontsize=13,
                  fontweight="600", color=COLORS["dgray"])
@@ -136,7 +142,7 @@ def main() -> int:
         ("mean_abs_response_vehh", "Mean |response| (veh/h)", "PuRd", 1),
     ]
     fig, axes = plt.subplots(1, 3, figsize=(15.5, 5.0))
-    for ax, (key, title, cmap, scale) in zip(axes, metrics):
+    for ax, (key, title, cmap, scale) in zip(axes, metrics, strict=True):
         vals = {c: summ[c][key] * scale for c in summ if c > 0}
         lo, hi = min(vals.values()), max(vals.values())
         cm = plt.get_cmap(cmap)

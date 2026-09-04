@@ -28,8 +28,8 @@ from scipy import stats
 REPO = Path(__file__).resolve().parent.parent.parent
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 sys.path.insert(0, str(REPO / "scripts" / "evaluation"))
-from thesis_style import COLORS  # noqa: E402
 from artifact_paths import resolve  # noqa: E402
+from thesis_style import COLORS  # noqa: E402
 
 OUT = REPO / "docs" / "figures" / "results"
 T8 = "point_net_transf_gat_8th_trial_lower_dropout"
@@ -220,7 +220,7 @@ def fig_calibration(t, pmc, sig):
     ax.bar(x + w / 2, 100 * (cov(ev_e, ev_s, Tb) - levels), w, color=COLORS["green"],
            label="after scaling")
     ax.axhline(0, color=COLORS["slate"], lw=1)
-    ax.set_xticks(x); ax.set_xticklabels([f"{int(l * 100)}" for l in levels])
+    ax.set_xticks(x); ax.set_xticklabels([f"{int(v * 100)}" for v in levels])
     ax.set_xlabel("nominal level (%)")
     ax.set_ylabel("coverage gap (percentage points)")
     ax.set_title("How far off, at each level", fontweight="600", color=COLORS["dgray"])
@@ -264,7 +264,7 @@ def fig_selective_and_detection(t, pmc, sig, pdet):
     ax.set_title("Selective prediction", fontweight="600", color=COLORS["dgray"])
 
     ax = axes[1]
-    from sklearn.metrics import roc_curve, roc_auc_score
+    from sklearn.metrics import roc_auc_score, roc_curve
     for pct, c in [(10, COLORS["coral"]), (20, COLORS["blue"])]:
         y = (err_det >= np.percentile(err_det, 100 - pct)).astype(np.int8)
         fpr, tpr, _ = roc_curve(y, sig)
@@ -288,7 +288,7 @@ def fig_selective_and_detection(t, pmc, sig, pdet):
         got.append(100 * (ev <= q).mean()); width.append(2 * q)
     x = np.arange(len(lv))
     ax.bar(x, got, color=COLORS["green"], width=0.5)
-    for i, (g, w) in enumerate(zip(got, width)):
+    for i, (g, w) in enumerate(zip(got, width, strict=True)):
         ax.text(i, g + 1.2, f"{g:.2f}%\n±{w/2:.1f}", ha="center", fontsize=7.8,
                 color=COLORS["slate"])
     ax.plot(x, [100 * a for a in lv], "o--", color=COLORS["coral"], ms=5,
@@ -298,7 +298,9 @@ def fig_selective_and_detection(t, pmc, sig, pdet):
     ax.set_xlabel("nominal coverage")
     ax.set_ylabel("empirical coverage (%)")
     ax.set_title("Split conformal coverage", fontweight="600", color=COLORS["dgray"])
-    ax.legend(fontsize=8.2, loc="lower right")
+    # Bottom-right puts the swatch level with the 95% bar, where it reads as a stray
+    # data point rather than a key. Upper-left is empty in this panel.
+    ax.legend(fontsize=8.2, loc="upper left")
 
     fig.suptitle("What the uncertainty is good for", fontsize=13,
                  fontweight="600", color=COLORS["dgray"])
