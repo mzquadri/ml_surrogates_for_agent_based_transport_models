@@ -202,6 +202,74 @@ def focus_on(ax, pos, q=0.6, pad=0.006):
     ax.set_ylim(y0 - pad, y1 + pad)
 
 
+def load_districts(repo):
+    """The 20 arrondissement polygons, as (code, exterior ring) pairs.
+
+    Read straight from data/visualisation/districts_paris.geojson, which is
+    CRS84 -- the same WGS84 longitude/latitude the `pos` tensor uses, so the two
+    overlay without any reprojection.
+    """
+    import json
+
+    path = repo / "data" / "visualisation" / "districts_paris.geojson"
+    gj = json.loads(path.read_text(encoding="utf-8"))
+    out = []
+    for f in gj["features"]:
+        code = int(f["properties"]["c_ar"])
+        g = f["geometry"]
+        rings = (g["coordinates"] if g["type"] == "Polygon"
+                 else [r for poly in g["coordinates"] for r in poly])
+        out.append((code, [np.asarray(r, dtype=float) for r in rings]))
+    return sorted(out)
+
+
+def districts(ax, polys, colour=None, lw=0.9, alpha=0.75, label=False,
+              label_size=7.0, label_colour=None, label_bg=None, fill=None):
+    """Draw arrondissement boundaries over a map, optionally numbered.
+
+    Boundaries go on top of the network but stay thin and semi-transparent: they
+    are there to locate the reader, not to compete with the data underneath.
+    """
+    c = colour or MUTED
+    for code, rings in polys:
+        for r in rings:
+            if fill is not None:
+                ax.fill(r[:, 0], r[:, 1], color=fill, zorder=1, lw=0)
+            ax.plot(r[:, 0], r[:, 1], color=c, lw=lw, alpha=alpha, zorder=6,
+                    solid_joinstyle="round")
+        if label:
+            # The badge has to contrast with the map underneath, not with the
+            # boundary line: a light number on a light badge disappears.
+            cx, cy = rings[0][:, 0].mean(), rings[0][:, 1].mean()
+            ax.text(cx, cy, str(code), fontsize=label_size, ha="center", va="center",
+                    color=label_colour or INK, zorder=7, fontweight="700",
+                    bbox=dict(boxstyle="circle,pad=0.22", fc=label_bg or PAPER,
+                              ec="none", alpha=0.82))
+
+
+def district_of(pos, polys):
+    """Assign each link to an arrondissement by its midpoint, 0 where outside.
+
+    Uses shapely's prepared geometries: a plain point-in-polygon loop over 31,635
+    midpoints and 20 polygons is slow enough to notice, and this is exact rather
+    than a bounding-box approximation.
+    """
+    from shapely.geometry import Polygon
+    from shapely.prepared import prep
+    from shapely.vectorized import contains
+
+    lon, lat = pos[:, 2, 0], pos[:, 2, 1]
+    out = np.zeros(pos.shape[0], dtype=np.int16)
+    for code, rings in polys:
+        poly = Polygon(rings[0])
+        if not poly.is_valid:
+            poly = poly.buffer(0)
+        prep(poly)
+        hit = contains(poly, lon, lat)
+        out[hit & (out == 0)] = code
+    return out
+
+
 def bare(ax):
     """A map panel: geometry only."""
     ax.set_xticks([]); ax.set_yticks([])

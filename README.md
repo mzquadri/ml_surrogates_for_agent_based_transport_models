@@ -67,7 +67,7 @@ preprocessing names each one after the districts its policy touches —
 `create_policy_key()` returns *"Policy introduced in Arrondissement(s) 5, 12"*. **The
 arrondissement is the unit the experiment was designed around.**
 
-![Network and districts](docs/figures/geography/01_network_and_districts.png)
+![Paris by arrondissement](docs/figures/portfolio/07_arrondissements.png)
 
 88.4% of links fall inside the twenty arrondissements; the rest extend into the wider
 Île-de-France. The policy only ever touches three OSM road classes — primary, secondary and
@@ -109,6 +109,13 @@ topology are byte-identical in every scenario; only `CAPACITY_REDUCTION` moves.
 The `EdgeFeatures` enum also declares `ALLOWED_MODE_CAR` … `ALLOWED_MODE_SUBWAY` at indices
 6–11, but `use_allowed_modes = False` in the preprocessing, so those six columns were
 **designed and never materialised**. `x` has six columns, not twelve.
+
+![The five model features](docs/figures/portfolio/09_five_model_features.png)
+
+The same panel layout the thesis used, rebuilt over the whole corpus rather than a
+200-graph subset. Every one of the eleven stored fields has its own card —
+distribution, spatial map and relationship with the response — in
+[`docs/figures/features/`](docs/figures/features/README.md).
 
 ![The busiest roads are the steady ones](docs/figures/portfolio/03_inverted_u.png)
 
@@ -318,6 +325,39 @@ These replay the analyses from cached prediction arrays. They do not retrain the
 do not rerun MATSim — the raw simulation outputs were not retained.
 [`docs/CORRIGENDUM.md`](docs/CORRIGENDUM.md) C5 states the replay boundaries;
 [`DATA.md`](DATA.md) covers artifact availability.
+
+---
+
+## The figures
+
+Every figure is generated from the published corpus by a tracked script and rebuilds
+byte-identically. Nothing is drawn by hand.
+
+| | What it shows | Where |
+|---|---|---|
+| **The network** | 31,635 real street segments, shaded by traffic | [gallery](docs/figures/portfolio/README.md) |
+| **Five model features** | the (a)–(e) panel figure, full corpus | [gallery](docs/figures/portfolio/README.md) |
+| **Eleven field cards** | one card per stored field | [features](docs/figures/features/README.md) |
+| **Policy vs response** | where the policy lands against where traffic moves | [gallery](docs/figures/portfolio/README.md) |
+| **Model architecture** | read from the Trial 8 checkpoint | [gallery](docs/figures/portfolio/README.md) |
+| **Arrondissements** | districts from the GeoJSON, overlaid on the network | [gallery](docs/figures/portfolio/README.md) |
+| **Structural diagrams** | problem, features, model, uncertainty, evaluation | [`docs/diagrams/`](docs/diagrams/) |
+| **Data anatomy** | `.pt` schema, the eleven fields, why HIGHWAY is excluded | [`docs/diagrams_data/`](docs/diagrams_data/) |
+
+```bash
+CORPUS=/path/to/corpus       # gh release download train-data-v1
+CACHE=/path/to/scratch
+python scripts/data_exploration/explore_tensors.py          --corpus $CORPUS --cache $CACHE
+python scripts/figure_generation/generate_portfolio_figures.py  --corpus $CORPUS --cache $CACHE
+python scripts/figure_generation/generate_feature_cards.py      --corpus $CORPUS --cache $CACHE
+python scripts/figure_generation/generate_five_features_figure.py --corpus $CORPUS --cache $CACHE
+python scripts/figure_generation/generate_model_diagram.py
+```
+
+Maps draw the real street geometry from `pos[:, 0]` to `pos[:, 1]`, and district
+boundaries come from the arrondissement GeoJSON — the same CRS84 longitude and latitude,
+so the two overlay without reprojection. Heavy reductions use the Intel Arc GPU through
+`torch.xpu` where it helps, which is about fifteen times faster than numpy for this shape.
 
 ---
 

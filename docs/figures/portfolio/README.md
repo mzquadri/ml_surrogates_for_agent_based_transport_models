@@ -76,6 +76,16 @@ cannot drift away from the model it describes.
 python scripts/figure_generation/generate_model_diagram.py
 ```
 
+### 9 · The five model features
+
+![Five model features](09_five_model_features.png)
+
+The panel layout the thesis used for its input-feature figure, rebuilt over the whole
+corpus instead of a 200-graph subset, with FREESPEED in km/h. Where the two overlap the
+numbers agree — median 10.9 veh/h, skew 6.2, 36 capacity values, 71.8% of links at
+30 km/h — and where they differ they should: the zero share of CAPACITY_REDUCTION is
+87.94% over 31.6M observations against 85.8% on the subset.
+
 ---
 
 ## Design notes
@@ -87,6 +97,11 @@ python scripts/figure_generation/generate_model_diagram.py
   scribble.
 - **Framing.** Maps are framed on a percentile of the endpoints. A handful of links run
   far south of Paris, and framing on the raw extent shrinks the city to a smudge.
+- **Districts come from the data.** Arrondissement boundaries are read from
+  `data/visualisation/districts_paris.geojson`, which is CRS84 — the same longitude and
+  latitude `pos` uses — so they overlay the network without reprojection. The
+  point-in-polygon assignment agrees with the one behind the published assets on all
+  31,635 links.
 - **Bins that can resolve what they claim.** The volume figure uses equal-width bands
   merged until each holds at least 100 links, with standard errors. Quantile bins were
   tried first and hid the fall entirely inside their top bin.
