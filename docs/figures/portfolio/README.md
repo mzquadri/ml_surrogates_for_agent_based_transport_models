@@ -86,6 +86,14 @@ numbers agree — median 10.9 veh/h, skew 6.2, 36 capacity values, 71.8% of link
 30 km/h — and where they differ they should: the zero share of CAPACITY_REDUCTION is
 87.94% over 31.6M observations against 85.8% on the subset.
 
+### 10 · Field reference
+
+![Field reference](10_field_reference.png)
+
+All eleven stored fields on one page: shape, dtype, whether it changes between
+scenarios, and whether the model reads it. Rows are read from `tensor_anatomy.json`
+and `feature_statistics.json`, so the table cannot drift from the data.
+
 ---
 
 ## Design notes

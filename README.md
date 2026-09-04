@@ -110,6 +110,8 @@ The `EdgeFeatures` enum also declares `ALLOWED_MODE_CAR` … `ALLOWED_MODE_SUBWA
 6–11, but `use_allowed_modes = False` in the preprocessing, so those six columns were
 **designed and never materialised**. `x` has six columns, not twelve.
 
+![Field reference](docs/figures/portfolio/10_field_reference.png)
+
 ![The five model features](docs/figures/portfolio/09_five_model_features.png)
 
 The same panel layout the thesis used, rebuilt over the whole corpus rather than a
@@ -337,6 +339,7 @@ byte-identically. Nothing is drawn by hand.
 |---|---|---|
 | **The network** | 31,635 real street segments, shaded by traffic | [gallery](docs/figures/portfolio/README.md) |
 | **Five model features** | the (a)–(e) panel figure, full corpus | [gallery](docs/figures/portfolio/README.md) |
+| **Field reference** | all eleven fields: shape, dynamic, model input | [gallery](docs/figures/portfolio/README.md) |
 | **Eleven field cards** | one card per stored field | [features](docs/figures/features/README.md) |
 | **Policy vs response** | where the policy lands against where traffic moves | [gallery](docs/figures/portfolio/README.md) |
 | **Model architecture** | read from the Trial 8 checkpoint | [gallery](docs/figures/portfolio/README.md) |
@@ -352,6 +355,7 @@ python scripts/figure_generation/generate_portfolio_figures.py  --corpus $CORPUS
 python scripts/figure_generation/generate_feature_cards.py      --corpus $CORPUS --cache $CACHE
 python scripts/figure_generation/generate_five_features_figure.py --corpus $CORPUS --cache $CACHE
 python scripts/figure_generation/generate_model_diagram.py
+python scripts/figure_generation/generate_field_reference.py
 ```
 
 Maps draw the real street geometry from `pos[:, 0]` to `pos[:, 1]`, and district

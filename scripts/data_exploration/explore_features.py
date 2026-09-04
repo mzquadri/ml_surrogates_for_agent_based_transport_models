@@ -264,7 +264,7 @@ def main() -> int:
         ("y", "dynamic", "the per-link change in car volume the policy caused",
          "training target"),
         ("edge_index", "static", "nothing; identical in all 1,000 scenarios",
-         "graph connectivity for all four message-passing layers"),
+         "graph connectivity for all six message-passing layers"),
         ("mode_stats_diff", "dynamic", "per-mode travel-time, distance and trip-count "
          "differences", "not read by any training or evaluation code"),
         ("mode_stats_diff_perc", "dynamic", "the same differences as percentages",

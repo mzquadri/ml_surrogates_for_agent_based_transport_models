@@ -896,7 +896,7 @@
       "field": "edge_index",
       "static_or_dynamic": "static",
       "what_changes": "nothing; identical in all 1,000 scenarios",
-      "model_usage": "graph connectivity for all four message-passing layers"
+      "model_usage": "graph connectivity for all six message-passing layers"
     },
     {
       "field": "mode_stats_diff",
