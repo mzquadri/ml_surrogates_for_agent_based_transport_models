@@ -310,6 +310,96 @@ accepted on that basis. Binary artifacts are held to a strict byte comparison.
 
 **Reproduction.** `python scripts/check_repository.py`.
 
+## C11 - The stored num_nodes disagrees with the tensors
+
+**What was assumed.** That the corpus has 31,635 nodes per graph, the figure quoted
+throughout this repository and in the thesis.
+
+**What is stored.** `x`, `pos` and `y` each carry 31,635 rows, but `num_nodes` is
+stored as **31,559** in every one of the 1,000 scenarios, and `max(edge_index) + 1`
+is 31,559 as well. The gap is 76 rows.
+
+**Cause.** In `scripts/data_preprocessing/process_simulations_for_gnn.py`:
+
+```python
+data = Data(edge_index=edge_index)
+data.num_nodes = edge_index.shape[1] if use_linegraph else len(nodes)
+if use_linegraph:
+    data = linegraph_transformation(data)
+data.x = edge_tensor
+```
+
+`num_nodes` is taken from the road-network edge count *before* the line-graph
+transform and never updated once `x` is assigned.
+
+**What the 76 rows are.** Not padding. They carry a real `LENGTH` (20 m to 1,528 m)
+and real coordinates inside Paris, but `VOL_BASE_CASE`, `CAPACITY_BASE_CASE`,
+`FREESPEED` and `CAPACITY_REDUCTION` are all exactly zero, `HIGHWAY` is -1 for
+every one of them, they appear in no edge, and `y` is exactly zero in all 1,000
+scenarios. They are public-transport links with no car mode, which the
+preprocessing zeroes:
+
+```python
+capacities_new = np.where(gdf["modes"].str.contains("car"), gdf["capacity"], 0)
+freespeed      = np.where(gdf["modes"].str.contains("car"), gdf["freespeed"], 0)
+```
+
+With no car volume on either side, `y = 0 - 0 = 0` by construction.
+
+**Effect on reported metrics.** The evaluation counts 3,163,500 nodes = 100 graphs
+x 31,635, so 7,600 trivially-zero nodes (0.240%) are included. Recomputed from
+`test_predictions.npz`:
+
+| Subset | MAE | RMSE | R2 | n |
+|---|---|---|---|---|
+| All rows, as published | 3.9573 | 7.1183 | 0.5957 | 3,163,500 |
+| Excluding the 76 isolated links | 3.9665 | 7.1268 | 0.5957 | 3,155,900 |
+| Those links alone | 0.1198 | 0.1292 | - | 7,600 |
+
+Including them makes the published MAE optimistic by 0.0092 veh/h, a 0.23%
+relative difference. R2 is unchanged at four decimals. **No published number is
+restated**: the effect is smaller than the tolerances in
+`scripts/verify_headline_results.py`, and the split is recorded here so a reader
+can see it rather than discover it.
+
+**Reproduction.** `python scripts/data_exploration/explore_tensors.py`.
+
+## C12 - mode_stats_diff_perc sits at about -100% for a reason
+
+**What it looks like.** Four of the six rows of `mode_stats_diff_perc` report about
+**-99.99%** in columns 0 and 1, in every scenario, while column 2 stays near zero.
+Read literally, every policy scenario eliminates almost all travel time and all
+distance travelled for every transport mode at once while leaving trip counts
+unchanged. No cell is exactly -100: the count over the corpus is 0 of 18,000.
+
+**Cause, established rather than guessed.** The base-case CSV is not in the
+repository or on any release, so the two sides cannot be compared directly. They
+can be reconstructed, because the two stored tensors over-determine them:
+`base = diff / (perc/100)` and `scenario = base + diff`. Doing that gives implied
+scenario values that are ordinary per-trip averages (1,078 s of travel time,
+3,343 m of distance) and implied base values that are those same quantities times
+roughly the trip count.
+
+The hypothesis "base stores per-mode sums, scenario stores per-mode means"
+predicts the ratio must equal `1 / trip_count`. Tested over 100 scenarios from
+four batches, the median relative error is **0.34%** for travel time and **0.30%**
+for distance. The ratio is `1 / trip_count`. Column 2 is unaffected because both
+sides hold a count on the same scale.
+
+So a sum is being subtracted from a mean and then divided by the sum. The near
+-100% is arithmetic, not a simulation result. The column order is *not* misaligned:
+the reconstruction shows column 1 of the scenario side is a distance, not a count.
+
+**Consequence.** None for any reported result. Neither `mode_stats_diff` nor
+`mode_stats_diff_perc` is read by any training or evaluation code. The model's
+only mode-stats path reads `data.mode_stats`, an attribute this corpus does not
+have, and it is disabled with no corresponding parameters in any checkpoint. The
+defect cannot be repaired from the published artifacts because the base-case CSV
+is not part of any release.
+
+**Reproduction.** `python scripts/data_exploration/explore_tensors.py`, and
+[`data_exploration/auxiliary_tensors.md`](data_exploration/auxiliary_tensors.md).
+
 ## Provenance
 
 - Submitted artifact baseline, by content: `thesis/latex_tum_official/main.pdf`,

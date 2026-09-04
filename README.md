@@ -108,8 +108,14 @@ The `EdgeFeatures` enum also declares `ALLOWED_MODE_CAR` … `ALLOWED_MODE_SUBWA
 6–11, but `use_allowed_modes = False` in the preprocessing, so those six columns were
 **designed and never materialised**. `x` has six columns, not twelve.
 
-Per-field detail: [`docs/DATASET.md`](docs/DATASET.md) and
-[`02_features.md`](docs/portfolio_data_story/02_features.md).
+A separate check on the stored schema found that `num_nodes` is recorded as 31,559 while
+`x`, `pos` and `y` all carry 31,635 rows. The 76 extra rows are public-transport links with
+no car access, no edges, and a target of exactly zero in every scenario — see
+[CORRIGENDUM C11](docs/CORRIGENDUM.md).
+
+Per-field detail: [`docs/DATASET.md`](docs/DATASET.md),
+[`02_features.md`](docs/portfolio_data_story/02_features.md), and the full corpus
+exploration in [`docs/data_exploration/`](docs/data_exploration/README.md).
 
 ---
 
@@ -122,7 +128,17 @@ means two links meet. 31,635 nodes, 59,851 directed edges, maximum degree 10.
 
 Both planes hold the same real links, drawn from `pos`. Directedness, degree distribution
 and the 121 components:
-[`03_graph_topology.md`](docs/portfolio_data_story/03_graph_topology.md).
+[`03_graph_topology.md`](docs/portfolio_data_story/03_graph_topology.md) and
+[`graph_topology.md`](docs/data_exploration/graph_topology.md).
+
+The model reads five of the six `x` columns as node features, and also consumes
+`pos[:, 0]`, `pos[:, 1]` and `edge_index`. `HIGHWAY` is excluded because its integers are
+nominal road-class labels, not quantities.
+
+![What actually enters the model](docs/diagrams_data/data_03_model_inputs.svg)
+
+Traced to the code and confirmed against the trained checkpoint:
+[`model_inputs.md`](docs/data_exploration/model_inputs.md).
 
 ---
 
@@ -309,7 +325,8 @@ scripts/
 docs/
   DATASET.md  CORRIGENDUM.md  ARTIFACT_PROVENANCE.md
   portfolio_data_story/        Deep corpus analysis + derived web assets
-  diagrams/  diagrams_isometric/  figures/
+  data_exploration/            Stored fields, model inputs, topology, auxiliary tensors
+  diagrams/  diagrams_isometric/  diagrams_data/  figures/
   migration/                   Repository-consolidation record
 models/     16 trial checkpoints
 results/    Result JSONs, prediction archives, per-trial metrics
