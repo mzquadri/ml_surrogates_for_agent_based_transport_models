@@ -43,14 +43,14 @@ STATS = REPO / "docs" / "portfolio_data_story" / "assets" / "feature_statistics.
 COPY = {
     "VOL_BASE_CASE": dict(
         plain="How much car traffic the street already carries, before any policy",
-        unit="vehicles per hour", cmap=ps.FLOW,
+        unit="vehicles per hour", cmap=ps.FLOW_LIGHT,
         source="links_base_case['vol_car'] in process_simulations_for_gnn.py",
         insight="The strongest single predictor of where traffic moves. Response rises "
                 "to a peak near 500 veh/h and then falls: the busiest roads absorb "
                 "a diversion without changing much."),
     "CAPACITY_BASE_CASE": dict(
         plain="How much traffic the street could carry if it filled up",
-        unit="vehicles per hour", cmap=ps.FLOW,
+        unit="vehicles per hour", cmap=ps.FLOW_LIGHT,
         source="np.where(modes.contains('car'), capacity, 0)",
         insight="Only 36 distinct values, and half the network sits at exactly "
                 "480 veh/h. Its response curve peaks near 2,500 veh/h and falls "
@@ -63,7 +63,7 @@ COPY = {
                 "ever removed, never added, and only on three road classes."),
     "FREESPEED": dict(
         plain="How fast traffic is allowed to flow when the street is empty",
-        unit="metres per second", cmap=ps.FLOW,
+        unit="metres per second", cmap=ps.FLOW_LIGHT,
         source="np.where(modes.contains('car'), freespeed, 0)",
         insight="Sixteen discrete values. 8.33 m/s is 30 km/h, and it is the median, "
                 "the lower quartile and the upper quartile at once."),
@@ -75,7 +75,7 @@ COPY = {
                 "amounts, so arithmetic on them would be meaningless."),
     "LENGTH": dict(
         plain="How long the street is",
-        unit="metres", cmap=ps.FLOW,
+        unit="metres", cmap=ps.FLOW_LIGHT,
         source="edge feature dictionary in process_simulations_for_gnn.py",
         insight="The only feature with essentially no rank relationship to the "
                 "response on its own (Spearman -0.08)."),
@@ -152,7 +152,7 @@ def card(name, col, X, red, absy, pos, stats):
             ps.focus_on(axM, pos)
         else:
             ps.network(axM, pos, values=np.log10(shown + 1) if name != "FREESPEED"
-                       else shown, cmap=meta["cmap"], lw=0.55, background="#0B1220")
+                       else shown, cmap=meta["cmap"], lw=0.6)
     axM.text(0, 1.035, "Where it is", transform=axM.transAxes, fontsize=12.4,
              color=ps.INK, fontweight="600", va="bottom")
 
@@ -253,8 +253,7 @@ def card_pos(pos, X, absy):
     axA = fig.add_axes([0.545, 0.520, 0.415, 0.245])
     axB = fig.add_axes([0.545, 0.215, 0.415, 0.215])
 
-    ps.network(axM, pos, values=np.log10(X[:, 0] + 1), cmap=ps.FLOW, lw=0.55,
-               background="#0B1220")
+    ps.network(axM, pos, values=np.log10(X[:, 0] + 1), cmap=ps.FLOW_LIGHT, lw=0.6)
     axM.text(0, 1.035, "Where it is", transform=axM.transAxes, fontsize=12.4,
              color=ps.INK, fontweight="600", va="bottom")
     ps.note(axM, 0.5, -0.055, "every line is drawn start -> end from this tensor",
