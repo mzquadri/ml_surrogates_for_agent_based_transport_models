@@ -21,7 +21,6 @@ Output: docs/diagrams_isometric/
 from __future__ import annotations
 
 import argparse
-import json
 import math
 import sys
 from pathlib import Path
@@ -52,6 +51,29 @@ def iso(x, y, z=0.0):
     return (x - y) * COS30, (x + y) * SIN30 - z
 
 
+def normalise(mid):
+    """Real WGS84 midpoints -> the unit square, without distorting the city.
+
+    Three things matter here:
+
+      * longitude is scaled by cos(lat), so Paris is not stretched sideways;
+      * the span comes from the 1st-99th percentile, because a handful of outlying
+        links otherwise push the dense core into one corner of the plate;
+      * both axes share one scale, so relative distances survive the projection.
+
+    Points outside that frame are clamped to the plate edge rather than dropped. The
+    number clamped is returned so the caller can state it instead of hiding it.
+    """
+    lat0 = float(np.mean(mid[:, 1]))
+    xy = np.column_stack([mid[:, 0] * np.cos(np.deg2rad(lat0)), mid[:, 1]])
+    q_lo, q_hi = np.percentile(xy, 1, axis=0), np.percentile(xy, 99, axis=0)
+    span = float((q_hi - q_lo).max())
+    ctr = (q_hi + q_lo) / 2.0
+    p = (xy - ctr) / span + 0.5
+    n_out = int(((p < -0.1) | (p > 1.1)).any(1).sum())
+    return np.clip(p, -0.1, 1.1), n_out
+
+
 def plate(cx, cy, w, h, z, fill, edge, opacity=0.92):
     """A flat quad in the ground plane, lifted by z."""
     pts = [iso(cx - w / 2, cy - h / 2, z), iso(cx + w / 2, cy - h / 2, z),
@@ -80,11 +102,9 @@ def header(w, h, title, subtitle):
 
 def diagram_graph_lifting(mid, ei, hw, out):
     """Geography -> line graph: the same links, seen twice."""
-    W, H = 1180, 760
+    W, H = 1180, 700
     s = ""
-    # normalise real coordinates into a unit square
-    lo, hi = mid.min(0), mid.max(0)
-    p = (mid - lo) / (hi - lo)
+    p, n_out = normalise(mid)
     rng = np.random.default_rng(7)
     sel = rng.choice(len(p), 5200, replace=False)
     Z_TOP = 0.62
@@ -101,8 +121,10 @@ def diagram_graph_lifting(mid, ei, hw, out):
         return OX + sx * SCALE, OY + sy * SCALE
 
     s += header(W, H, "From road geometry to graph nodes",
-                "Every point below is a real link midpoint from pos[:, 2]. "
-                "The two planes hold the same 5,200 sampled links.")
+                "Every point is a real link midpoint from pos[:, 2]: 5,200 sampled links "
+                "below, every second one of them redrawn above so the edges stay legible. "
+                f"{n_out:,} of 31,635 links fall outside the 1-99 percentile frame and "
+                "sit on its edge.")
 
     # --- lower plane: geography ---
     def quad(z, fill, edge, op):
@@ -117,9 +139,10 @@ def diagram_graph_lifting(mid, ei, hw, out):
         col = {1: PAL["uq"], 2: "#d97706", 3: PAL["eval"]}.get(int(hw[i]), "#cbd5e1")
         s += f'<circle cx="{x:.1f}" cy="{y:.1f}" r="1.05" fill="{col}" fill-opacity="0.9"/>\n'
     lx, ly = place(-0.1, 1.1, 0.0)
-    s += f'<text class="lbl" x="{lx-150:.0f}" y="{ly+30:.0f}">1 · Road network in space</text>\n'
-    s += (f'<text class="sub" x="{lx-150:.0f}" y="{ly+48:.0f}">31,635 links, WGS84 '
-          f'midpoints. Colour = OSM class.</text>\n')
+    s += (f'<text class="lbl" text-anchor="end" x="{lx-26:.0f}" y="{ly-16:.0f}">'
+          f'1 · Road network in space</text>\n')
+    s += (f'<text class="sub" text-anchor="end" x="{lx-26:.0f}" y="{ly+2:.0f}">'
+          f'31,635 links, WGS84 midpoints. Colour = OSM class.</text>\n')
 
     # --- upper plane: graph ---
     Z = Z_TOP
@@ -127,7 +150,7 @@ def diagram_graph_lifting(mid, ei, hw, out):
     # draw a subgraph of real edges among the sampled nodes
     pick = set(sel.tolist())
     drawn = 0
-    for a, b in zip(ei[0][::37], ei[1][::37]):
+    for a, b in zip(ei[0][::37], ei[1][::37], strict=True):
         if drawn > 900:
             break
         if a in pick and b in pick:
@@ -140,9 +163,10 @@ def diagram_graph_lifting(mid, ei, hw, out):
         x, y = place(p[i, 0], p[i, 1], Z)
         s += f'<circle cx="{x:.1f}" cy="{y:.1f}" r="1.2" fill="{PAL["data"]}" fill-opacity="0.9"/>\n'
     lx, ly = place(-0.1, 1.1, Z)
-    s += f'<text class="lbl" x="{lx-150:.0f}" y="{ly+30:.0f}">2 · Line graph</text>\n'
-    s += (f'<text class="sub" x="{lx-150:.0f}" y="{ly+48:.0f}">each link becomes a node; '
-          f'an edge means two links meet</text>\n')
+    s += (f'<text class="lbl" text-anchor="end" x="{lx-26:.0f}" y="{ly-16:.0f}">'
+          f'2 · Line graph</text>\n')
+    s += (f'<text class="sub" text-anchor="end" x="{lx-26:.0f}" y="{ly+2:.0f}">'
+          f'each link becomes a node; an edge means two links meet</text>\n')
 
     # lifting cues
     for i in sel[:26]:
@@ -167,8 +191,7 @@ def diagram_graph_lifting(mid, ei, hw, out):
 def diagram_stack(mid, red, y, out):
     """Four stacked planes: features -> intervention -> response -> uncertainty."""
     W, H = 1180, 860
-    lo, hi = mid.min(0), mid.max(0)
-    p = (mid - lo) / (hi - lo)
+    p, _n_out = normalise(mid)
     rng = np.random.default_rng(11)
     sel = rng.choice(len(p), 4200, replace=False)
     corners = [iso(u, v, z) for u in (-0.12, 1.12) for v in (-0.12, 1.12)
@@ -220,8 +243,10 @@ def diagram_stack(mid, red, y, out):
                 s += (f'<circle cx="{x:.1f}" cy="{yy:.1f}" r="{0.9+2.4*v[k]:.2f}" '
                       f'fill="{col}" fill-opacity="{0.25+0.6*v[k]:.2f}"/>\n')
         lx, ly = place(-0.1, 1.1, z)
-        s += f'<text class="lbl" x="{lx-155:.0f}" y="{ly+26:.0f}">{title}</text>\n'
-        s += f'<text class="sub" x="{lx-155:.0f}" y="{ly+43:.0f}">{sub}</text>\n'
+        s += (f'<text class="lbl" text-anchor="end" x="{lx-26:.0f}" '
+              f'y="{ly-14:.0f}">{title}</text>\n')
+        s += (f'<text class="sub" text-anchor="end" x="{lx-26:.0f}" '
+              f'y="{ly+4:.0f}">{sub}</text>\n')
 
     s += (f'<text class="cap" x="34" y="{H-52}">Marker size and opacity encode the '
           f'quantity on that plane. The intervention layer shows how often each link was '
@@ -238,8 +263,7 @@ def diagram_stack(mid, red, y, out):
 
 def diagram_pipeline(out):
     """Isometric slab pipeline: simulation -> graph -> model -> UQ -> decision."""
-    W, H = 1180, 620
-    SCALE, OX, OY = 118, 210, 250
+    W, H = 1180, 660
     stages = [
         ("MATSim", "1,000 scenarios", "hours each", PAL["data"], PAL["data_lt"]),
         ("Line graph", "31,635 nodes", "59,851 edges", PAL["data"], PAL["data_lt"]),
@@ -251,6 +275,20 @@ def diagram_pipeline(out):
     s = header(W, H, "The pipeline as built",
                "Six stages, each labelled with a figure verified by "
                "scripts/verify_headline_results.py.")
+
+    # Six slabs stepping down and to the right span a long diagonal. Fit that diagonal
+    # to the canvas instead of assuming a scale: with a fixed one the last two stages
+    # fall off the bottom-right edge and collide with the caption.
+    MARGIN_X, TOP, BOTTOM = 42, 112, 104
+    pts = [iso(k * 1.15 + du, dv, dz)
+           for k in range(len(stages))
+           for du in (0.0, 0.95) for dv in (0.0, 0.95) for dz in (0.0, 0.30)]
+    xs = [q[0] for q in pts]; ys = [q[1] for q in pts]
+    SCALE = min((W - 2 * MARGIN_X) / (max(xs) - min(xs)),
+                (H - TOP - BOTTOM) / (max(ys) - min(ys)))
+    OX = MARGIN_X - min(xs) * SCALE + (W - 2 * MARGIN_X - (max(xs) - min(xs)) * SCALE) / 2
+    OY = TOP - min(ys) * SCALE
+
     for k, (name, a, b, col, lt) in enumerate(stages):
         u = k * 1.15
         # slab with visible thickness
