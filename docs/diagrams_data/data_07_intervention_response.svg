@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1180 560" width="1180" height="560" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif">
+  <rect width="1180" height="560" fill="#ffffff"/>
+  <style>
+    .h { fill:#0f172a; font-size:19px; font-weight:600; }
+    .s { fill:#64748b; font-size:12.5px; }
+    .lbl { fill:#0f172a; font-size:14px; font-weight:600; }
+    .sub { fill:#64748b; font-size:11.5px; }
+    .mono { font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:11.5px; fill:#334155; }
+    .monob { font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:12.5px; fill:#0f172a; font-weight:600; }
+    .cap { fill:#64748b; font-size:12px; }
+    .tick { fill:#059669; font-size:15px; font-weight:700; }
+    .cross { fill:#ea580c; font-size:15px; font-weight:700; }
+  </style>
+  <text class="h" x="34" y="40">One scenario: intervention in, response out</text>
+  <text class="s" x="34" y="62">The only thing that changes between scenarios is one column. Everything else about the graph is fixed.</text>
+  <rect x="34" y="108" width="340" height="190" rx="9" fill="#fff7ed" stroke="#fed7aa" stroke-width="1.4"/>
+  <text class="lbl" x="52" y="136" text-anchor="start">What the scenario changes</text>
+  <text class="mono" x="52" y="162" text-anchor="start">x[:, 2]  CAPACITY_REDUCTION</text>
+  <text class="sub" x="52" y="186" text-anchor="start">11,305 links are ever eligible</text>
+  <text class="sub" x="52" y="206" text-anchor="start">3,317 links touched in the median scenario</text>
+  <text class="sub" x="52" y="226" text-anchor="start">28 distinct magnitudes, all negative</text>
+  <text class="sub" x="52" y="246" text-anchor="start">range -7,200 to -240 veh/h</text>
+  <text class="sub" x="52" y="272" text-anchor="start">capacity is only ever removed</text>
+  <line x1="380" y1="200" x2="416.0" y2="200" stroke="#94a3b8" stroke-width="1.8"/>
+  <polygon points="424,200 416.0,195.4 416.0,204.6" fill="#94a3b8"/>
+  <rect x="434" y="108" width="300" height="190" rx="9" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.4"/>
+  <text class="lbl" x="452" y="136" text-anchor="start">What stays fixed</text>
+  <text class="sub" x="452" y="162" text-anchor="start">the other five x columns</text>
+  <text class="mono" x="452" y="182" text-anchor="start">pos</text>
+  <text class="mono" x="452" y="202" text-anchor="start">edge_index</text>
+  <text class="sub" x="452" y="228" text-anchor="start">identical in all 1,000</text>
+  <text class="sub" x="452" y="248" text-anchor="start">scenarios, verified by</text>
+  <text class="sub" x="452" y="268" text-anchor="start">byte comparison</text>
+  <line x1="740" y1="200" x2="776.0" y2="200" stroke="#94a3b8" stroke-width="1.8"/>
+  <polygon points="784,200 776.0,195.4 776.0,204.6" fill="#94a3b8"/>
+  <rect x="794" y="108" width="352" height="190" rx="9" fill="#ecfdf5" stroke="#a7f3d0" stroke-width="1.4"/>
+  <text class="lbl" x="812" y="136" text-anchor="start">What comes out</text>
+  <text class="mono" x="812" y="162" text-anchor="start">y  change in link car volume</text>
+  <text class="sub" x="812" y="186" text-anchor="start">mean +0.4189 veh/h across the network</text>
+  <text class="sub" x="812" y="206" text-anchor="start">27.6% of links unchanged</text>
+  <text class="sub" x="812" y="226" text-anchor="start">41.1% gain, 31.3% lose traffic</text>
+  <text class="sub" x="812" y="252" text-anchor="start">gains and losses nearly cancel:</text>
+  <text class="sub" x="812" y="272" text-anchor="start">traffic is redistributed, not removed</text>
+  <rect x="34" y="330" width="1112" height="122" rx="9" fill="#eff6ff" stroke="#bfdbfe" stroke-width="1.4"/>
+  <text class="lbl" x="52" y="356" text-anchor="start">The result that makes the problem interesting</text>
+  <text class="sub" x="52" y="382" text-anchor="start">Of the 31,635 links, only 11,305 can ever be intervened, yet the response reaches far beyond them.</text>
+  <text class="sub" x="52" y="402" text-anchor="start">Trunk roads are never touched by any policy and still carry the second-highest mean response of any road class.</text>
+  <text class="sub" x="52" y="422" text-anchor="start">A surrogate that only learned the treated links would miss most of what the simulator is being asked about.</text>
+  <text class="cap" x="34" y="534">y = vol_car(scenario) - vol_car(base case), from compute_target_tensor_only_edge_features in scripts/data_preprocessing/help_functions.py.</text>
+</svg>

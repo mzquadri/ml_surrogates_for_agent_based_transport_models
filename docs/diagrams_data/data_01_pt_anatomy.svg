@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1180 570" width="1180" height="570" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif">
+  <rect width="1180" height="570" fill="#ffffff"/>
+  <style>
+    .h { fill:#0f172a; font-size:19px; font-weight:600; }
+    .s { fill:#64748b; font-size:12.5px; }
+    .lbl { fill:#0f172a; font-size:14px; font-weight:600; }
+    .sub { fill:#64748b; font-size:11.5px; }
+    .mono { font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:11.5px; fill:#334155; }
+    .monob { font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:12.5px; fill:#0f172a; font-weight:600; }
+    .cap { fill:#64748b; font-size:12px; }
+    .tick { fill:#059669; font-size:15px; font-weight:700; }
+    .cross { fill:#ea580c; font-size:15px; font-weight:700; }
+  </style>
+  <text class="h" x="34" y="40">Anatomy of one datalist_batch_*.pt file</text>
+  <text class="s" x="34" y="62">Twenty files hold 1,000 scenarios of the same Paris network. Each file is a plain Python list of PyG Data objects.</text>
+  <text class="s" x="34" y="79">Sizes and shapes read from the published corpus.</text>
+  <rect x="34" y="100" width="300" height="92" rx="9" fill="#eff6ff" stroke="#bfdbfe" stroke-width="1.4"/>
+  <text class="lbl" x="52" y="128" text-anchor="start">datalist_batch_1.pt</text>
+  <text class="sub" x="52" y="150" text-anchor="start">list of 50 Data objects</text>
+  <text class="mono" x="52" y="168" text-anchor="start">131 MB on disk</text>
+  <line x1="340" y1="146" x2="384.0" y2="146" stroke="#94a3b8" stroke-width="1.8"/>
+  <polygon points="392,146 384.0,141.4 384.0,150.6" fill="#94a3b8"/>
+  <rect x="400" y="100" width="746" height="92" rx="9" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.4"/>
+  <text class="lbl" x="418" y="128" text-anchor="start">one Data object = one policy scenario</text>
+  <text class="sub" x="418" y="150" text-anchor="start">the same 31,635 road links, one capacity intervention applied</text>
+  <text class="mono" x="418" y="168" text-anchor="start">3.36 MB in memory</text>
+  <text class="lbl" x="34" y="228" text-anchor="start">Seven stored entries</text>
+  <text class="sub" x="300" y="228" text-anchor="start">five tensors, one scalar attribute, and x carrying six columns</text>
+  <rect x="34" y="238" width="1112" height="30" rx="6" fill="#f1f5f9" stroke="#e2e8f0" stroke-width="1.4"/>
+  <text class="sub" x="52" y="258" text-anchor="start">field</text>
+  <text class="sub" x="300" y="258" text-anchor="start">shape</text>
+  <text class="sub" x="470" y="258" text-anchor="start">dtype</text>
+  <text class="sub" x="610" y="258" text-anchor="start">MB</text>
+  <text class="sub" x="690" y="258" text-anchor="start">static?</text>
+  <text class="sub" x="810" y="258" text-anchor="start">used by the model?</text>
+  <rect x="34" y="272" width="1112" height="26" rx="5" fill="#ecfdf5" stroke="#a7f3d0" stroke-width="1.4"/>
+  <text class="monob" x="52" y="290" text-anchor="start">x</text>
+  <text class="mono" x="300" y="290" text-anchor="start">[31635, 6]</text>
+  <text class="mono" x="470" y="290" text-anchor="start">float64</text>
+  <text class="mono" x="610" y="290" text-anchor="start">1.52</text>
+  <text class="sub" x="690" y="290" text-anchor="start">5 of 6 static</text>
+  <text class="sub" x="810" y="290" text-anchor="start">5 of 6 columns</text>
+  <rect x="34" y="302" width="1112" height="26" rx="5" fill="#ecfdf5" stroke="#a7f3d0" stroke-width="1.4"/>
+  <text class="monob" x="52" y="320" text-anchor="start">pos</text>
+  <text class="mono" x="300" y="320" text-anchor="start">[31635, 3, 2]</text>
+  <text class="mono" x="470" y="320" text-anchor="start">float32</text>
+  <text class="mono" x="610" y="320" text-anchor="start">0.76</text>
+  <text class="sub" x="690" y="320" text-anchor="start">yes</text>
+  <text class="sub" x="810" y="320" text-anchor="start">pos[:,0] and pos[:,1]</text>
+  <rect x="34" y="332" width="1112" height="26" rx="5" fill="#ecfdf5" stroke="#a7f3d0" stroke-width="1.4"/>
+  <text class="monob" x="52" y="350" text-anchor="start">y</text>
+  <text class="mono" x="300" y="350" text-anchor="start">[31635, 1]</text>
+  <text class="mono" x="470" y="350" text-anchor="start">float32</text>
+  <text class="mono" x="610" y="350" text-anchor="start">0.13</text>
+  <text class="sub" x="690" y="350" text-anchor="start">no</text>
+  <text class="sub" x="810" y="350" text-anchor="start">training target</text>
+  <rect x="34" y="362" width="1112" height="26" rx="5" fill="#ecfdf5" stroke="#a7f3d0" stroke-width="1.4"/>
+  <text class="monob" x="52" y="380" text-anchor="start">edge_index</text>
+  <text class="mono" x="300" y="380" text-anchor="start">[2, 59851]</text>
+  <text class="mono" x="470" y="380" text-anchor="start">int64</text>
+  <text class="mono" x="610" y="380" text-anchor="start">0.96</text>
+  <text class="sub" x="690" y="380" text-anchor="start">yes</text>
+  <text class="sub" x="810" y="380" text-anchor="start">all layers</text>
+  <rect x="34" y="392" width="1112" height="26" rx="5" fill="#fff7ed" stroke="#fed7aa" stroke-width="1.4"/>
+  <text class="monob" x="52" y="410" text-anchor="start">mode_stats_diff</text>
+  <text class="mono" x="300" y="410" text-anchor="start">[6, 3]</text>
+  <text class="mono" x="470" y="410" text-anchor="start">float32</text>
+  <text class="mono" x="610" y="410" text-anchor="start">0.00</text>
+  <text class="sub" x="690" y="410" text-anchor="start">no</text>
+  <text class="sub" x="810" y="410" text-anchor="start">never read</text>
+  <rect x="34" y="422" width="1112" height="26" rx="5" fill="#fff7ed" stroke="#fed7aa" stroke-width="1.4"/>
+  <text class="monob" x="52" y="440" text-anchor="start">mode_stats_diff_perc</text>
+  <text class="mono" x="300" y="440" text-anchor="start">[6, 3]</text>
+  <text class="mono" x="470" y="440" text-anchor="start">float64</text>
+  <text class="mono" x="610" y="440" text-anchor="start">0.00</text>
+  <text class="sub" x="690" y="440" text-anchor="start">no</text>
+  <text class="sub" x="810" y="440" text-anchor="start">never read</text>
+  <rect x="34" y="452" width="1112" height="26" rx="5" fill="#fff7ed" stroke="#fed7aa" stroke-width="1.4"/>
+  <text class="monob" x="52" y="470" text-anchor="start">num_nodes</text>
+  <text class="mono" x="300" y="470" text-anchor="start">scalar 31559</text>
+  <text class="mono" x="470" y="470" text-anchor="start">int</text>
+  <text class="mono" x="610" y="470" text-anchor="start">0.00</text>
+  <text class="sub" x="690" y="470" text-anchor="start">yes</text>
+  <text class="sub" x="810" y="470" text-anchor="start">disagrees with x; see caption</text>
+  <text class="cap" x="34" y="508">num_nodes is a stored integer, not a tensor, and it disagrees with the tensors: it says 31,559 while x, pos and y each carry 31,635 rows.</text>
+  <text class="cap" x="34" y="526">The preprocessing set it from the road-network edge count before the line-graph transform and never updated it. The 76 extra rows are</text>
+  <text class="cap" x="34" y="544">public-transport links with no car access; they appear in no edge and their target is exactly zero in all 1,000 scenarios.</text>
+</svg>

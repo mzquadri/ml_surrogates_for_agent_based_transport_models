@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1180 620" width="1180" height="620" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif">
+  <rect width="1180" height="620" fill="#ffffff"/>
+  <style>
+    .h { fill:#0f172a; font-size:19px; font-weight:600; }
+    .s { fill:#64748b; font-size:12.5px; }
+    .lbl { fill:#0f172a; font-size:14px; font-weight:600; }
+    .sub { fill:#64748b; font-size:11.5px; }
+    .mono { font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:11.5px; fill:#334155; }
+    .monob { font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:12.5px; fill:#0f172a; font-weight:600; }
+    .cap { fill:#64748b; font-size:12px; }
+    .tick { fill:#059669; font-size:15px; font-weight:700; }
+    .cross { fill:#ea580c; font-size:15px; font-weight:700; }
+  </style>
+  <text class="h" x="34" y="40">The eleven stored fields</text>
+  <text class="s" x="34" y="62">Six columns inside x, plus five further stored tensors. This is what the corpus actually contains.</text>
+  <text class="s" x="34" y="79">The enum also declares six ALLOWED_MODE_* columns that were never written.</text>
+  <rect x="34" y="100" width="560" height="250" rx="9" fill="#eff6ff" stroke="#bfdbfe" stroke-width="1.4"/>
+  <text class="lbl" x="52" y="128" text-anchor="start">1-6   the six columns of x</text>
+  <text class="sub" x="52" y="148" text-anchor="start">x has shape [31635, 6] and dtype float64</text>
+  <text class="tick" x="58" y="174" text-anchor="start">&#10003;</text>
+  <text class="mono" x="84" y="174" text-anchor="start">0</text>
+  <text class="monob" x="110" y="174" text-anchor="start">VOL_BASE_CASE</text>
+  <text class="sub" x="330" y="174" text-anchor="start">vehicles per hour, base case</text>
+  <text class="tick" x="58" y="201" text-anchor="start">&#10003;</text>
+  <text class="mono" x="84" y="201" text-anchor="start">1</text>
+  <text class="monob" x="110" y="201" text-anchor="start">CAPACITY_BASE_CASE</text>
+  <text class="sub" x="330" y="201" text-anchor="start">vehicles per hour, base case</text>
+  <text class="tick" x="58" y="228" text-anchor="start">&#10003;</text>
+  <text class="mono" x="84" y="228" text-anchor="start">2</text>
+  <text class="monob" x="110" y="228" text-anchor="start">CAPACITY_REDUCTION</text>
+  <text class="sub" x="330" y="228" text-anchor="start">vehicles per hour, negative, per scenario</text>
+  <text class="tick" x="58" y="255" text-anchor="start">&#10003;</text>
+  <text class="mono" x="84" y="255" text-anchor="start">3</text>
+  <text class="monob" x="110" y="255" text-anchor="start">FREESPEED</text>
+  <text class="sub" x="330" y="255" text-anchor="start">metres per second</text>
+  <text class="cross" x="58" y="282" text-anchor="start">&#10007;</text>
+  <text class="mono" x="84" y="282" text-anchor="start">4</text>
+  <text class="monob" x="110" y="282" text-anchor="start">HIGHWAY</text>
+  <text class="sub" x="330" y="282" text-anchor="start">nominal road-class code</text>
+  <text class="tick" x="58" y="309" text-anchor="start">&#10003;</text>
+  <text class="mono" x="84" y="309" text-anchor="start">5</text>
+  <text class="monob" x="110" y="309" text-anchor="start">LENGTH</text>
+  <text class="sub" x="330" y="309" text-anchor="start">metres</text>
+  <rect x="618" y="100" width="528" height="250" rx="9" fill="#f5f3ff" stroke="#ddd6fe" stroke-width="1.4"/>
+  <text class="lbl" x="636" y="128" text-anchor="start">7-11   the five other stored tensors</text>
+  <text class="sub" x="636" y="148" text-anchor="start">not columns of x; separate entries on the Data object</text>
+  <text class="mono" x="642" y="174" text-anchor="start">7</text>
+  <text class="monob" x="672" y="174" text-anchor="start">pos</text>
+  <text class="mono" x="840" y="174" text-anchor="start">[31635, 3, 2]</text>
+  <text class="sub" x="960" y="174" text-anchor="start">start, end, midpoint</text>
+  <text class="mono" x="642" y="201" text-anchor="start">8</text>
+  <text class="monob" x="672" y="201" text-anchor="start">y</text>
+  <text class="mono" x="840" y="201" text-anchor="start">[31635, 1]</text>
+  <text class="sub" x="960" y="201" text-anchor="start">the target</text>
+  <text class="mono" x="642" y="228" text-anchor="start">9</text>
+  <text class="monob" x="672" y="228" text-anchor="start">edge_index</text>
+  <text class="mono" x="840" y="228" text-anchor="start">[2, 59851]</text>
+  <text class="sub" x="960" y="228" text-anchor="start">connectivity</text>
+  <text class="mono" x="642" y="255" text-anchor="start">10</text>
+  <text class="monob" x="672" y="255" text-anchor="start">mode_stats_diff</text>
+  <text class="mono" x="840" y="255" text-anchor="start">[6, 3]</text>
+  <text class="sub" x="960" y="255" text-anchor="start">per-mode aggregates</text>
+  <text class="mono" x="642" y="282" text-anchor="start">11</text>
+  <text class="monob" x="672" y="282" text-anchor="start">mode_stats_diff_perc</text>
+  <text class="mono" x="840" y="282" text-anchor="start">[6, 3]</text>
+  <text class="sub" x="960" y="282" text-anchor="start">the same, as percentages</text>
+  <rect x="34" y="372" width="1112" height="118" rx="9" fill="#fff7ed" stroke="#fed7aa" stroke-width="1.4"/>
+  <text class="lbl" x="52" y="398" text-anchor="start">Designed and never built: ALLOWED_MODE_* at indices 6-11</text>
+  <text class="sub" x="52" y="420" text-anchor="start">EdgeFeatures declares ALLOWED_MODE_CAR, _BUS, _PT, _TRAIN, _RAIL and _SUBWAY at indices 6 to 11, and NET_FLOW at 12.</text>
+  <text class="sub" x="52" y="440" text-anchor="start">process_simulations_for_gnn.py sets use_allowed_modes = False, so those columns were never written to any file.</text>
+  <text class="sub" x="52" y="460" text-anchor="start">x therefore has six columns, not twelve. The enum is a plan; the corpus is the record of what was built.</text>
+  <text class="sub" x="52" y="480" text-anchor="start">Do not read the enum as a description of the stored data.</text>
+  <text class="cap" x="34" y="576">Verified by streaming all 1,000 scenarios: every shape and dtype is identical across the corpus, and only CAPACITY_REDUCTION varies between</text>
+  <text class="cap" x="34" y="594">scenarios. See scripts/data_exploration/explore_tensors.py.</text>
+</svg>

@@ -1,0 +1,121 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1180 660" width="1180" height="660" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif">
+  <rect width="1180" height="660" fill="#ffffff"/>
+  <style>
+    .h { fill:#0f172a; font-size:19px; font-weight:600; }
+    .s { fill:#64748b; font-size:12.5px; }
+    .lbl { fill:#0f172a; font-size:14px; font-weight:600; }
+    .sub { fill:#64748b; font-size:11.5px; }
+    .mono { font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:11.5px; fill:#334155; }
+    .monob { font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:12.5px; fill:#0f172a; font-weight:600; }
+    .cap { fill:#64748b; font-size:12px; }
+    .tick { fill:#059669; font-size:15px; font-weight:700; }
+    .cross { fill:#ea580c; font-size:15px; font-weight:700; }
+  </style>
+  <text class="h" x="34" y="40">Why HIGHWAY is not a model feature</text>
+  <text class="s" x="34" y="62">The column exists and is populated. It is excluded because of what its numbers mean, not because they are missing.</text>
+  <rect x="34" y="100" width="1112" height="112" rx="9" fill="#fff7ed" stroke="#fed7aa" stroke-width="1.4"/>
+  <text class="lbl" x="52" y="128" text-anchor="start">The encoding is nominal</text>
+  <text class="sub" x="52" y="152" text-anchor="start">highway_mapping turns an OSM class string into an integer. The integers are names, not amounts.</text>
+  <text class="sub" x="52" y="172" text-anchor="start">A network layer computes weighted sums, so feeding these codes asserts that tertiary - secondary = secondary - primary,</text>
+  <text class="sub" x="52" y="192" text-anchor="start">and that residential is four times trunk. Neither statement means anything.</text>
+  <text class="lbl" x="34" y="230" text-anchor="start">The classes as they appear in the corpus</text>
+  <rect x="34" y="238" width="1112" height="28" rx="6" fill="#f1f5f9" stroke="#e2e8f0" stroke-width="1.4"/>
+  <text class="sub" x="52" y="257" text-anchor="start">code</text>
+  <text class="sub" x="118" y="257" text-anchor="start">road class</text>
+  <text class="sub" x="470" y="257" text-anchor="start">links</text>
+  <text class="sub" x="560" y="257" text-anchor="start">share</text>
+  <text class="sub" x="650" y="257" text-anchor="start">ever intervened</text>
+  <text class="sub" x="810" y="257" text-anchor="start">mean |response|</text>
+  <text class="sub" x="970" y="257" text-anchor="start">directly intervened</text>
+  <rect x="34" y="270" width="1112" height="22" rx="4" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.4"/>
+  <text class="mono" x="52" y="286" text-anchor="start">-1</text>
+  <text class="sub" x="118" y="286" text-anchor="start">pt (public transport) or unmapped</text>
+  <text class="mono" x="470" y="286" text-anchor="start">3,173</text>
+  <text class="mono" x="560" y="286" text-anchor="start">10.0%</text>
+  <text class="mono" x="650" y="286" text-anchor="start">0</text>
+  <text class="mono" x="810" y="286" text-anchor="start">0.35</text>
+  <text class="sub" x="970" y="286" text-anchor="start">never</text>
+  <rect x="34" y="295" width="1112" height="22" rx="4" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.4"/>
+  <text class="mono" x="52" y="311" text-anchor="start">0</text>
+  <text class="sub" x="118" y="311" text-anchor="start">trunk / trunk_link / motorway_link</text>
+  <text class="mono" x="470" y="311" text-anchor="start">933</text>
+  <text class="mono" x="560" y="311" text-anchor="start">2.9%</text>
+  <text class="mono" x="650" y="311" text-anchor="start">0</text>
+  <text class="mono" x="810" y="311" text-anchor="start">9.15</text>
+  <text class="sub" x="970" y="311" text-anchor="start">never</text>
+  <rect x="34" y="320" width="1112" height="22" rx="4" fill="#ecfdf5" stroke="#a7f3d0" stroke-width="1.4"/>
+  <text class="mono" x="52" y="336" text-anchor="start">1</text>
+  <text class="sub" x="118" y="336" text-anchor="start">primary / primary_link</text>
+  <text class="mono" x="470" y="336" text-anchor="start">5,295</text>
+  <text class="mono" x="560" y="336" text-anchor="start">16.7%</text>
+  <text class="mono" x="650" y="336" text-anchor="start">4,503</text>
+  <text class="mono" x="810" y="336" text-anchor="start">9.69</text>
+  <text class="sub" x="970" y="336" text-anchor="start">yes</text>
+  <rect x="34" y="345" width="1112" height="22" rx="4" fill="#ecfdf5" stroke="#a7f3d0" stroke-width="1.4"/>
+  <text class="mono" x="52" y="361" text-anchor="start">2</text>
+  <text class="sub" x="118" y="361" text-anchor="start">secondary / secondary_link</text>
+  <text class="mono" x="470" y="361" text-anchor="start">4,328</text>
+  <text class="mono" x="560" y="361" text-anchor="start">13.7%</text>
+  <text class="mono" x="650" y="361" text-anchor="start">3,425</text>
+  <text class="mono" x="810" y="361" text-anchor="start">5.31</text>
+  <text class="sub" x="970" y="361" text-anchor="start">yes</text>
+  <rect x="34" y="370" width="1112" height="22" rx="4" fill="#ecfdf5" stroke="#a7f3d0" stroke-width="1.4"/>
+  <text class="mono" x="52" y="386" text-anchor="start">3</text>
+  <text class="sub" x="118" y="386" text-anchor="start">tertiary / tertiary_link</text>
+  <text class="mono" x="470" y="386" text-anchor="start">3,792</text>
+  <text class="mono" x="560" y="386" text-anchor="start">12.0%</text>
+  <text class="mono" x="650" y="386" text-anchor="start">3,377</text>
+  <text class="mono" x="810" y="386" text-anchor="start">4.11</text>
+  <text class="sub" x="970" y="386" text-anchor="start">yes</text>
+  <rect x="34" y="395" width="1112" height="22" rx="4" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.4"/>
+  <text class="mono" x="52" y="411" text-anchor="start">4</text>
+  <text class="sub" x="118" y="411" text-anchor="start">residential</text>
+  <text class="mono" x="470" y="411" text-anchor="start">11,796</text>
+  <text class="mono" x="560" y="411" text-anchor="start">37.3%</text>
+  <text class="mono" x="650" y="411" text-anchor="start">0</text>
+  <text class="mono" x="810" y="411" text-anchor="start">2.27</text>
+  <text class="sub" x="970" y="411" text-anchor="start">never</text>
+  <rect x="34" y="420" width="1112" height="22" rx="4" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.4"/>
+  <text class="mono" x="52" y="436" text-anchor="start">5</text>
+  <text class="sub" x="118" y="436" text-anchor="start">living_street</text>
+  <text class="mono" x="470" y="436" text-anchor="start">732</text>
+  <text class="mono" x="560" y="436" text-anchor="start">2.3%</text>
+  <text class="mono" x="650" y="436" text-anchor="start">0</text>
+  <text class="mono" x="810" y="436" text-anchor="start">1.06</text>
+  <text class="sub" x="970" y="436" text-anchor="start">never</text>
+  <rect x="34" y="445" width="1112" height="22" rx="4" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.4"/>
+  <text class="mono" x="52" y="461" text-anchor="start">6</text>
+  <text class="sub" x="118" y="461" text-anchor="start">pedestrian</text>
+  <text class="mono" x="470" y="461" text-anchor="start">29</text>
+  <text class="mono" x="560" y="461" text-anchor="start">0.1%</text>
+  <text class="mono" x="650" y="461" text-anchor="start">0</text>
+  <text class="mono" x="810" y="461" text-anchor="start">0.00</text>
+  <text class="sub" x="970" y="461" text-anchor="start">never</text>
+  <rect x="34" y="470" width="1112" height="22" rx="4" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.4"/>
+  <text class="mono" x="52" y="486" text-anchor="start">7</text>
+  <text class="sub" x="118" y="486" text-anchor="start">service</text>
+  <text class="mono" x="470" y="486" text-anchor="start">471</text>
+  <text class="mono" x="560" y="486" text-anchor="start">1.5%</text>
+  <text class="mono" x="650" y="486" text-anchor="start">0</text>
+  <text class="mono" x="810" y="486" text-anchor="start">0.00</text>
+  <text class="sub" x="970" y="486" text-anchor="start">never</text>
+  <rect x="34" y="495" width="1112" height="22" rx="4" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.4"/>
+  <text class="mono" x="52" y="511" text-anchor="start">8</text>
+  <text class="sub" x="118" y="511" text-anchor="start">construction</text>
+  <text class="mono" x="470" y="511" text-anchor="start">8</text>
+  <text class="mono" x="560" y="511" text-anchor="start">0.0%</text>
+  <text class="mono" x="650" y="511" text-anchor="start">0</text>
+  <text class="mono" x="810" y="511" text-anchor="start">0.00</text>
+  <text class="sub" x="970" y="511" text-anchor="start">never</text>
+  <rect x="34" y="520" width="1112" height="22" rx="4" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.4"/>
+  <text class="mono" x="52" y="536" text-anchor="start">9</text>
+  <text class="sub" x="118" y="536" text-anchor="start">unclassified</text>
+  <text class="mono" x="470" y="536" text-anchor="start">1,078</text>
+  <text class="mono" x="560" y="536" text-anchor="start">3.4%</text>
+  <text class="mono" x="650" y="536" text-anchor="start">0</text>
+  <text class="mono" x="810" y="536" text-anchor="start">2.26</text>
+  <text class="sub" x="970" y="536" text-anchor="start">never</text>
+  <text class="cap" x="34" y="598">Only primary, secondary and tertiary are ever intervened. Trunk is never touched by any policy yet carries the second-highest mean response in the</text>
+  <text class="cap" x="34" y="616">network, which is spillover rather than treatment. A one-hot encoding or a learned embedding would be a defensible way to use this column; neither</text>
+  <text class="cap" x="34" y="634">was part of the thesis, and both belong under future work.</text>
+</svg>
