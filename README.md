@@ -12,6 +12,8 @@
 
 **[Read the thesis (PDF)](thesis/submission_2026-05-15/)** · **[Verified results](#results)** · **[Reproduce them](#reproducing-the-results)** · **[Data story](docs/portfolio_data_story/)** · **[Corrigendum](docs/CORRIGENDUM.md)**
 
+![The Paris network](docs/figures/portfolio/01_the_network.png)
+
 ---
 
 ## The problem
@@ -107,6 +109,8 @@ topology are byte-identical in every scenario; only `CAPACITY_REDUCTION` moves.
 The `EdgeFeatures` enum also declares `ALLOWED_MODE_CAR` … `ALLOWED_MODE_SUBWAY` at indices
 6–11, but `use_allowed_modes = False` in the preprocessing, so those six columns were
 **designed and never materialised**. `x` has six columns, not twelve.
+
+![The busiest roads are the steady ones](docs/figures/portfolio/03_inverted_u.png)
 
 A separate check on the stored schema found that `num_nodes` is recorded as 31,559 while
 `x`, `pos` and `y` all carry 31,635 rows. The 76 extra rows are public-transport links with
@@ -248,6 +252,8 @@ redistribution rather than a gradient that fades with distance.
 It survives its reachability control (one hop reaches only 32% of the network, three reach
 70%) and holds under both directed and undirected traversal. It is an association, not
 evidence of a mechanism. See [`05_spillover.md`](docs/portfolio_data_story/05_spillover.md).
+
+![Where the policy lands and where the traffic moves](docs/figures/portfolio/04_policy_vs_response.png)
 
 [^t7]: The thesis reports 0.446 for Trial 7. That value is not reproducible from the
     retained archive, which yields 0.4437 under the definition that reproduces Trial 8

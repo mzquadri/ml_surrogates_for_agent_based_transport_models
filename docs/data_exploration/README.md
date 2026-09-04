@@ -26,6 +26,9 @@ python scripts/data_exploration/explore_graph.py    --corpus $CORPUS --cache $CA
 | [Scenario analysis](scenario_analysis.md) | Interventions, responses and representative cases |
 | [Auxiliary tensors](auxiliary_tensors.md) | `mode_stats_diff` and the near −100% values |
 
+For the same material drawn for presentation rather than for analysis, see the
+[figure gallery](../figures/portfolio/README.md).
+
 ## The four things worth knowing
 
 **`x` has six columns, and five of them reach the model.** The enum declares
