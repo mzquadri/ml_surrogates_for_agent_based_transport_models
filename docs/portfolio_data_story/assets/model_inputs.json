@@ -1,0 +1,42 @@
+{
+  "verified_from": [
+    "scripts/training/help_functions.py (node_features branch)",
+    "scripts/gnn/models/point_net_transf_gat.py (forward)",
+    "models/point_net_transf_gat_8th_trial_lower_dropout/trained_model/model.pth"
+  ],
+  "checkpoint_evidence": {
+    "layer": "point_net_conv_1.local_nn.0.weight",
+    "shape": [
+      256,
+      7
+    ],
+    "reading": "PointNetConv concatenates node features with a 2-D relative coordinate, so 7 - 2 = 5 node feature channels."
+  },
+  "node_features_used": [
+    "VOL_BASE_CASE",
+    "CAPACITY_BASE_CASE",
+    "CAPACITY_REDUCTION",
+    "FREESPEED",
+    "LENGTH"
+  ],
+  "node_features_excluded": [
+    "HIGHWAY"
+  ],
+  "also_consumed_by_the_architecture": {
+    "pos[:, 0]": "start coordinate, first PointNetConv",
+    "pos[:, 1]": "end coordinate, second PointNetConv",
+    "edge_index": "connectivity for both PointNetConv, both TransformerConv and both GATConv layers"
+  },
+  "not_consumed": {
+    "pos[:, 2]": "midpoint; used only for plotting",
+    "mode_stats_diff": "no code path reads it",
+    "mode_stats_diff_perc": "no code path reads it"
+  },
+  "precise_statement": "Five of the six node-attribute columns in x were used as node features. The model also consumes graph connectivity (edge_index) and two of the three stored coordinate pairs (pos[:,0], pos[:,1]). It is not true that only five pieces of information enter the model.",
+  "isolated_public_transport_links": {
+    "n": 76,
+    "stored_num_nodes": 31559,
+    "rows_in_x": 31635,
+    "description": "Links with no car mode: zero volume, capacity and freespeed, HIGHWAY -1, never intervened, target exactly zero in every scenario, and absent from edge_index."
+  }
+}

@@ -1,0 +1,914 @@
+{
+  "corpus": {
+    "n_scenarios": 1000,
+    "n_links": 31635,
+    "n_node_observations": 31635000
+  },
+  "features": {
+    "VOL_BASE_CASE": {
+      "index": 0,
+      "name": "VOL_BASE_CASE",
+      "unit": "vehicles per hour",
+      "meaning": "Car volume on the link in the untouched base-case simulation.",
+      "source": "process_simulations_for_gnn.py: links_base_case['vol_car'].values",
+      "static": true,
+      "dtype": "float64",
+      "used_by_model": true,
+      "exclusion_reason": null,
+      "treatment": "continuous, static",
+      "stats": {
+        "count": 31635,
+        "min": 0.0,
+        "p01": 0.0,
+        "q1": 0.238095,
+        "median": 10.928571,
+        "q3": 45.27381,
+        "p99": 841.924762,
+        "max": 1596.0,
+        "mean": 50.908044,
+        "std": 135.829772,
+        "iqr": 45.035714,
+        "n_unique": 5694,
+        "zero_pct": 23.8596,
+        "nan_pct": 0.0,
+        "negative_pct": 0.0
+      },
+      "spearman_vs_mean_abs_response": 0.8849,
+      "response_curve_vs_abs_target": [
+        {
+          "bin": 0,
+          "feature_low": 0.0238,
+          "feature_high": 1.2857,
+          "n_links": 2002,
+          "median_abs_response": 0.460711,
+          "mean_abs_response": 0.735299,
+          "p90_abs_response": 1.685948
+        },
+        {
+          "bin": 1,
+          "feature_low": 1.2857,
+          "feature_high": 3.2381,
+          "n_links": 1999,
+          "median_abs_response": 0.71714,
+          "mean_abs_response": 0.98554,
+          "p90_abs_response": 1.897677
+        },
+        {
+          "bin": 2,
+          "feature_low": 3.2381,
+          "feature_high": 6.0476,
+          "n_links": 2020,
+          "median_abs_response": 1.121789,
+          "mean_abs_response": 1.357659,
+          "p90_abs_response": 2.500619
+        },
+        {
+          "bin": 3,
+          "feature_low": 6.0476,
+          "feature_high": 10.2778,
+          "n_links": 2008,
+          "median_abs_response": 1.771194,
+          "mean_abs_response": 2.24974,
+          "p90_abs_response": 4.257414
+        },
+        {
+          "bin": 4,
+          "feature_low": 10.2778,
+          "feature_high": 16.0476,
+          "n_links": 2006,
+          "median_abs_response": 2.404045,
+          "mean_abs_response": 2.86965,
+          "p90_abs_response": 5.036208
+        },
+        {
+          "bin": 5,
+          "feature_low": 16.0476,
+          "feature_high": 23.4048,
+          "n_links": 2006,
+          "median_abs_response": 3.309875,
+          "mean_abs_response": 3.754793,
+          "p90_abs_response": 6.416839
+        },
+        {
+          "bin": 6,
+          "feature_low": 23.4048,
+          "feature_high": 32.5,
+          "n_links": 2006,
+          "median_abs_response": 3.815328,
+          "mean_abs_response": 4.655954,
+          "p90_abs_response": 8.334206
+        },
+        {
+          "bin": 7,
+          "feature_low": 32.5,
+          "feature_high": 44.3095,
+          "n_links": 2007,
+          "median_abs_response": 4.526995,
+          "mean_abs_response": 5.238204,
+          "p90_abs_response": 8.64524
+        },
+        {
+          "bin": 8,
+          "feature_low": 44.3095,
+          "feature_high": 61.0714,
+          "n_links": 2006,
+          "median_abs_response": 5.285144,
+          "mean_abs_response": 5.925686,
+          "p90_abs_response": 9.317883
+        },
+        {
+          "bin": 9,
+          "feature_low": 61.0714,
+          "feature_high": 92.4524,
+          "n_links": 2011,
+          "median_abs_response": 6.263299,
+          "mean_abs_response": 6.936059,
+          "p90_abs_response": 10.939334
+        },
+        {
+          "bin": 10,
+          "feature_low": 92.4524,
+          "feature_high": 167.1111,
+          "n_links": 2008,
+          "median_abs_response": 9.410324,
+          "mean_abs_response": 10.139542,
+          "p90_abs_response": 16.955864
+        },
+        {
+          "bin": 11,
+          "feature_low": 167.1111,
+          "feature_high": 1596.0,
+          "n_links": 2008,
+          "median_abs_response": 14.38706,
+          "mean_abs_response": 18.904678,
+          "p90_abs_response": 36.456398
+        }
+      ],
+      "response_curve_fine": [
+        {
+          "low": 0.0,
+          "high": 67.0,
+          "n_links": 26132,
+          "mean_abs_response": 2.3214,
+          "median_abs_response": 1.2936,
+          "sem": 0.0181
+        },
+        {
+          "low": 67.0,
+          "high": 134.0,
+          "n_links": 2871,
+          "mean_abs_response": 8.309,
+          "median_abs_response": 7.3387,
+          "sem": 0.0813
+        },
+        {
+          "low": 134.0,
+          "high": 201.0,
+          "n_links": 1057,
+          "mean_abs_response": 12.0704,
+          "median_abs_response": 11.4469,
+          "sem": 0.2127
+        },
+        {
+          "low": 201.0,
+          "high": 268.0,
+          "n_links": 490,
+          "mean_abs_response": 16.3021,
+          "median_abs_response": 15.1311,
+          "sem": 0.3999
+        },
+        {
+          "low": 268.0,
+          "high": 335.0,
+          "n_links": 277,
+          "mean_abs_response": 19.6824,
+          "median_abs_response": 17.7315,
+          "sem": 0.7595
+        },
+        {
+          "low": 335.0,
+          "high": 402.0,
+          "n_links": 157,
+          "mean_abs_response": 25.0531,
+          "median_abs_response": 19.722,
+          "sem": 1.5095
+        },
+        {
+          "low": 402.0,
+          "high": 469.0,
+          "n_links": 102,
+          "mean_abs_response": 34.1628,
+          "median_abs_response": 26.9745,
+          "sem": 2.3456
+        },
+        {
+          "low": 469.0,
+          "high": 603.0,
+          "n_links": 112,
+          "mean_abs_response": 37.7519,
+          "median_abs_response": 44.767,
+          "sem": 2.4609
+        },
+        {
+          "low": 603.0,
+          "high": 804.0,
+          "n_links": 108,
+          "mean_abs_response": 25.2503,
+          "median_abs_response": 22.3757,
+          "sem": 1.5922
+        },
+        {
+          "low": 804.0,
+          "high": 1005.0,
+          "n_links": 100,
+          "mean_abs_response": 13.4098,
+          "median_abs_response": 13.41,
+          "sem": 0.4102
+        },
+        {
+          "low": 1005.0,
+          "high": 1206.0,
+          "n_links": 133,
+          "mean_abs_response": 12.3802,
+          "median_abs_response": 12.2579,
+          "sem": 0.4523
+        },
+        {
+          "low": 1206.0,
+          "high": 1608.0,
+          "n_links": 96,
+          "mean_abs_response": 15.0369,
+          "median_abs_response": 12.5774,
+          "sem": 0.9803
+        }
+      ],
+      "shape": "inverted U: rises to a peak near 500 veh/h, then falls for the busiest links"
+    },
+    "CAPACITY_BASE_CASE": {
+      "index": 1,
+      "name": "CAPACITY_BASE_CASE",
+      "unit": "vehicles per hour",
+      "meaning": "Link capacity in the base case; zero where the link carries no car mode.",
+      "source": "help_functions.py get_basic_edge_attributes: np.where(modes.str.contains('car'), capacity, 0)",
+      "static": true,
+      "dtype": "float64",
+      "used_by_model": true,
+      "exclusion_reason": null,
+      "treatment": "continuous, static",
+      "stats": {
+        "count": 31635,
+        "min": 0.0,
+        "p01": 0.0,
+        "q1": 480.0,
+        "median": 480.0,
+        "q3": 1200.0,
+        "p99": 6400.0,
+        "max": 14400.0,
+        "mean": 1028.955587,
+        "std": 1264.453662,
+        "iqr": 720.0,
+        "n_unique": 36,
+        "zero_pct": 10.7855,
+        "nan_pct": 0.0,
+        "negative_pct": 0.0
+      },
+      "spearman_vs_mean_abs_response": 0.4764,
+      "response_curve_vs_abs_target": [
+        {
+          "bin": 0,
+          "feature_low": 240.0,
+          "feature_high": 480.0,
+          "n_links": 727,
+          "median_abs_response": 0.599762,
+          "mean_abs_response": 1.064071,
+          "p90_abs_response": 2.628753
+        },
+        {
+          "bin": 1,
+          "feature_low": 480.0,
+          "feature_high": 600.0,
+          "n_links": 14381,
+          "median_abs_response": 1.976556,
+          "mean_abs_response": 2.796533,
+          "p90_abs_response": 6.466145
+        },
+        {
+          "bin": 2,
+          "feature_low": 600.0,
+          "feature_high": 960.0,
+          "n_links": 3400,
+          "median_abs_response": 2.692237,
+          "mean_abs_response": 3.481631,
+          "p90_abs_response": 8.309208
+        },
+        {
+          "bin": 3,
+          "feature_low": 960.0,
+          "feature_high": 1200.0,
+          "n_links": 1403,
+          "median_abs_response": 1.702527,
+          "mean_abs_response": 3.103285,
+          "p90_abs_response": 7.616281
+        },
+        {
+          "bin": 4,
+          "feature_low": 1200.0,
+          "feature_high": 2400.0,
+          "n_links": 3543,
+          "median_abs_response": 5.172879,
+          "mean_abs_response": 8.241098,
+          "p90_abs_response": 17.604
+        },
+        {
+          "bin": 5,
+          "feature_low": 2400.0,
+          "feature_high": 3000.0,
+          "n_links": 2355,
+          "median_abs_response": 7.296276,
+          "mean_abs_response": 9.598073,
+          "p90_abs_response": 19.993864
+        },
+        {
+          "bin": 6,
+          "feature_low": 3000.0,
+          "feature_high": 14400.0,
+          "n_links": 2414,
+          "median_abs_response": 6.656692,
+          "mean_abs_response": 8.507464,
+          "p90_abs_response": 19.844936
+        }
+      ]
+    },
+    "CAPACITY_REDUCTION": {
+      "index": 2,
+      "name": "CAPACITY_REDUCTION",
+      "unit": "vehicles per hour (signed, <= 0)",
+      "meaning": "Capacity removed by the policy: scenario capacity minus base capacity. The only column that differs between scenarios.",
+      "source": "help_functions.py get_basic_edge_attributes: capacities_new - capacity_base_case",
+      "static": false,
+      "dtype": "float64",
+      "used_by_model": true,
+      "exclusion_reason": null,
+      "treatment": "continuous, dynamic",
+      "stats_over_all_scenarios": {
+        "count": 31635000,
+        "min": -7200.0,
+        "p01": -1800.0,
+        "q1": 0.0,
+        "median": 0.0,
+        "q3": 0.0,
+        "p99": 0.0,
+        "max": 0.0,
+        "mean": -93.332588,
+        "std": 334.026398,
+        "iqr": 0.0,
+        "n_unique": 29,
+        "zero_pct": 87.9447,
+        "nan_pct": 0.0,
+        "negative_pct": 12.0553
+      },
+      "nonzero_only": {
+        "count": 3813684,
+        "min": -7200.0,
+        "p01": -3000.0,
+        "q1": -1200.0,
+        "median": -600.0,
+        "q3": -400.0,
+        "p99": -240.0,
+        "max": -240.0,
+        "mean": -774.205811,
+        "std": 631.174744,
+        "iqr": 800.0,
+        "n_unique": 28,
+        "zero_pct": 0.0,
+        "nan_pct": 0.0,
+        "negative_pct": 100.0
+      },
+      "n_distinct_magnitudes": 28,
+      "links_intervened_per_scenario": {
+        "min": 306,
+        "median": 3317,
+        "max": 11305,
+        "mean": 3813.68
+      },
+      "links_ever_intervened": 11305,
+      "times_intervened_per_link": {
+        "max": 660,
+        "mean_over_eligible": 337.34
+      },
+      "response_curve_vs_abs_target": [
+        {
+          "bin": 0,
+          "feature_low": 73.68,
+          "feature_high": 76.32,
+          "n_links": 636,
+          "median_abs_response": 4.413136,
+          "mean_abs_response": 4.825248,
+          "p90_abs_response": 8.170216
+        },
+        {
+          "bin": 1,
+          "feature_low": 76.32,
+          "feature_high": 81.36,
+          "n_links": 1207,
+          "median_abs_response": 3.49325,
+          "mean_abs_response": 3.983204,
+          "p90_abs_response": 7.224627
+        },
+        {
+          "bin": 2,
+          "feature_low": 81.36,
+          "feature_high": 123.2,
+          "n_links": 913,
+          "median_abs_response": 3.941647,
+          "mean_abs_response": 4.752223,
+          "p90_abs_response": 8.612749
+        },
+        {
+          "bin": 3,
+          "feature_low": 123.2,
+          "feature_high": 132.8,
+          "n_links": 865,
+          "median_abs_response": 3.887429,
+          "mean_abs_response": 5.234245,
+          "p90_abs_response": 10.124998
+        },
+        {
+          "bin": 4,
+          "feature_low": 132.8,
+          "feature_high": 140.4,
+          "n_links": 1090,
+          "median_abs_response": 4.890998,
+          "mean_abs_response": 5.778659,
+          "p90_abs_response": 9.619102
+        },
+        {
+          "bin": 5,
+          "feature_low": 140.4,
+          "feature_high": 190.8,
+          "n_links": 816,
+          "median_abs_response": 5.859729,
+          "mean_abs_response": 10.300359,
+          "p90_abs_response": 22.854317
+        },
+        {
+          "bin": 6,
+          "feature_low": 190.8,
+          "feature_high": 228.96,
+          "n_links": 1067,
+          "median_abs_response": 6.035035,
+          "mean_abs_response": 10.726402,
+          "p90_abs_response": 22.312147
+        },
+        {
+          "bin": 7,
+          "feature_low": 228.96,
+          "feature_high": 280.8,
+          "n_links": 838,
+          "median_abs_response": 5.30376,
+          "mean_abs_response": 6.802662,
+          "p90_abs_response": 12.979282
+        },
+        {
+          "bin": 8,
+          "feature_low": 280.8,
+          "feature_high": 381.6,
+          "n_links": 1012,
+          "median_abs_response": 8.519114,
+          "mean_abs_response": 10.994287,
+          "p90_abs_response": 22.731457
+        },
+        {
+          "bin": 9,
+          "feature_low": 381.6,
+          "feature_high": 399.6,
+          "n_links": 824,
+          "median_abs_response": 5.397069,
+          "mean_abs_response": 6.793227,
+          "p90_abs_response": 14.849818
+        },
+        {
+          "bin": 10,
+          "feature_low": 399.6,
+          "feature_high": 586.8,
+          "n_links": 1084,
+          "median_abs_response": 7.659483,
+          "mean_abs_response": 10.821129,
+          "p90_abs_response": 21.542692
+        },
+        {
+          "bin": 11,
+          "feature_low": 586.8,
+          "feature_high": 3873.6001,
+          "n_links": 953,
+          "median_abs_response": 9.039873,
+          "mean_abs_response": 11.549545,
+          "p90_abs_response": 24.141052
+        }
+      ]
+    },
+    "FREESPEED": {
+      "index": 3,
+      "name": "FREESPEED",
+      "unit": "metres per second",
+      "meaning": "Free-flow speed permitted on the link; zero where no car mode is allowed.",
+      "source": "help_functions.py get_basic_edge_attributes: np.where(modes.str.contains('car'), freespeed, 0)",
+      "static": true,
+      "dtype": "float64",
+      "used_by_model": true,
+      "exclusion_reason": null,
+      "treatment": "continuous, static",
+      "stats": {
+        "count": 31635,
+        "min": 0.0,
+        "p01": 0.0,
+        "q1": 8.333333,
+        "median": 8.333333,
+        "q3": 8.333333,
+        "p99": 22.222222,
+        "max": 33.333333,
+        "mean": 8.152407,
+        "std": 4.012837,
+        "iqr": 0.0,
+        "n_unique": 16,
+        "zero_pct": 10.7855,
+        "nan_pct": 0.0,
+        "negative_pct": 0.0
+      },
+      "spearman_vs_mean_abs_response": 0.4107,
+      "response_curve_vs_abs_target": [
+        {
+          "bin": 0,
+          "feature_low": 1.3889,
+          "feature_high": 8.3333,
+          "n_links": 1673,
+          "median_abs_response": 0.006,
+          "mean_abs_response": 0.674781,
+          "p90_abs_response": 2.007599
+        },
+        {
+          "bin": 1,
+          "feature_low": 8.3333,
+          "feature_high": 13.8889,
+          "n_links": 22708,
+          "median_abs_response": 2.956263,
+          "mean_abs_response": 4.324367,
+          "p90_abs_response": 9.771663
+        },
+        {
+          "bin": 2,
+          "feature_low": 13.8889,
+          "feature_high": 33.3333,
+          "n_links": 3842,
+          "median_abs_response": 3.679,
+          "mean_abs_response": 7.858938,
+          "p90_abs_response": 20.135107
+        }
+      ]
+    },
+    "HIGHWAY": {
+      "index": 4,
+      "name": "HIGHWAY",
+      "unit": "categorical code (nominal)",
+      "meaning": "OSM road class mapped to an integer. -1 means public transport or a class absent from the mapping.",
+      "source": "help_functions.py get_basic_edge_attributes: gdf['highway'].apply(highway_mapping.get, -1)",
+      "static": true,
+      "dtype": "float64",
+      "used_by_model": false,
+      "exclusion_reason": "Nominal road class encoded as an integer. The codes carry no order or distance, so feeding them to a network that computes weighted sums would invent arithmetic relationships that do not exist.",
+      "treatment": "categorical",
+      "classes": [
+        {
+          "code": -1,
+          "road_class": "pt (public transport) or unmapped",
+          "n_links": 3173,
+          "pct_of_network": 10.03,
+          "ever_intervened": 0,
+          "pct_of_class_intervened": 0.0,
+          "mean_abs_response": 0.351132,
+          "median_abs_response": 0.0,
+          "directly_intervened": false
+        },
+        {
+          "code": 0,
+          "road_class": "trunk / trunk_link / motorway_link",
+          "n_links": 933,
+          "pct_of_network": 2.9493,
+          "ever_intervened": 0,
+          "pct_of_class_intervened": 0.0,
+          "mean_abs_response": 9.147063,
+          "median_abs_response": 8.305175,
+          "directly_intervened": false
+        },
+        {
+          "code": 1,
+          "road_class": "primary / primary_link",
+          "n_links": 5295,
+          "pct_of_network": 16.7378,
+          "ever_intervened": 4503,
+          "pct_of_class_intervened": 85.0425,
+          "mean_abs_response": 9.693705,
+          "median_abs_response": 6.53004,
+          "directly_intervened": true
+        },
+        {
+          "code": 2,
+          "road_class": "secondary / secondary_link",
+          "n_links": 4328,
+          "pct_of_network": 13.681,
+          "ever_intervened": 3425,
+          "pct_of_class_intervened": 79.1359,
+          "mean_abs_response": 5.307925,
+          "median_abs_response": 4.28589,
+          "directly_intervened": true
+        },
+        {
+          "code": 3,
+          "road_class": "tertiary / tertiary_link",
+          "n_links": 3792,
+          "pct_of_network": 11.9867,
+          "ever_intervened": 3377,
+          "pct_of_class_intervened": 89.0559,
+          "mean_abs_response": 4.112425,
+          "median_abs_response": 3.574904,
+          "directly_intervened": true
+        },
+        {
+          "code": 4,
+          "road_class": "residential",
+          "n_links": 11796,
+          "pct_of_network": 37.2878,
+          "ever_intervened": 0,
+          "pct_of_class_intervened": 0.0,
+          "mean_abs_response": 2.268551,
+          "median_abs_response": 1.42161,
+          "directly_intervened": false
+        },
+        {
+          "code": 5,
+          "road_class": "living_street",
+          "n_links": 732,
+          "pct_of_network": 2.3139,
+          "ever_intervened": 0,
+          "pct_of_class_intervened": 0.0,
+          "mean_abs_response": 1.064846,
+          "median_abs_response": 0.600311,
+          "directly_intervened": false
+        },
+        {
+          "code": 6,
+          "road_class": "pedestrian",
+          "n_links": 29,
+          "pct_of_network": 0.0917,
+          "ever_intervened": 0,
+          "pct_of_class_intervened": 0.0,
+          "mean_abs_response": 0.0,
+          "median_abs_response": 0.0,
+          "directly_intervened": false
+        },
+        {
+          "code": 7,
+          "road_class": "service",
+          "n_links": 471,
+          "pct_of_network": 1.4889,
+          "ever_intervened": 0,
+          "pct_of_class_intervened": 0.0,
+          "mean_abs_response": 0.0,
+          "median_abs_response": 0.0,
+          "directly_intervened": false
+        },
+        {
+          "code": 8,
+          "road_class": "construction",
+          "n_links": 8,
+          "pct_of_network": 0.0253,
+          "ever_intervened": 0,
+          "pct_of_class_intervened": 0.0,
+          "mean_abs_response": 0.0,
+          "median_abs_response": 0.0,
+          "directly_intervened": false
+        },
+        {
+          "code": 9,
+          "road_class": "unclassified",
+          "n_links": 1078,
+          "pct_of_network": 3.4076,
+          "ever_intervened": 0,
+          "pct_of_class_intervened": 0.0,
+          "mean_abs_response": 2.261442,
+          "median_abs_response": 0.873344,
+          "directly_intervened": false
+        }
+      ],
+      "n_classes": 11
+    },
+    "LENGTH": {
+      "index": 5,
+      "name": "LENGTH",
+      "unit": "metres",
+      "meaning": "Physical length of the road link.",
+      "source": "process_simulations_for_gnn.py edge feature dictionary",
+      "static": true,
+      "dtype": "float64",
+      "used_by_model": true,
+      "exclusion_reason": null,
+      "treatment": "continuous, static",
+      "stats": {
+        "count": 31635,
+        "min": 4.166667,
+        "p01": 8.333333,
+        "q1": 24.995518,
+        "median": 58.359829,
+        "q3": 114.476259,
+        "p99": 551.824222,
+        "max": 2568.575674,
+        "mean": 91.597884,
+        "std": 109.937304,
+        "iqr": 89.480742,
+        "n_unique": 23257,
+        "zero_pct": 0.0,
+        "nan_pct": 0.0,
+        "negative_pct": 0.0
+      },
+      "spearman_vs_mean_abs_response": -0.0754,
+      "response_curve_vs_abs_target": [
+        {
+          "bin": 0,
+          "feature_low": 4.1667,
+          "feature_high": 11.921,
+          "n_links": 2637,
+          "median_abs_response": 2.714421,
+          "mean_abs_response": 4.62211,
+          "p90_abs_response": 10.871393
+        },
+        {
+          "bin": 1,
+          "feature_low": 11.921,
+          "feature_high": 18.6336,
+          "n_links": 2636,
+          "median_abs_response": 3.058843,
+          "mean_abs_response": 5.506605,
+          "p90_abs_response": 13.326651
+        },
+        {
+          "bin": 2,
+          "feature_low": 18.6336,
+          "feature_high": 24.9955,
+          "n_links": 2635,
+          "median_abs_response": 0.693905,
+          "mean_abs_response": 3.357735,
+          "p90_abs_response": 9.287336
+        },
+        {
+          "bin": 3,
+          "feature_low": 24.9955,
+          "feature_high": 35.3704,
+          "n_links": 2637,
+          "median_abs_response": 2.704568,
+          "mean_abs_response": 4.747884,
+          "p90_abs_response": 11.104095
+        },
+        {
+          "bin": 4,
+          "feature_low": 35.3704,
+          "feature_high": 45.9895,
+          "n_links": 2636,
+          "median_abs_response": 2.089514,
+          "mean_abs_response": 4.040537,
+          "p90_abs_response": 10.128056
+        },
+        {
+          "bin": 5,
+          "feature_low": 45.9895,
+          "feature_high": 58.3598,
+          "n_links": 2636,
+          "median_abs_response": 2.510633,
+          "mean_abs_response": 4.195682,
+          "p90_abs_response": 9.889556
+        },
+        {
+          "bin": 6,
+          "feature_low": 58.3598,
+          "feature_high": 73.6022,
+          "n_links": 2637,
+          "median_abs_response": 2.284081,
+          "mean_abs_response": 4.175692,
+          "p90_abs_response": 9.808897
+        },
+        {
+          "bin": 7,
+          "feature_low": 73.6022,
+          "feature_high": 91.8624,
+          "n_links": 2636,
+          "median_abs_response": 2.050738,
+          "mean_abs_response": 3.876569,
+          "p90_abs_response": 9.142255
+        },
+        {
+          "bin": 8,
+          "feature_low": 91.8624,
+          "feature_high": 114.4763,
+          "n_links": 2636,
+          "median_abs_response": 2.379571,
+          "mean_abs_response": 4.306903,
+          "p90_abs_response": 9.518795
+        },
+        {
+          "bin": 9,
+          "feature_low": 114.4763,
+          "feature_high": 145.9093,
+          "n_links": 2636,
+          "median_abs_response": 2.285508,
+          "mean_abs_response": 3.795893,
+          "p90_abs_response": 8.704204
+        },
+        {
+          "bin": 10,
+          "feature_low": 145.9093,
+          "feature_high": 210.9657,
+          "n_links": 2636,
+          "median_abs_response": 2.160035,
+          "mean_abs_response": 3.823413,
+          "p90_abs_response": 9.259712
+        },
+        {
+          "bin": 11,
+          "feature_low": 210.9657,
+          "feature_high": 2568.5757,
+          "n_links": 2637,
+          "median_abs_response": 0.0,
+          "mean_abs_response": 2.681399,
+          "p90_abs_response": 8.727241
+        }
+      ]
+    }
+  },
+  "static_vs_dynamic": [
+    {
+      "field": "x[:, 0]  VOL_BASE_CASE",
+      "static_or_dynamic": "static",
+      "what_changes": "nothing; identical in all 1,000 scenarios",
+      "model_usage": "input feature"
+    },
+    {
+      "field": "x[:, 1]  CAPACITY_BASE_CASE",
+      "static_or_dynamic": "static",
+      "what_changes": "nothing; identical in all 1,000 scenarios",
+      "model_usage": "input feature"
+    },
+    {
+      "field": "x[:, 2]  CAPACITY_REDUCTION",
+      "static_or_dynamic": "dynamic",
+      "what_changes": "capacity removed by the policy, per scenario",
+      "model_usage": "input feature"
+    },
+    {
+      "field": "x[:, 3]  FREESPEED",
+      "static_or_dynamic": "static",
+      "what_changes": "nothing; identical in all 1,000 scenarios",
+      "model_usage": "input feature"
+    },
+    {
+      "field": "x[:, 4]  HIGHWAY",
+      "static_or_dynamic": "static",
+      "what_changes": "nothing; identical in all 1,000 scenarios",
+      "model_usage": "not used"
+    },
+    {
+      "field": "x[:, 5]  LENGTH",
+      "static_or_dynamic": "static",
+      "what_changes": "nothing; identical in all 1,000 scenarios",
+      "model_usage": "input feature"
+    },
+    {
+      "field": "pos",
+      "static_or_dynamic": "static",
+      "what_changes": "nothing; identical in all 1,000 scenarios",
+      "model_usage": "pos[:,0] and pos[:,1] feed the two PointNetConv layers; pos[:,2] is unused"
+    },
+    {
+      "field": "y",
+      "static_or_dynamic": "dynamic",
+      "what_changes": "the per-link change in car volume the policy caused",
+      "model_usage": "training target"
+    },
+    {
+      "field": "edge_index",
+      "static_or_dynamic": "static",
+      "what_changes": "nothing; identical in all 1,000 scenarios",
+      "model_usage": "graph connectivity for all four message-passing layers"
+    },
+    {
+      "field": "mode_stats_diff",
+      "static_or_dynamic": "dynamic",
+      "what_changes": "per-mode travel-time, distance and trip-count differences",
+      "model_usage": "not read by any training or evaluation code"
+    },
+    {
+      "field": "mode_stats_diff_perc",
+      "static_or_dynamic": "dynamic",
+      "what_changes": "the same differences as percentages",
+      "model_usage": "not read by any training or evaluation code"
+    }
+  ]
+}
