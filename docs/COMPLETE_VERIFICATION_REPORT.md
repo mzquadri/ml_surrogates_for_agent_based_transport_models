@@ -1,4 +1,9 @@
 # Complete Thesis Verification & Results Summary
+
+> **Figures not retained.** This report embeds twenty images from a `verification/` directory
+> that was never committed to this repository, so every image link below is broken. The text
+> and the numbers are kept as a record of what was checked; the figures are not recoverable.
+> For current verified numbers run `python scripts/verify_headline_results.py`.
 ## ML Surrogates for Agent-Based Transport Models with Uncertainty Quantification
 
 **Author**: Mohd Zamin Quadri (Matrikelnummer 3751911)  
