@@ -52,7 +52,7 @@
       "analysis_outputs/thesis_intelligence.json"
     ],
     "source_commit": "3ad2fb3fccb1885e2f34a1098170499b44af328a",
-    "source_repository": "https://github.com/mzquadri/ml-surrogates-thesis",
+    "source_repository": "https://github.com/mzquadri/ml_surrogates_for_agent_based_transport_models",
     "units": "veh/h for mae and rmse; r2 and coverage unitless",
     "upstream": {
       "audit_source_commit": "fdb4ef0c9c736576ae34d5e331d8b66a7a6d877a",

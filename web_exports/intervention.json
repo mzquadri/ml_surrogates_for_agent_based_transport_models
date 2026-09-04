@@ -57,7 +57,7 @@
       "train-data-v1/datalist_batch_1..20.pt"
     ],
     "source_commit": "3ad2fb3fccb1885e2f34a1098170499b44af328a",
-    "source_repository": "https://github.com/mzquadri/ml-surrogates-thesis",
+    "source_repository": "https://github.com/mzquadri/ml_surrogates_for_agent_based_transport_models",
     "units": "veh/h"
   },
   "ratio_mean_response": {

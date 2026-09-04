@@ -22,7 +22,7 @@ Usage
 The two AUROC checks need `trial8_uq_ablation_results.csv` (209 MB, a release
 asset). Fetch it, or point THESIS_DATA_ROOT at a data tree that has it:
 
-    gh release download large-files-v1 --repo mzquadri/ml-surrogates-thesis-data \\
+    gh release download thesis-data-v1 --repo mzquadri/ml_surrogates_for_agent_based_transport_models \\
       --pattern '*trial8_uq_ablation_results.csv' \\
       --dir data/TR-C_Benchmarks/point_net_transf_gat_8th_trial_lower_dropout/
 """

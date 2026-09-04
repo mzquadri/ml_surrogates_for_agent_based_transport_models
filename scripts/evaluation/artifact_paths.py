@@ -64,8 +64,8 @@ def resolve(relative: str, *, hint: str | None = None) -> Path:
 RELEASE_HINT = (
     "This file exceeds GitHub's 100 MB limit, so it is published as a release\n"
     "asset instead of being tracked. Fetch it with:\n\n"
-    "  gh release download large-files-v1 \\\n"
-    "    --repo mzquadri/ml-surrogates-thesis-data \\\n"
+    "  gh release download thesis-data-v1 \\\n"
+    "    --repo mzquadri/ml_surrogates_for_agent_based_transport_models \\\n"
     "    --pattern '*trial8_uq_ablation_results.csv' --dir data/TR-C_Benchmarks/\\\n"
     "point_net_transf_gat_8th_trial_lower_dropout/\n\n"
     "Or point THESIS_DATA_ROOT at a data tree you already have."

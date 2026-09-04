@@ -134,7 +134,7 @@ def provenance(classification: str, source_artifacts: list[str], **extra: Any) -
     block = {
         "schema_version": SCHEMA_VERSION,
         "classification": classification,
-        "source_repository": "https://github.com/mzquadri/ml-surrogates-thesis",
+        "source_repository": "https://github.com/mzquadri/ml_surrogates_for_agent_based_transport_models",
         "source_commit": run_git("rev-parse", "HEAD"),
         "dataset_release": DATASET_RELEASE,
         "generated_by": GENERATED_BY,
@@ -157,7 +157,7 @@ def batch_paths() -> list[Path]:
     if not paths:
         raise SystemExit(
             f"No datalist_batch_*.pt under {CORPUS.relative_to(ROOT)}.\n"
-            "  gh release download train-data-v1 --repo mzquadri/ml-surrogates-thesis \\\n"
+            "  gh release download train-data-v1 --repo mzquadri/ml_surrogates_for_agent_based_transport_models \\\n"
             "    --pattern 'datalist_batch_*.pt' --dir <dir>"
         )
     return paths

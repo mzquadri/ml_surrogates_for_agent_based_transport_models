@@ -1,0 +1,284 @@
+{
+  "migration": "thesis repository consolidation to a single canonical repository",
+  "date": "2026-09-04",
+  "canonical_repository": "mzquadri/ml_surrogates_for_agent_based_transport_models",
+  "retired_repositories": [
+    {
+      "name": "mzquadri/ml-surrogates-thesis-data",
+      "role": "companion data repository holding the per-trial artifact tree",
+      "head_commit": "0f460e997a7f7143d8f40ef0f0600488e5830cdc",
+      "commits": 5,
+      "tracked_files": 1272,
+      "tracked_bytes": 1384212480,
+      "release": "large-files-v1 (20 assets, 4.35 GB)",
+      "deleted": true
+    },
+    {
+      "name": "mzquadri/ml-surrogates-thesis",
+      "role": "retired predecessor; held the submitted-artifact baseline",
+      "head_commit": "ebb110e4f3d62fecfe16ece41225e39142300c2a",
+      "commits": 15,
+      "tags": [
+        "train-data-v1",
+        "backup/pre-cleanup-main"
+      ],
+      "backup_tag_commit": "3d9af642f13c12a8f64a3e97bacf5efce2079fb6",
+      "submitted_artifact_baseline_commit": "4b95a3d8aca5929bb88b84bb7f7ae86c48e2f428",
+      "release": "train-data-v1 (21 assets, 2.62 GB)",
+      "release_duplicated_in_canonical": true,
+      "deleted": true
+    }
+  ],
+  "findings": {
+    "historical_release_duplicate": "20 of 21 assets on ml-surrogates-thesis/train-data-v1 matched the canonical train-data-v1 assets by name and byte size; only SHA256SUMS.txt differed, the canonical one covering more files. No asset migration was required from that repository.",
+    "data_tracked_tree_duplicate": "The data repository's tracked tree was already present inside the canonical benchmarks-v1 per-trial tars. Verified on point_net_transf_gat_11th_trial_cqr_frozen: identical file set, identical sizes, and val_predictions.npz identical by SHA256 (eb5caf4a944be45c40b3bb7d92896e5bf15abb9dc65ffc0a55f5ac7b61c6788e). The tree was migrated anyway as a tar, because duplication is cheaper than an irreversible loss.",
+    "data_release_unique": "All 20 assets on large-files-v1 were absent from every canonical release. They fill the data_created_during_training/ directories that the benchmarks-v1 tars contain but leave empty. These were the only genuinely unique bytes in either retired repository.",
+    "history_disjoint": "None of the 15 commits in ml-surrogates-thesis are reachable from the canonical repository; the two lineages are disjoint. Both histories were bundled before deletion."
+  },
+  "release_assets_migrated": [
+    {
+      "source_repository": "mzquadri/ml-surrogates-thesis-data",
+      "source_release": "large-files-v1",
+      "asset": "SHA256SUMS.txt",
+      "size_bytes": 2969,
+      "sha256": "05acdf5d74b3e4a40a1dd3399cb46318043939c3266f94e22b007b67042e9e39",
+      "destination_repository": "mzquadri/ml_surrogates_for_agent_based_transport_models",
+      "destination_release": "thesis-data-v1",
+      "destination_size_bytes": 2969,
+      "size_verified": true
+    },
+    {
+      "source_repository": "mzquadri/ml-surrogates-thesis-data",
+      "source_release": "large-files-v1",
+      "asset": "TR-C_Benchmarks__deep_ensemble_seed137__data_created_during_training__test_dl.pt",
+      "size_bytes": 311059407,
+      "sha256": "9b7a300eb5e6d0c881bc544b44eca232329e9a8656c1c0a03ff78e73a40834af",
+      "destination_repository": "mzquadri/ml_surrogates_for_agent_based_transport_models",
+      "destination_release": "thesis-data-v1",
+      "destination_size_bytes": 311059407,
+      "size_verified": true
+    },
+    {
+      "source_repository": "mzquadri/ml-surrogates-thesis-data",
+      "source_release": "large-files-v1",
+      "asset": "TR-C_Benchmarks__deep_ensemble_seed256__data_created_during_training__test_dl.pt",
+      "size_bytes": 311059407,
+      "sha256": "9b7a300eb5e6d0c881bc544b44eca232329e9a8656c1c0a03ff78e73a40834af",
+      "destination_repository": "mzquadri/ml_surrogates_for_agent_based_transport_models",
+      "destination_release": "thesis-data-v1",
+      "destination_size_bytes": 311059407,
+      "size_verified": true
+    },
+    {
+      "source_repository": "mzquadri/ml-surrogates-thesis-data",
+      "source_release": "large-files-v1",
+      "asset": "TR-C_Benchmarks__deep_ensemble_seed389__data_created_during_training__test_dl.pt",
+      "size_bytes": 311059407,
+      "sha256": "9b7a300eb5e6d0c881bc544b44eca232329e9a8656c1c0a03ff78e73a40834af",
+      "destination_repository": "mzquadri/ml_surrogates_for_agent_based_transport_models",
+      "destination_release": "thesis-data-v1",
+      "destination_size_bytes": 311059407,
+      "size_verified": true
+    },
+    {
+      "source_repository": "mzquadri/ml-surrogates-thesis-data",
+      "source_release": "large-files-v1",
+      "asset": "TR-C_Benchmarks__deep_ensemble_seed42__data_created_during_training__test_dl.pt",
+      "size_bytes": 311059407,
+      "sha256": "9b7a300eb5e6d0c881bc544b44eca232329e9a8656c1c0a03ff78e73a40834af",
+      "destination_repository": "mzquadri/ml_surrogates_for_agent_based_transport_models",
+      "destination_release": "thesis-data-v1",
+      "destination_size_bytes": 311059407,
+      "size_verified": true
+    },
+    {
+      "source_repository": "mzquadri/ml-surrogates-thesis-data",
+      "source_release": "large-files-v1",
+      "asset": "TR-C_Benchmarks__deep_ensemble_seed512__data_created_during_training__test_dl.pt",
+      "size_bytes": 311059407,
+      "sha256": "9b7a300eb5e6d0c881bc544b44eca232329e9a8656c1c0a03ff78e73a40834af",
+      "destination_repository": "mzquadri/ml_surrogates_for_agent_based_transport_models",
+      "destination_release": "thesis-data-v1",
+      "destination_size_bytes": 311059407,
+      "size_verified": true
+    },
+    {
+      "source_repository": "mzquadri/ml-surrogates-thesis-data",
+      "source_release": "large-files-v1",
+      "asset": "TR-C_Benchmarks__point_net_transf_gat_10th_trial_cqr__data_created_during_training__test_dl.pt",
+      "size_bytes": 311059407,
+      "sha256": "9b7a300eb5e6d0c881bc544b44eca232329e9a8656c1c0a03ff78e73a40834af",
+      "destination_repository": "mzquadri/ml_surrogates_for_agent_based_transport_models",
+      "destination_release": "thesis-data-v1",
+      "destination_size_bytes": 311059407,
+      "size_verified": true
+    },
+    {
+      "source_repository": "mzquadri/ml-surrogates-thesis-data",
+      "source_release": "large-files-v1",
+      "asset": "TR-C_Benchmarks__point_net_transf_gat_2nd_try__data_created_during_training__test_dl.pt",
+      "size_bytes": 155530727,
+      "sha256": "1728ae9040535493860cc7cb729c9e4224fef86661274010fe3a4c5842224595",
+      "destination_repository": "mzquadri/ml_surrogates_for_agent_based_transport_models",
+      "destination_release": "thesis-data-v1",
+      "destination_size_bytes": 155530727,
+      "size_verified": true
+    },
+    {
+      "source_repository": "mzquadri/ml-surrogates-thesis-data",
+      "source_release": "large-files-v1",
+      "asset": "TR-C_Benchmarks__point_net_transf_gat_3rd_trial_weighted_loss__data_created_during_training__test_dl.pt",
+      "size_bytes": 155530727,
+      "sha256": "1728ae9040535493860cc7cb729c9e4224fef86661274010fe3a4c5842224595",
+      "destination_repository": "mzquadri/ml_surrogates_for_agent_based_transport_models",
+      "destination_release": "thesis-data-v1",
+      "destination_size_bytes": 155530727,
+      "size_verified": true
+    },
+    {
+      "source_repository": "mzquadri/ml-surrogates-thesis-data",
+      "source_release": "large-files-v1",
+      "asset": "TR-C_Benchmarks__point_net_transf_gat_4th_trial_weighted_loss__data_created_during_training__test_dl.pt",
+      "size_bytes": 155530727,
+      "sha256": "1728ae9040535493860cc7cb729c9e4224fef86661274010fe3a4c5842224595",
+      "destination_repository": "mzquadri/ml_surrogates_for_agent_based_transport_models",
+      "destination_release": "thesis-data-v1",
+      "destination_size_bytes": 155530727,
+      "size_verified": true
+    },
+    {
+      "source_repository": "mzquadri/ml-surrogates-thesis-data",
+      "source_release": "large-files-v1",
+      "asset": "TR-C_Benchmarks__point_net_transf_gat_5th_try__data_created_during_training__test_dl.pt",
+      "size_bytes": 155530727,
+      "sha256": "1728ae9040535493860cc7cb729c9e4224fef86661274010fe3a4c5842224595",
+      "destination_repository": "mzquadri/ml_surrogates_for_agent_based_transport_models",
+      "destination_release": "thesis-data-v1",
+      "destination_size_bytes": 155530727,
+      "size_verified": true
+    },
+    {
+      "source_repository": "mzquadri/ml-surrogates-thesis-data",
+      "source_release": "large-files-v1",
+      "asset": "TR-C_Benchmarks__point_net_transf_gat_6th_trial_lower_lr__data_created_during_training__test_dl.pt",
+      "size_bytes": 155530727,
+      "sha256": "1728ae9040535493860cc7cb729c9e4224fef86661274010fe3a4c5842224595",
+      "destination_repository": "mzquadri/ml_surrogates_for_agent_based_transport_models",
+      "destination_release": "thesis-data-v1",
+      "destination_size_bytes": 155530727,
+      "size_verified": true
+    },
+    {
+      "source_repository": "mzquadri/ml-surrogates-thesis-data",
+      "source_release": "large-files-v1",
+      "asset": "TR-C_Benchmarks__point_net_transf_gat_7th_trial_80_10_10_split__data_created_during_training__test_dl.pt",
+      "size_bytes": 311059407,
+      "sha256": "0850b5ccf0331590d7cab43293d2c5816ed451f44e507b05b0649fd79f003ebd",
+      "destination_repository": "mzquadri/ml_surrogates_for_agent_based_transport_models",
+      "destination_release": "thesis-data-v1",
+      "destination_size_bytes": 311059407,
+      "size_verified": true
+    },
+    {
+      "source_repository": "mzquadri/ml-surrogates-thesis-data",
+      "source_release": "large-files-v1",
+      "asset": "TR-C_Benchmarks__point_net_transf_gat_8th_trial_lower_dropout__data_created_during_training__test_dl.pt",
+      "size_bytes": 311059407,
+      "sha256": "0850b5ccf0331590d7cab43293d2c5816ed451f44e507b05b0649fd79f003ebd",
+      "destination_repository": "mzquadri/ml_surrogates_for_agent_based_transport_models",
+      "destination_release": "thesis-data-v1",
+      "destination_size_bytes": 311059407,
+      "size_verified": true
+    },
+    {
+      "source_repository": "mzquadri/ml-surrogates-thesis-data",
+      "source_release": "large-files-v1",
+      "asset": "TR-C_Benchmarks__point_net_transf_gat_8th_trial_lower_dropout__trial8_uq_ablation_results.csv",
+      "size_bytes": 209346826,
+      "sha256": "96429e89ff0044e50fd1fbfc86c17563bd98c7baaf430afe873e6f4fe5dadbaa",
+      "destination_repository": "mzquadri/ml_surrogates_for_agent_based_transport_models",
+      "destination_release": "thesis-data-v1",
+      "destination_size_bytes": 209346826,
+      "size_verified": true
+    },
+    {
+      "source_repository": "mzquadri/ml-surrogates-thesis-data",
+      "source_release": "large-files-v1",
+      "asset": "TR-C_Benchmarks__point_net_transf_gat_8th_trial_lower_dropout__uq_results__ensemble_experiments__experiment_a_fixed_data.npz",
+      "size_bytes": 165704567,
+      "sha256": "e1b3fb2d165fd72e3ec7e433ad6ad541dc67f3800d2b0ab99f22bbca6fa0cc88",
+      "destination_repository": "mzquadri/ml_surrogates_for_agent_based_transport_models",
+      "destination_release": "thesis-data-v1",
+      "destination_size_bytes": 165704567,
+      "size_verified": true
+    },
+    {
+      "source_repository": "mzquadri/ml-surrogates-thesis-data",
+      "source_release": "large-files-v1",
+      "asset": "TR-C_Benchmarks__point_net_transf_gat_9th_trial_heteroscedastic__data_created_during_training__test_dl.pt",
+      "size_bytes": 311059407,
+      "sha256": "9b7a300eb5e6d0c881bc544b44eca232329e9a8656c1c0a03ff78e73a40834af",
+      "destination_repository": "mzquadri/ml_surrogates_for_agent_based_transport_models",
+      "destination_release": "thesis-data-v1",
+      "destination_size_bytes": 311059407,
+      "size_verified": true
+    },
+    {
+      "source_repository": "mzquadri/ml-surrogates-thesis-data",
+      "source_release": "large-files-v1",
+      "asset": "TR-C_Benchmarks__pointnet_transf_gat_1st_bs32_5feat_seed42__dataloaders__test_dl.pt",
+      "size_bytes": 155530727,
+      "sha256": "1728ae9040535493860cc7cb729c9e4224fef86661274010fe3a4c5842224595",
+      "destination_repository": "mzquadri/ml_surrogates_for_agent_based_transport_models",
+      "destination_release": "thesis-data-v1",
+      "destination_size_bytes": 155530727,
+      "size_verified": true
+    },
+    {
+      "source_repository": "mzquadri/ml-surrogates-thesis-data",
+      "source_release": "large-files-v1",
+      "asset": "TR-C_Benchmarks__trans_conv_5_features__data_created_during_training__test_dl_v1_2025-09.pt",
+      "size_bytes": 118203575,
+      "sha256": "f679c3391a3612fe4d21f16e9ab34b9efc6706f235149803122daeb26462dd33",
+      "destination_repository": "mzquadri/ml_surrogates_for_agent_based_transport_models",
+      "destination_release": "thesis-data-v1",
+      "destination_size_bytes": 118203575,
+      "size_verified": true
+    },
+    {
+      "source_repository": "mzquadri/ml-surrogates-thesis-data",
+      "source_release": "large-files-v1",
+      "asset": "misc__feature_data.npz",
+      "size_bytes": 126541238,
+      "sha256": "b5e64647b9431caf501c43a76c9448c90bc62aa337b828b4d21a8e70903566b0",
+      "destination_repository": "mzquadri/ml_surrogates_for_agent_based_transport_models",
+      "destination_release": "thesis-data-v1",
+      "destination_size_bytes": 126541238,
+      "size_verified": true
+    }
+  ],
+  "history_bundles": [
+    {
+      "asset": "ml-surrogates-thesis-data-history.bundle",
+      "size_bytes": 1172578030,
+      "sha256": "3871ebeed853a612247e34d553af3bc5d146ec85e13181703ea1eaa0194c8e37",
+      "destination_repository": "mzquadri/ml_surrogates_for_agent_based_transport_models",
+      "destination_release": "provenance-v1"
+    },
+    {
+      "asset": "ml-surrogates-thesis-history.bundle",
+      "size_bytes": 8280883,
+      "sha256": "f9d2183d34ab30a1b8a850d7d79649ddea4205826241e52928a4f91f5c364b72",
+      "destination_repository": "mzquadri/ml_surrogates_for_agent_based_transport_models",
+      "destination_release": "provenance-v1"
+    }
+  ],
+  "tracked_tree_archive": {
+    "asset": "ml-surrogates-thesis-data-tracked-tree.tar",
+    "size_bytes": 1384212480,
+    "sha256": "c851c3e24c36b86b339bf4b60907559fec44a6253d1c03d8ee08d3472b9b457f",
+    "entries": 1370,
+    "destination_release": "thesis-data-v1",
+    "note": "git archive of the retired data repository at HEAD"
+  }
+}
