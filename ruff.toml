@@ -33,6 +33,8 @@ include = [
     "scripts/figure_generation/generate_isometric_diagrams.py",
     "scripts/figure_generation/generate_data_exploration_figures.py",
     "scripts/figure_generation/generate_data_anatomy_diagrams.py",
+    "scripts/figure_generation/generate_portfolio_figures.py",
+    "scripts/figure_generation/portfolio_style.py",
 ]
 
 [lint]
