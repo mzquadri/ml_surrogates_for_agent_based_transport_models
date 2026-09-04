@@ -1,0 +1,206 @@
+{
+  "source": "train-data-v1 release, datalist_batch_1..20.pt",
+  "n_scenario_files": 20,
+  "n_scenarios": 1000,
+  "per_file": [
+    {
+      "file": "datalist_batch_1.pt",
+      "scenarios": 50,
+      "bytes": 130970931
+    },
+    {
+      "file": "datalist_batch_2.pt",
+      "scenarios": 50,
+      "bytes": 130970931
+    },
+    {
+      "file": "datalist_batch_3.pt",
+      "scenarios": 50,
+      "bytes": 130970931
+    },
+    {
+      "file": "datalist_batch_4.pt",
+      "scenarios": 50,
+      "bytes": 130970931
+    },
+    {
+      "file": "datalist_batch_5.pt",
+      "scenarios": 50,
+      "bytes": 130970931
+    },
+    {
+      "file": "datalist_batch_6.pt",
+      "scenarios": 50,
+      "bytes": 130970931
+    },
+    {
+      "file": "datalist_batch_7.pt",
+      "scenarios": 50,
+      "bytes": 130970931
+    },
+    {
+      "file": "datalist_batch_8.pt",
+      "scenarios": 50,
+      "bytes": 130970931
+    },
+    {
+      "file": "datalist_batch_9.pt",
+      "scenarios": 50,
+      "bytes": 130970931
+    },
+    {
+      "file": "datalist_batch_10.pt",
+      "scenarios": 50,
+      "bytes": 130971186
+    },
+    {
+      "file": "datalist_batch_11.pt",
+      "scenarios": 50,
+      "bytes": 130971186
+    },
+    {
+      "file": "datalist_batch_12.pt",
+      "scenarios": 50,
+      "bytes": 130971186
+    },
+    {
+      "file": "datalist_batch_13.pt",
+      "scenarios": 50,
+      "bytes": 130971186
+    },
+    {
+      "file": "datalist_batch_14.pt",
+      "scenarios": 50,
+      "bytes": 130971186
+    },
+    {
+      "file": "datalist_batch_15.pt",
+      "scenarios": 50,
+      "bytes": 130971186
+    },
+    {
+      "file": "datalist_batch_16.pt",
+      "scenarios": 50,
+      "bytes": 130971186
+    },
+    {
+      "file": "datalist_batch_17.pt",
+      "scenarios": 50,
+      "bytes": 130971186
+    },
+    {
+      "file": "datalist_batch_18.pt",
+      "scenarios": 50,
+      "bytes": 130971186
+    },
+    {
+      "file": "datalist_batch_19.pt",
+      "scenarios": 50,
+      "bytes": 130971186
+    },
+    {
+      "file": "datalist_batch_20.pt",
+      "scenarios": 50,
+      "bytes": 130971186
+    }
+  ],
+  "stored_fields": [
+    {
+      "name": "edge_index",
+      "shape": [
+        2,
+        59851
+      ],
+      "dtype": "torch.int64",
+      "bytes_per_scenario": 957616
+    },
+    {
+      "name": "mode_stats_diff",
+      "shape": [
+        6,
+        3
+      ],
+      "dtype": "torch.float32",
+      "bytes_per_scenario": 72
+    },
+    {
+      "name": "mode_stats_diff_perc",
+      "shape": [
+        6,
+        3
+      ],
+      "dtype": "torch.float64",
+      "bytes_per_scenario": 144
+    },
+    {
+      "name": "pos",
+      "shape": [
+        31635,
+        3,
+        2
+      ],
+      "dtype": "torch.float32",
+      "bytes_per_scenario": 759240
+    },
+    {
+      "name": "x",
+      "shape": [
+        31635,
+        6
+      ],
+      "dtype": "torch.float64",
+      "bytes_per_scenario": 1518480
+    },
+    {
+      "name": "y",
+      "shape": [
+        31635,
+        1
+      ],
+      "dtype": "torch.float32",
+      "bytes_per_scenario": 126540
+    }
+  ],
+  "non_tensor_attributes": {
+    "num_nodes": 31559
+  },
+  "keys": [
+    "edge_index",
+    "mode_stats_diff",
+    "mode_stats_diff_perc",
+    "num_nodes",
+    "pos",
+    "x",
+    "y"
+  ],
+  "x_columns": [
+    "VOL_BASE_CASE",
+    "CAPACITY_BASE_CASE",
+    "CAPACITY_REDUCTION",
+    "FREESPEED",
+    "HIGHWAY",
+    "LENGTH"
+  ],
+  "invariants_checked_over_all_scenarios": {
+    "shapes_constant": true,
+    "dtypes_constant": true,
+    "x_static_columns_identical": true,
+    "pos_identical": true,
+    "edge_index_identical": true,
+    "capacity_reduction_varies": true,
+    "distinct_num_nodes_values": [
+      31559
+    ]
+  },
+  "node_accounting": {
+    "rows_in_x_pos_y": 31635,
+    "stored_num_nodes": 31559,
+    "shortfall": 76,
+    "max_edge_index_plus_one": 31559,
+    "isolated_rows": 76,
+    "self_loops": 766,
+    "edges": 59851,
+    "tail_rows_target_always_zero": true,
+    "note": "The last 76 rows carry real feature and position values but appear in no edge and have a target of exactly zero in every scenario. num_nodes is stored as 31,559, which excludes them; x, pos and y all have 31,635 rows, and the published evaluation counts of 31,635 per graph include them."
+  }
+}
