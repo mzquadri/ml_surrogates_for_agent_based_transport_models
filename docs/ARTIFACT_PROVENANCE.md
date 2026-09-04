@@ -5,7 +5,7 @@
 | Role | Repository/commit | Treatment |
 |---|---|---|
 | **Canonical repository** | `mzquadri/ml_surrogates_for_agent_based_transport_models` | The single public home for the code, thesis, documentation and data releases |
-| Submitted artifact baseline | commit `4b95a3d8aca5929bb88b84bb7f7ae86c48e2f428`, formerly in `mzquadri/ml-surrogates-thesis` | *Historical repository, deleted after consolidation on 2026-09-04.* History preserved in the `provenance-v1` release |
+| Submitted artifact baseline | `thesis/latex_tum_official/main.pdf`, 674,395 bytes, SHA-256 `0ac5309d060cda53d82a05cc837136fe853e7f9dcbabd2f4fb4b4282a39bc97e` | Verified on every run of `scripts/check_repository.py`. The commit id `4b95a3d8aca5929bb88b84bb7f7ae86c48e2f428` recorded in `scripts/evidence_contract.py` is a historical label: it resolves neither in this repository nor in the `provenance-v1` bundles, which do hold the complete history of both retired repositories. See CORRIGENDUM C10. |
 | Audited evidence source | `mzquadri/ml_surrogates_for_agent_based_transport_models` at `fdb4ef0c9c736576ae34d5e331d8b66a7a6d877a` | Post-submission audit source |
 | Pre-audit source baseline | Source commit `c3c84499029f310df4f05c76afa4e3e0d6b79de3` | Matches submitted PDF blob |
 
@@ -62,9 +62,13 @@ does not claim the row-level artifact is included in this canonical repository. 
 allow an authorized holder to verify those source artifacts before regenerating the aggregate
 bundle.
 
-The repository check compares the full submitted `document/` tree with baseline commit `4b95a3d`,
-locks every aggregate export, and validates the path, size, and SHA-256 of every source artifact
-required for regeneration. The local graph loader is verified before pickle-capable deserialization.
+`scripts/check_repository.py` verifies that the sixteen required artifacts are present and that
+the Python among them compiles, then verifies the size and SHA-256 of the submitted thesis PDF
+and of all fifteen artifacts named in `scripts/evidence_contract.py`. It exits non-zero on any
+mismatch. Five JSON evidence files are accepted only after restoring the CRLF line endings they
+had at audit time, which reproduces their recorded hashes exactly; see CORRIGENDUM C10. An
+earlier version of this paragraph described tree and commit comparisons that the check did not
+perform.
 
 ## Excluded Assets
 

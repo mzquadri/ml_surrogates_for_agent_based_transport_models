@@ -23,6 +23,7 @@ include = [
     "scripts/verify_headline_results.py",
     "scripts/check_docs.py",
     "scripts/check_web_assets.py",
+    "scripts/check_repository.py",
     "scripts/restore_large_files.py",
     "scripts/data_exploration/*.py",
     "scripts/evaluation/artifact_paths.py",

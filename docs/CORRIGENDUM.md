@@ -265,9 +265,58 @@ not comparable with Trial 8's 0.596 on any axis.
 **Reproduction.** `python scripts/data_exploration/explore_checkpoints.py` prints the
 inventory and emits the split warning directly from the artifacts.
 
+## C10 — Two provenance claims that did not hold
+
+**What was written.** `docs/ARTIFACT_PROVENANCE.md` stated that "the repository check
+compares the full submitted `document/` tree with baseline commit `4b95a3d`, locks every
+aggregate export, and validates the path, size, and SHA-256 of every source artifact
+required for regeneration." It also recorded the submitted-artifact baseline as a commit
+"formerly in `mzquadri/ml-surrogates-thesis`", whose history is preserved in the
+`provenance-v1` release.
+
+**What was true.** Neither claim survived checking.
+
+`scripts/check_repository.py` verified that sixteen paths existed and that the Python
+among them compiled. It did not read a single hash, did not resolve any commit, and did
+not compare any tree. The paragraph described work that was not being done.
+
+The commit `4b95a3d8aca5929bb88b84bb7f7ae86c48e2f428` and the tree
+`f104db730eb1c8d228d913fde6545599da7795d5` do not resolve anywhere that survives. The
+`provenance-v1` bundle holds the complete fifteen-commit history of the retired
+`ml-surrogates-thesis` repository — `git bundle verify` reports "the bundle records a
+complete history" — and that commit is not among them, nor is it known to the canonical
+remote. There is also no `document/` directory in this repository; the submitted
+material lives under `thesis/`, so a tree recorded against the old layout could not match
+in any case.
+
+**What is actually verifiable.** The submitted thesis itself, by content rather than by
+git identity. `thesis/latex_tum_official/main.pdf` is 674,395 bytes with SHA-256
+`0ac5309d060cda53d82a05cc837136fe853e7f9dcbabd2f4fb4b4282a39bc97e`, matching the value
+recorded at submission exactly.
+
+**What changed.** Rather than soften the prose, the check was made to do what the prose
+claimed. `scripts/check_repository.py` now verifies the size and SHA-256 of the submitted
+PDF and of all fifteen artifacts named in `scripts/evidence_contract.py`, and exits
+non-zero on any mismatch. The provenance text now states what is verified and records the
+two git identifiers as historical labels that no longer resolve.
+
+**One wrinkle, deliberately not papered over.** Five JSON evidence files no longer match
+their recorded sizes, each short by exactly its own line count. `.gitattributes`
+normalised tracked text to LF after the audit, which rewrote their line endings without
+changing a character. Restoring CRLF reproduces the recorded size and SHA-256 exactly for
+all five. The contract keeps its original audit-time hashes; the checker retries text
+artifacts with CRLF restored and accepts only an exact match, reporting which files were
+accepted on that basis. Binary artifacts are held to a strict byte comparison.
+
+**Reproduction.** `python scripts/check_repository.py`.
+
 ## Provenance
 
-- Immutable submitted artifact baseline: canonical commit `4b95a3d8aca5929bb88b84bb7f7ae86c48e2f428`.
+- Submitted artifact baseline, by content: `thesis/latex_tum_official/main.pdf`,
+  674,395 bytes, SHA-256 `0ac5309d060cda53d82a05cc837136fe853e7f9dcbabd2f4fb4b4282a39bc97e`,
+  verified by `scripts/check_repository.py`. The commit id
+  `4b95a3d8aca5929bb88b84bb7f7ae86c48e2f428` is a historical label from a repository
+  lineage that no longer resolves — see C10.
 - Audited reproducibility source: `fdb4ef0c9c736576ae34d5e331d8b66a7a6d877a` on branch
   `analysis/e2e-thesis-intelligence` of this repository.
 - Audit generation date recorded in the aggregate bundle: August 15, 2026.
