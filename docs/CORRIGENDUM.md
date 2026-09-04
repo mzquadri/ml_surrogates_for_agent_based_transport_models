@@ -366,7 +366,7 @@ can see it rather than discover it.
 
 ## C12 - mode_stats_diff_perc sits at about -100% for a reason
 
-**What it looks like.** Four of the six rows of `mode_stats_diff_perc` report about
+**What it looks like.** All six rows of `mode_stats_diff_perc` report about
 **-99.99%** in columns 0 and 1, in every scenario, while column 2 stays near zero.
 Read literally, every policy scenario eliminates almost all travel time and all
 distance travelled for every transport mode at once while leaving trip counts

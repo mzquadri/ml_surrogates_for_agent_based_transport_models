@@ -63,6 +63,6 @@ Both are recorded in [`../CORRIGENDUM.md`](../CORRIGENDUM.md).
   31,635 rows. The 76 extra rows are public-transport links with no car access;
   they sit in no edge and their target is exactly zero in every scenario.
   Including them makes the published MAE optimistic by 0.0092 veh/h.
-- **C12** — `mode_stats_diff_perc` sits at about −99.99% for four of its six
+- **C12** — `mode_stats_diff_perc` sits at about −99.99% in all six of its
   rows because the two sides of the subtraction are on different scales. The
   cause is established, not guessed. Neither tensor is read by any model code.

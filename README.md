@@ -154,9 +154,9 @@ graph-transformer layers, two attention layers reducing to one value per link.
 
 ![Model architecture](docs/figures/portfolio/08_model_architecture.png)
 
-Every shape and count above is a tensor in the Trial 8 checkpoint. A per-feature
-card for each column of `x` is in
-[`docs/figures/features/`](docs/figures/features/README.md).
+Every shape and count above is a tensor in the Trial 8 checkpoint. There is a card
+for each of the eleven stored fields — the six columns of `x` and the five other
+tensors — in [`docs/figures/features/`](docs/figures/features/README.md).
 
 The two dropout layers are the only stochastic elements — which is exactly what makes
 post-hoc MC Dropout possible without touching the weights.
