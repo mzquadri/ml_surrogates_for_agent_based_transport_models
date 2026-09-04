@@ -1,0 +1,220 @@
+{
+  "source": "data/visualisation/districts_paris.geojson (20 polygons, CRS84)",
+  "join": "point-in-polygon of each link midpoint (pos[:,2]) against the arrondissement polygons",
+  "note": "arrondissement 0 means the link midpoint lies outside all twenty polygons; the modelled network extends beyond the city boundary",
+  "caveat": "the polygons are administrative boundaries, not the road network",
+  "links_inside": 27958,
+  "links_outside": 3677,
+  "arrondissements": [
+    {
+      "arrondissement": 0,
+      "links": 3677,
+      "share_links_ever_intervened": 0.03182,
+      "mean_intervention_severity_vehh": 27.998,
+      "mean_abs_response_vehh": 1.0461,
+      "mean_vol_base_case": 5.56,
+      "mean_capacity_base_case": 1671.7,
+      "total_intervention_events": 38459
+    },
+    {
+      "arrondissement": 1,
+      "links": 473,
+      "share_links_ever_intervened": 0.33192,
+      "mean_intervention_severity_vehh": 211.501,
+      "mean_abs_response_vehh": 4.3033,
+      "mean_vol_base_case": 41.92,
+      "mean_capacity_base_case": 594.0,
+      "total_intervention_events": 56725
+    },
+    {
+      "arrondissement": 2,
+      "links": 344,
+      "share_links_ever_intervened": 0.375,
+      "mean_intervention_severity_vehh": 256.279,
+      "mean_abs_response_vehh": 4.9273,
+      "mean_vol_base_case": 47.14,
+      "mean_capacity_base_case": 723.95,
+      "total_intervention_events": 46046
+    },
+    {
+      "arrondissement": 3,
+      "links": 381,
+      "share_links_ever_intervened": 0.27559,
+      "mean_intervention_severity_vehh": 237.795,
+      "mean_abs_response_vehh": 6.8732,
+      "mean_vol_base_case": 51.77,
+      "mean_capacity_base_case": 766.61,
+      "total_intervention_events": 34966
+    },
+    {
+      "arrondissement": 4,
+      "links": 535,
+      "share_links_ever_intervened": 0.2972,
+      "mean_intervention_severity_vehh": 287.477,
+      "mean_abs_response_vehh": 6.0868,
+      "mean_vol_base_case": 57.81,
+      "mean_capacity_base_case": 788.93,
+      "total_intervention_events": 51251
+    },
+    {
+      "arrondissement": 5,
+      "links": 835,
+      "share_links_ever_intervened": 0.42874,
+      "mean_intervention_severity_vehh": 267.353,
+      "mean_abs_response_vehh": 4.1264,
+      "mean_vol_base_case": 36.48,
+      "mean_capacity_base_case": 745.1,
+      "total_intervention_events": 123230
+    },
+    {
+      "arrondissement": 6,
+      "links": 737,
+      "share_links_ever_intervened": 0.42469,
+      "mean_intervention_severity_vehh": 244.125,
+      "mean_abs_response_vehh": 4.7465,
+      "mean_vol_base_case": 36.38,
+      "mean_capacity_base_case": 690.47,
+      "total_intervention_events": 103467
+    },
+    {
+      "arrondissement": 7,
+      "links": 1177,
+      "share_links_ever_intervened": 0.43925,
+      "mean_intervention_severity_vehh": 316.941,
+      "mean_abs_response_vehh": 3.8991,
+      "mean_vol_base_case": 34.09,
+      "mean_capacity_base_case": 872.46,
+      "total_intervention_events": 169627
+    },
+    {
+      "arrondissement": 8,
+      "links": 1224,
+      "share_links_ever_intervened": 0.45425,
+      "mean_intervention_severity_vehh": 472.288,
+      "mean_abs_response_vehh": 6.8431,
+      "mean_vol_base_case": 63.61,
+      "mean_capacity_base_case": 1146.73,
+      "total_intervention_events": 190951
+    },
+    {
+      "arrondissement": 9,
+      "links": 772,
+      "share_links_ever_intervened": 0.30311,
+      "mean_intervention_severity_vehh": 224.922,
+      "mean_abs_response_vehh": 4.0198,
+      "mean_vol_base_case": 35.63,
+      "mean_capacity_base_case": 718.45,
+      "total_intervention_events": 82316
+    },
+    {
+      "arrondissement": 10,
+      "links": 953,
+      "share_links_ever_intervened": 0.33368,
+      "mean_intervention_severity_vehh": 268.29,
+      "mean_abs_response_vehh": 3.8066,
+      "mean_vol_base_case": 40.28,
+      "mean_capacity_base_case": 740.31,
+      "total_intervention_events": 105077
+    },
+    {
+      "arrondissement": 11,
+      "links": 1173,
+      "share_links_ever_intervened": 0.41347,
+      "mean_intervention_severity_vehh": 203.956,
+      "mean_abs_response_vehh": 4.0873,
+      "mean_vol_base_case": 31.15,
+      "mean_capacity_base_case": 637.89,
+      "total_intervention_events": 173206
+    },
+    {
+      "arrondissement": 12,
+      "links": 2408,
+      "share_links_ever_intervened": 0.47342,
+      "mean_intervention_severity_vehh": 376.852,
+      "mean_abs_response_vehh": 3.8008,
+      "mean_vol_base_case": 75.11,
+      "mean_capacity_base_case": 1107.24,
+      "total_intervention_events": 404586
+    },
+    {
+      "arrondissement": 13,
+      "links": 2262,
+      "share_links_ever_intervened": 0.39788,
+      "mean_intervention_severity_vehh": 299.788,
+      "mean_abs_response_vehh": 3.4791,
+      "mean_vol_base_case": 50.1,
+      "mean_capacity_base_case": 920.02,
+      "total_intervention_events": 303652
+    },
+    {
+      "arrondissement": 14,
+      "links": 1666,
+      "share_links_ever_intervened": 0.45378,
+      "mean_intervention_severity_vehh": 328.986,
+      "mean_abs_response_vehh": 8.0267,
+      "mean_vol_base_case": 83.98,
+      "mean_capacity_base_case": 971.3,
+      "total_intervention_events": 242894
+    },
+    {
+      "arrondissement": 15,
+      "links": 2604,
+      "share_links_ever_intervened": 0.40246,
+      "mean_intervention_severity_vehh": 258.241,
+      "mean_abs_response_vehh": 3.9521,
+      "mean_vol_base_case": 50.07,
+      "mean_capacity_base_case": 830.81,
+      "total_intervention_events": 374548
+    },
+    {
+      "arrondissement": 16,
+      "links": 3022,
+      "share_links_ever_intervened": 0.48114,
+      "mean_intervention_severity_vehh": 430.695,
+      "mean_abs_response_vehh": 3.0519,
+      "mean_vol_base_case": 65.89,
+      "mean_capacity_base_case": 1303.22,
+      "total_intervention_events": 465837
+    },
+    {
+      "arrondissement": 17,
+      "links": 2179,
+      "share_links_ever_intervened": 0.36668,
+      "mean_intervention_severity_vehh": 313.621,
+      "mean_abs_response_vehh": 7.1361,
+      "mean_vol_base_case": 73.72,
+      "mean_capacity_base_case": 1029.37,
+      "total_intervention_events": 271728
+    },
+    {
+      "arrondissement": 18,
+      "links": 1963,
+      "share_links_ever_intervened": 0.25879,
+      "mean_intervention_severity_vehh": 189.975,
+      "mean_abs_response_vehh": 3.8632,
+      "mean_vol_base_case": 48.48,
+      "mean_capacity_base_case": 764.83,
+      "total_intervention_events": 168981
+    },
+    {
+      "arrondissement": 19,
+      "links": 1701,
+      "share_links_ever_intervened": 0.43151,
+      "mean_intervention_severity_vehh": 350.664,
+      "mean_abs_response_vehh": 3.6091,
+      "mean_vol_base_case": 66.2,
+      "mean_capacity_base_case": 1088.58,
+      "total_intervention_events": 238104
+    },
+    {
+      "arrondissement": 20,
+      "links": 1549,
+      "share_links_ever_intervened": 0.33441,
+      "mean_intervention_severity_vehh": 267.747,
+      "mean_abs_response_vehh": 3.5208,
+      "mean_vol_base_case": 60.44,
+      "mean_capacity_base_case": 985.67,
+      "total_intervention_events": 168033
+    }
+  ]
+}
