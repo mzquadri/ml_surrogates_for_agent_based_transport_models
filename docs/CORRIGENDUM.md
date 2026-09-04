@@ -227,6 +227,44 @@ verified values with a reference to this entry, and
 `scripts/data_exploration/` regenerates every number here from the published
 corpus.
 
+## C9: Trials Were Not All Scored on the Same Test Split
+
+Found in September 2026 while recovering architecture and metrics from all sixteen
+retained checkpoints.
+
+**The issue.** Test-set R² has been compared across trials as though every trial were
+measured on the same held-out data. It was not. The test split changed size at Trial 7:
+
+| Trials | Test graphs | Nodes scored |
+|---|---:|---:|
+| T1 – T6 | **50** | 1,581,750 |
+| T7 – T11, deep ensembles | **100** | 3,163,500 |
+
+The node counts come from the trials' own result files (`num_test_samples`, or
+`statistics.n_samples`), and 1,581,750 = 50 × 31,635 exactly, as 3,163,500 = 100 × 31,635.
+Trial 7's directory name records the change: `point_net_transf_gat_7th_trial_80_10_10_split`.
+
+**Impact.** Any ranking that places T1–T6 alongside T7–T8 on R² is not a like-for-like
+comparison, because the two groups were evaluated on differently sized held-out sets. This
+affects the trial-comparison figure at `docs/figures/results/05_trial_comparison.png`,
+which plots T2, T3, T5 and T6 next to T7 and T8, and any prose that reads a ranking off it.
+
+**What does not change.** Every individual trial's own metrics remain correct for the split
+it was measured on. Trial 8 remains the best of the trials sharing the 100-graph split, and
+all uncertainty work is built on Trial 8 alone, so no UQ result depends on a cross-split
+comparison. The headline numbers asserted by `scripts/verify_headline_results.py` are all
+Trial 8 or Trial 7 figures on the 100-graph split and are unaffected.
+
+**Related.** This gives a second, independent reason to keep Trial 1 out of comparisons.
+It was already excluded from uncertainty work because it used zero dropout, which leaves
+MC Dropout undefined. Checkpoint forensics now add two more differences: it carries a
+`read_out_node_predictions` Linear head instead of `gat_final` (1,416,833 parameters
+against 1,416,835), and it was scored on the 50-graph split. Its R² of 0.786 is therefore
+not comparable with Trial 8's 0.596 on any axis.
+
+**Reproduction.** `python scripts/data_exploration/explore_checkpoints.py` prints the
+inventory and emits the split warning directly from the artifacts.
+
 ## Provenance
 
 - Immutable submitted artifact baseline: canonical commit `4b95a3d8aca5929bb88b84bb7f7ae86c48e2f428`.

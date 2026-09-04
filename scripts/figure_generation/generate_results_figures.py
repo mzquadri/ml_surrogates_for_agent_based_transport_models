@@ -353,9 +353,10 @@ def fig_trials():
 
     fig.suptitle("Trial comparison — Trial 8 is the UQ baseline",
                  fontsize=13, fontweight="600", color=COLORS["dgray"])
-    fig.text(0.5, -0.07,
-             "Only trials with a retained test_evaluation_complete.json are shown. Trial 1 is excluded from UQ work entirely: it used a Linear output "
-             "head and zero\ndropout, so MC Dropout is undefined for it. Trial 3 used a weighted loss and is not comparable on these metrics.",
+    fig.text(0.5, -0.11,
+             "CAUTION: these trials were not all scored on the same held-out set. Trials 2, 3, 5 and 6 were measured on 50 test graphs; trials 7 and 8 on 100,\n"
+             "so their R² values are not strictly like-for-like — see CORRIGENDUM C9. Trial 1 is excluded entirely: a Linear output head, zero dropout (which\n"
+             "leaves MC Dropout undefined), and the 50-graph split. All uncertainty work uses Trial 8 alone, so no UQ result rests on a cross-split comparison.",
              ha="center", fontsize=8.2, color=COLORS["mgray"])
     fig.tight_layout()
     save(fig, "05_trial_comparison", "where Trial 8 sits among the trials")
