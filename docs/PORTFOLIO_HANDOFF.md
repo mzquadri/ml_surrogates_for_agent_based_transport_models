@@ -125,7 +125,7 @@ In narrative order:
 | Field | Value |
 | --- | --- |
 | GitHub | `https://github.com/mzquadri/ml_surrogates_for_agent_based_transport_models` |
-| Companion data | `https://github.com/mzquadri/ml-surrogates-thesis-data` |
+| Data + model releases | `https://github.com/mzquadri/ml_surrogates_for_agent_based_transport_models/releases` |
 | Gitea | *(placeholder — not yet published)* |
 | Upstream | `https://github.com/enatterer/ml_surrogates_for_agent_based_transport_models` |
 

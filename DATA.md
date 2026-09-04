@@ -1,9 +1,10 @@
 # Dataset
 
 The artifacts backing this thesis total **7.8 GB across 1,307 files** — too large to track
-here, since GitHub rejects any single file over 100 MB. They live in a companion
-repository, **[mzquadri/ml-surrogates-thesis-data](https://github.com/mzquadri/ml-surrogates-thesis-data)**,
-in the same directory layout the training scripts wrote.
+in git, since GitHub rejects any single file over 100 MB. They are published as
+**[Releases on this repository](../../releases)**, in the same directory layout the
+training scripts wrote. There is no companion repository: this one is the single
+canonical home for the code, the thesis and the data.
 
 ## Contents
 
@@ -22,28 +23,31 @@ network (31,635 road segments).
 
 ## Where to get it
 
-`data/` is gitignored here, so clone the data repository into it. The evaluation scripts
-read from a local `data/` tree and this puts everything at the paths they expect:
+`data/` is gitignored, so the tree is rebuilt from the releases. Three downloads give you
+everything the evaluation scripts read.
+
+**1. The per-trial tree** — every scaler, checkpoint, metric file, prediction archive and
+plot, in the original layout:
 
 ```bash
-git clone https://github.com/mzquadri/ml-surrogates-thesis-data.git data
+gh release download benchmarks-v1 --repo mzquadri/ml_surrogates_for_agent_based_transport_models --dir /tmp/bench
+mkdir -p data/TR-C_Benchmarks && for t in /tmp/bench/*.tar; do tar -xf "$t" -C data/TR-C_Benchmarks; done
 ```
 
-That gives you 1,267 files (1.3 GB): every scaler, checkpoint, metric file, prediction
-archive and plot small enough to be tracked. Two further downloads complete the tree.
-
-**The nineteen files over GitHub's 100 MB limit** — fifteen `test_dl.pt` test dataloaders
-at 148–296 MB each, `feature_data.npz`, `experiment_a_fixed_data.npz`, and a 200 MB
-ablation CSV — are attached to that repository's `large-files-v1` release. Their asset
+**2. The oversized files** — fifteen `test_dl.pt` test dataloaders at 148–296 MB each,
+`feature_data.npz`, `experiment_a_fixed_data.npz`, and the 200 MB Trial 8 ablation CSV.
+These fill the `data_created_during_training/` directories the tars leave empty. Asset
 names encode the destination path with `__` in place of `/`, because release assets are a
 flat list and fifteen of them are called `test_dl.pt`:
 
 ```bash
-cd data
-gh release download large-files-v1 \
-  --repo mzquadri/ml-surrogates-thesis-data --dir /tmp/large
-python restore_large_files.py /tmp/large
+gh release download thesis-data-v1   --repo mzquadri/ml_surrogates_for_agent_based_transport_models --dir /tmp/large
+python scripts/restore_large_files.py /tmp/large
 ```
+
+`thesis-data-v1` also carries `ml-surrogates-thesis-data-tracked-tree.tar`, the complete
+tree as a single archive, if you would rather unpack it in one step than assemble it from
+the per-trial tars.
 
 **The twenty training batches** (2.44 GiB) stay on this repository's release, where they
 were first published:

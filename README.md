@@ -215,7 +215,7 @@ That runs against artifacts tracked in this repository and needs no downloads. T
 checks — the AUROC pair — report `SKIP` until the 209 MB ablation CSV is fetched:
 
 ```bash
-gh release download large-files-v1 --repo mzquadri/ml-surrogates-thesis-data \
+gh release download thesis-data-v1 --repo mzquadri/ml_surrogates_for_agent_based_transport_models \
   --pattern '*trial8_uq_ablation_results.csv' \
   --dir data/TR-C_Benchmarks/point_net_transf_gat_8th_trial_lower_dropout/
 ```
@@ -269,12 +269,13 @@ tests/                          Test suite (pytest)
 > The examined thesis is `thesis/submission_2026-05-15/`. The working LaTeX in
 > `thesis/latex_tum_official/` has been edited since and compiles to a different PDF.
 
-Large artifacts live on releases rather than in the tree: the training corpus
-([`train-data-v1`](../../releases/tag/train-data-v1)), per-trial evaluation outputs
-([`benchmarks-v1`](../../releases/tag/benchmarks-v1)), and oversized prediction archives
-([`results-large-v1`](../../releases/tag/results-large-v1)). The companion repository
-[`mzquadri/ml-surrogates-thesis-data`](https://github.com/mzquadri/ml-surrogates-thesis-data) holds
-the data tree in its original per-trial layout. See [`DATA.md`](DATA.md).
+Large artifacts live on this repository's releases rather than in the tree: the training
+corpus ([`train-data-v1`](../../releases/tag/train-data-v1)), per-trial evaluation outputs
+([`benchmarks-v1`](../../releases/tag/benchmarks-v1)), oversized prediction archives
+([`results-large-v1`](../../releases/tag/results-large-v1)), and the per-trial artifacts
+that exceed GitHub's file limit ([`thesis-data-v1`](../../releases/tag/thesis-data-v1)).
+Everything the thesis needs is in this repository or its releases — there is no companion
+data repository. See [`DATA.md`](DATA.md).
 
 ---
 

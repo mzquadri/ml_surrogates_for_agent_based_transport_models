@@ -4,12 +4,35 @@
 
 | Role | Repository/commit | Treatment |
 |---|---|---|
-| Canonical destination | `mzquadri/ml-surrogates-thesis` at `4b95a3d8aca5929bb88b84bb7f7ae86c48e2f428` | Submitted artifact baseline |
+| **Canonical repository** | `mzquadri/ml_surrogates_for_agent_based_transport_models` | The single public home for the code, thesis, documentation and data releases |
+| Submitted artifact baseline | commit `4b95a3d8aca5929bb88b84bb7f7ae86c48e2f428`, formerly in `mzquadri/ml-surrogates-thesis` | *Historical repository, deleted after consolidation on 2026-09-04.* History preserved in the `provenance-v1` release |
 | Audited evidence source | `mzquadri/ml_surrogates_for_agent_based_transport_models` at `fdb4ef0c9c736576ae34d5e331d8b66a7a6d877a` | Post-submission audit source |
 | Pre-audit source baseline | Source commit `c3c84499029f310df4f05c76afa4e3e0d6b79de3` | Matches submitted PDF blob |
 
-The canonical repository is the only public destination. References to the underscore-named
-repository identify historical provenance, not an alternative canonical release.
+## Repository consolidation, 2026-09-04
+
+Two repositories were retired and deleted after their content was migrated here and
+verified. Neither is required to obtain any artifact, and no runnable command in this
+repository refers to either.
+
+| Retired repository | Role | What became of it |
+|---|---|---|
+| `mzquadri/ml-surrogates-thesis-data` | Companion data repository, per-trial artifact tree | Its 20 unique release assets (4.35 GB) are now the `thesis-data-v1` release here. Its tracked tree is archived as `ml-surrogates-thesis-data-tracked-tree.tar` on the same release, and was already duplicated inside `benchmarks-v1`. History bundled to `provenance-v1`. |
+| `mzquadri/ml-surrogates-thesis` | Retired predecessor holding the submitted-artifact baseline | Its `train-data-v1` release was a byte-for-byte duplicate of the canonical one, so nothing needed migrating. Its 15-commit history — a lineage disjoint from this repository, including the `backup/pre-cleanup-main` tag at `3d9af642f13c12a8f64a3e97bacf5efce2079fb6` — is bundled to `provenance-v1`. |
+
+Recovering either history:
+
+```bash
+gh release download provenance-v1 --repo mzquadri/ml_surrogates_for_agent_based_transport_models
+git clone ml-surrogates-thesis-history.bundle recovered
+```
+
+The machine-verifiable record, including every asset's SHA256 and the size verification
+between source and destination, is
+[`migration/thesis_repo_consolidation.json`](migration/thesis_repo_consolidation.json).
+
+Mentions of the two retired repositories elsewhere in this repository identify historical
+provenance only. They are labelled as such, and no command depends on them.
 
 ## Immutable Submitted PDF
 
