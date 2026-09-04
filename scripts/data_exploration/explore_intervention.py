@@ -53,7 +53,8 @@ def main() -> int:
     nz = red[M]
     vals, cnt = np.unique(nz, return_counts=True)
     print(f"  distinct non-zero values {len(vals)}   all negative: {bool((nz<0).all())}")
-    for v, c in sorted(zip(vals.tolist(), cnt.tolist()), key=lambda t: -t[1])[:10]:
+    for v, c in sorted(zip(vals.tolist(), cnt.tolist(), strict=True),
+                       key=lambda t: -t[1])[:10]:
         print(f"    {v:9.0f} veh/h  {c:10,}  ({100*c/nz.size:5.2f}%)")
 
     print("\n" + "=" * 76)

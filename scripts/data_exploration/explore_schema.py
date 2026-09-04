@@ -15,7 +15,7 @@ import numpy as np
 import torch
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from common import (FEATURES, add_common_args, load, undirected_adjacency)  # noqa: E402
+from common import FEATURES, add_common_args, load, undirected_adjacency  # noqa: E402
 
 
 def main() -> int:
