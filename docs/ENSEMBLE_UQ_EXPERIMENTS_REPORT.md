@@ -1,5 +1,8 @@
 # Ensemble-based Uncertainty Quantification Experiments Report
 
+> **One image below lives in the untracked data tree** (`data/TR-C_Benchmarks/.../plots/`) and will
+> not render from a plain clone. See [`DATA.md`](../DATA.md) for how to obtain that tree.
+
 **Author:** Mohd Zamin Quadri  
 **Date:** December 2024  
 **Thesis:** ML Surrogates for Agent-Based Transport Models  
