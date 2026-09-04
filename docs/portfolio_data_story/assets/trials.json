@@ -1,0 +1,333 @@
+{
+  "description": "Checkpoint inventory for the 16 retained trials. Architecture is derived from tensor shapes; metrics are read from whichever result file each trial wrote.",
+  "caveat": "Trials were not all scored on the same test split (50 vs 100 graphs). R2 is not comparable across that boundary -- see docs/CORRIGENDUM.md C9.",
+  "generated_by": "scripts/data_exploration/explore_checkpoints.py",
+  "n_trials": 16,
+  "n_with_recorded_metrics": 8,
+  "trials": [
+    {
+      "trial": "deep_ensemble_seed137",
+      "checkpoints": [
+        "models\\deep_ensemble_seed137\\trained_model\\model.pth"
+      ],
+      "checkpoint_mb": 5.68,
+      "architecture": {
+        "params": 1416835,
+        "tensors": 36,
+        "in_channels": 5,
+        "transformer_layers": 2,
+        "output_dim": 1,
+        "extra_heads": []
+      },
+      "test_metrics": null,
+      "metrics_source": null
+    },
+    {
+      "trial": "deep_ensemble_seed256",
+      "checkpoints": [
+        "models\\deep_ensemble_seed256\\trained_model\\model.pth"
+      ],
+      "checkpoint_mb": 5.68,
+      "architecture": {
+        "params": 1416835,
+        "tensors": 36,
+        "in_channels": 5,
+        "transformer_layers": 2,
+        "output_dim": 1,
+        "extra_heads": []
+      },
+      "test_metrics": null,
+      "metrics_source": null
+    },
+    {
+      "trial": "deep_ensemble_seed389",
+      "checkpoints": [
+        "models\\deep_ensemble_seed389\\trained_model\\model.pth"
+      ],
+      "checkpoint_mb": 5.68,
+      "architecture": {
+        "params": 1416835,
+        "tensors": 36,
+        "in_channels": 5,
+        "transformer_layers": 2,
+        "output_dim": 1,
+        "extra_heads": []
+      },
+      "test_metrics": null,
+      "metrics_source": null
+    },
+    {
+      "trial": "deep_ensemble_seed42",
+      "checkpoints": [
+        "models\\deep_ensemble_seed42\\trained_model\\model.pth"
+      ],
+      "checkpoint_mb": 5.68,
+      "architecture": {
+        "params": 1416835,
+        "tensors": 36,
+        "in_channels": 5,
+        "transformer_layers": 2,
+        "output_dim": 1,
+        "extra_heads": []
+      },
+      "test_metrics": null,
+      "metrics_source": null
+    },
+    {
+      "trial": "deep_ensemble_seed512",
+      "checkpoints": [
+        "models\\deep_ensemble_seed512\\trained_model\\model.pth"
+      ],
+      "checkpoint_mb": 5.68,
+      "architecture": {
+        "params": 1416835,
+        "tensors": 36,
+        "in_channels": 5,
+        "transformer_layers": 2,
+        "output_dim": 1,
+        "extra_heads": []
+      },
+      "test_metrics": null,
+      "metrics_source": null
+    },
+    {
+      "trial": "point_net_transf_gat_10th_trial_cqr",
+      "checkpoints": [
+        "models\\point_net_transf_gat_10th_trial_cqr\\trained_model\\model.pth"
+      ],
+      "checkpoint_mb": 5.68,
+      "architecture": {
+        "params": 1416902,
+        "tensors": 36,
+        "in_channels": 5,
+        "transformer_layers": 2,
+        "output_dim": 2,
+        "extra_heads": []
+      },
+      "test_metrics": null,
+      "metrics_source": null
+    },
+    {
+      "trial": "point_net_transf_gat_11th_trial_cqr_frozen",
+      "checkpoints": [
+        "models\\point_net_transf_gat_11th_trial_cqr_frozen\\trained_model\\model.pth"
+      ],
+      "checkpoint_mb": 5.68,
+      "architecture": {
+        "params": 1416902,
+        "tensors": 36,
+        "in_channels": 5,
+        "transformer_layers": 2,
+        "extra_heads": [
+          "gat_quantile_head"
+        ]
+      },
+      "test_metrics": null,
+      "metrics_source": null
+    },
+    {
+      "trial": "point_net_transf_gat_2nd_try",
+      "checkpoints": [
+        "models\\point_net_transf_gat_2nd_try\\trained_model\\model.pth"
+      ],
+      "checkpoint_mb": 5.68,
+      "architecture": {
+        "params": 1416835,
+        "tensors": 36,
+        "in_channels": 5,
+        "transformer_layers": 2,
+        "output_dim": 1,
+        "extra_heads": []
+      },
+      "test_metrics": {
+        "r2": 0.5116643905639648,
+        "mae": 4.327726364135742,
+        "rmse": 8.150483998162127,
+        "n_test_nodes": 1581750,
+        "n_test_graphs": 50.0
+      },
+      "metrics_source": "test_evaluation_complete.json"
+    },
+    {
+      "trial": "point_net_transf_gat_3rd_trial_weighted_loss",
+      "checkpoints": [
+        "models\\point_net_transf_gat_3rd_trial_weighted_loss\\trained_model\\model.pth"
+      ],
+      "checkpoint_mb": 5.68,
+      "architecture": {
+        "params": 1416835,
+        "tensors": 36,
+        "in_channels": 5,
+        "transformer_layers": 2,
+        "output_dim": 1,
+        "extra_heads": []
+      },
+      "test_metrics": {
+        "r2": 0.22463977336883545,
+        "mae": 5.989744186401367,
+        "rmse": 10.270130393919324,
+        "n_test_nodes": 1581750,
+        "n_test_graphs": 50.0
+      },
+      "metrics_source": "test_evaluation_complete.json"
+    },
+    {
+      "trial": "point_net_transf_gat_4th_trial_weighted_loss",
+      "checkpoints": [
+        "models\\point_net_transf_gat_4th_trial_weighted_loss\\trained_model\\model.pth"
+      ],
+      "checkpoint_mb": 5.68,
+      "architecture": {
+        "params": 1416835,
+        "tensors": 36,
+        "in_channels": 5,
+        "transformer_layers": 2,
+        "output_dim": 1,
+        "extra_heads": []
+      },
+      "test_metrics": {
+        "r2_score": 0.24255573749542236,
+        "mae": 6.079549789428711,
+        "rmse": 10.150785446166992,
+        "n_test_nodes": 1581750,
+        "n_test_graphs": 50.0
+      },
+      "metrics_source": "test_results.json"
+    },
+    {
+      "trial": "point_net_transf_gat_5th_try",
+      "checkpoints": [
+        "models\\point_net_transf_gat_5th_try\\trained_model\\model.pth"
+      ],
+      "checkpoint_mb": 5.68,
+      "architecture": {
+        "params": 1416835,
+        "tensors": 36,
+        "in_channels": 5,
+        "transformer_layers": 2,
+        "output_dim": 1,
+        "extra_heads": []
+      },
+      "test_metrics": {
+        "r2": 0.5552933216094971,
+        "mae": 4.2421159744262695,
+        "rmse": 7.777878284454346,
+        "n_test_nodes": 1581750,
+        "n_test_graphs": 50.0
+      },
+      "metrics_source": "test_evaluation_complete.json"
+    },
+    {
+      "trial": "point_net_transf_gat_6th_trial_lower_lr",
+      "checkpoints": [
+        "models\\point_net_transf_gat_6th_trial_lower_lr\\trained_model\\model.pth"
+      ],
+      "checkpoint_mb": 5.68,
+      "architecture": {
+        "params": 1416835,
+        "tensors": 36,
+        "in_channels": 5,
+        "transformer_layers": 2,
+        "output_dim": 1,
+        "extra_heads": []
+      },
+      "test_metrics": {
+        "r2": 0.5223422050476074,
+        "mae": 4.324154376983643,
+        "rmse": 8.060885429382324,
+        "n_test_nodes": 1581750,
+        "n_test_graphs": 50.0
+      },
+      "metrics_source": "test_evaluation_complete.json"
+    },
+    {
+      "trial": "point_net_transf_gat_7th_trial_80_10_10_split",
+      "checkpoints": [
+        "models\\point_net_transf_gat_7th_trial_80_10_10_split\\trained_model\\model.pth"
+      ],
+      "checkpoint_mb": 5.68,
+      "architecture": {
+        "params": 1416835,
+        "tensors": 36,
+        "in_channels": 5,
+        "transformer_layers": 2,
+        "output_dim": 1,
+        "extra_heads": []
+      },
+      "test_metrics": {
+        "r2": 0.5471095442771912,
+        "mae": 4.060104846954346,
+        "rmse": 7.534329891204834,
+        "n_test_nodes": 3163500,
+        "n_test_graphs": 100.0
+      },
+      "metrics_source": "test_evaluation_complete.json"
+    },
+    {
+      "trial": "point_net_transf_gat_8th_trial_lower_dropout",
+      "checkpoints": [
+        "models\\point_net_transf_gat_8th_trial_lower_dropout\\trained_model\\model.pth"
+      ],
+      "checkpoint_mb": 5.68,
+      "architecture": {
+        "params": 1416835,
+        "tensors": 36,
+        "in_channels": 5,
+        "transformer_layers": 2,
+        "output_dim": 1,
+        "extra_heads": []
+      },
+      "test_metrics": {
+        "r2": 0.5957479476928711,
+        "mae": 3.957288980484009,
+        "rmse": 7.118265151977539,
+        "n_test_nodes": 3163500,
+        "n_test_graphs": 100.0
+      },
+      "metrics_source": "test_evaluation_complete.json"
+    },
+    {
+      "trial": "point_net_transf_gat_9th_trial_heteroscedastic",
+      "checkpoints": [
+        "models\\point_net_transf_gat_9th_trial_heteroscedastic\\trained_model\\model.pth",
+        "models\\point_net_transf_gat_9th_trial_heteroscedastic\\trained_model\\model__snapshot_2026-04.pth"
+      ],
+      "checkpoint_mb": 11.36,
+      "architecture": {
+        "params": 1416902,
+        "tensors": 36,
+        "in_channels": 5,
+        "transformer_layers": 2,
+        "extra_heads": [
+          "gat_heteroscedastic_head"
+        ]
+      },
+      "test_metrics": null,
+      "metrics_source": null
+    },
+    {
+      "trial": "pointnet_transf_gat_1st_bs32_5feat_seed42",
+      "checkpoints": [
+        "models\\pointnet_transf_gat_1st_bs32_5feat_seed42\\model.pth"
+      ],
+      "checkpoint_mb": 5.68,
+      "architecture": {
+        "params": 1416833,
+        "tensors": 34,
+        "in_channels": 5,
+        "transformer_layers": 2,
+        "extra_heads": [
+          "read_out_node_predictions"
+        ]
+      },
+      "test_metrics": {
+        "r2": 0.7859956622123718,
+        "mae": 2.9715771675109863,
+        "rmse": 5.395548200499291,
+        "n_test_nodes": 1581750,
+        "n_test_graphs": 50.0
+      },
+      "metrics_source": "test_results.json"
+    }
+  ]
+}
