@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1180 560" width="1180" height="560" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif">
+  <rect width="1180" height="560" fill="#ffffff"/>
+  <style>
+    .h { fill:#0f172a; font-size:19px; font-weight:600; }
+    .s { fill:#64748b; font-size:12.5px; }
+    .lbl { fill:#0f172a; font-size:14px; font-weight:600; }
+    .sub { fill:#64748b; font-size:11.5px; }
+    .mono { font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:11.5px; fill:#334155; }
+    .monob { font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:12.5px; fill:#0f172a; font-weight:600; }
+    .cap { fill:#64748b; font-size:12px; }
+    .tick { fill:#059669; font-size:15px; font-weight:700; }
+    .cross { fill:#ea580c; font-size:15px; font-weight:700; }
+  </style>
+  <text class="h" x="34" y="40">From a policy on a map to a tensor the model can read</text>
+  <text class="s" x="34" y="62">Four representations of the same thing. The line-graph step is the one that decides what a prediction is about.</text>
+  <rect x="34" y="110" width="250" height="150" rx="9" fill="#fff7ed" stroke="#fed7aa" stroke-width="1.4"/>
+  <text class="lbl" x="52" y="140" text-anchor="start">1  Policy</text>
+  <text class="sub" x="52" y="168" text-anchor="start">a capacity reduction applied</text>
+  <text class="sub" x="52" y="188" text-anchor="start">to roads in one or more of</text>
+  <text class="sub" x="52" y="208" text-anchor="start">the 20 arrondissements</text>
+  <line x1="288" y1="185" x2="314.0" y2="185" stroke="#94a3b8" stroke-width="1.8"/>
+  <polygon points="322,185 314.0,180.4 314.0,189.6" fill="#94a3b8"/>
+  <rect x="326" y="110" width="250" height="150" rx="9" fill="#eff6ff" stroke="#bfdbfe" stroke-width="1.4"/>
+  <text class="lbl" x="344" y="140" text-anchor="start">2  Road network</text>
+  <text class="sub" x="344" y="168" text-anchor="start">intersections are nodes</text>
+  <text class="sub" x="344" y="188" text-anchor="start">road links are edges</text>
+  <text class="sub" x="344" y="208" text-anchor="start">31,635 links</text>
+  <line x1="580" y1="185" x2="606.0" y2="185" stroke="#94a3b8" stroke-width="1.8"/>
+  <polygon points="614,185 606.0,180.4 606.0,189.6" fill="#94a3b8"/>
+  <rect x="618" y="110" width="250" height="150" rx="9" fill="#f5f3ff" stroke="#ddd6fe" stroke-width="1.4"/>
+  <text class="lbl" x="636" y="140" text-anchor="start">3  Line graph</text>
+  <text class="sub" x="636" y="168" text-anchor="start">road links become nodes</text>
+  <text class="sub" x="636" y="188" text-anchor="start">an edge means two links meet</text>
+  <text class="sub" x="636" y="208" text-anchor="start">59,851 directed edges</text>
+  <line x1="872" y1="185" x2="898.0" y2="185" stroke="#94a3b8" stroke-width="1.8"/>
+  <polygon points="906,185 898.0,180.4 898.0,189.6" fill="#94a3b8"/>
+  <rect x="910" y="110" width="250" height="150" rx="9" fill="#ecfdf5" stroke="#a7f3d0" stroke-width="1.4"/>
+  <text class="lbl" x="928" y="140" text-anchor="start">4  Tensors</text>
+  <text class="sub" x="928" y="168" text-anchor="start">x, pos, y, edge_index</text>
+  <text class="sub" x="928" y="188" text-anchor="start">one Data object per scenario</text>
+  <text class="sub" x="928" y="208" text-anchor="start">3.36 MB</text>
+  <rect x="34" y="296" width="1112" height="150" rx="9" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.4"/>
+  <text class="lbl" x="52" y="322" text-anchor="start">Why the inversion matters</text>
+  <text class="sub" x="52" y="348" text-anchor="start">In the road network a prediction sits on an edge. After the line-graph transform it sits on a node, and a GNN predicts</text>
+  <text class="sub" x="52" y="368" text-anchor="start">one value per node. That is why the model produces one number per road link, which is the unit a policy question asks</text>
+  <text class="sub" x="52" y="388" text-anchor="start">about: how much does traffic on this street change.</text>
+  <text class="sub" x="52" y="416" text-anchor="start">Degree in the line graph runs from 0 to 10, median 4: a road link meets that many other links.</text>
+  <text class="cap" x="34" y="534">76 links have degree zero. They are public-transport links with no car access, and they never respond to any policy.</text>
+</svg>
