@@ -152,7 +152,11 @@ Traced to the code and confirmed against the trained checkpoint:
 graph-transformer layers, two attention layers reducing to one value per link.
 **1,416,835 parameters**, read from the Trial 8 checkpoint rather than code defaults.
 
-![Model architecture](docs/diagrams/04_model_architecture.svg)
+![Model architecture](docs/figures/portfolio/08_model_architecture.png)
+
+Every shape and count above is a tensor in the Trial 8 checkpoint. A per-feature
+card for each column of `x` is in
+[`docs/figures/features/`](docs/figures/features/README.md).
 
 The two dropout layers are the only stochastic elements — which is exactly what makes
 post-hoc MC Dropout possible without touching the weights.

@@ -65,6 +65,17 @@ trained checkpoint rather than from configuration.
 Interventions are drawn per district; where the traffic moves is almost unrelated to
 where capacity was removed (r = +0.17 across the twenty districts).
 
+### 8 · The model
+
+![Model architecture](08_model_architecture.png)
+
+Every shape and parameter count is read out of the Trial 8 checkpoint, so the diagram
+cannot drift away from the model it describes.
+
+```bash
+python scripts/figure_generation/generate_model_diagram.py
+```
+
 ---
 
 ## Design notes
