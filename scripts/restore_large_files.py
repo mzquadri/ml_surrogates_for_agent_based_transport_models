@@ -28,10 +28,14 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 
+#: The artifact tree lives under data/ here. In the retired data repository these
+#: paths sat at the repository root, so the asset names carry no "data/" prefix.
+DATA_ROOT = REPO_ROOT / "data"
+
 
 def destination_for(asset_name: str) -> Path:
     """The real path an encoded asset name belongs at."""
-    return REPO_ROOT / Path(*asset_name.split("__"))
+    return DATA_ROOT / Path(*asset_name.split("__"))
 
 
 def main() -> int:
@@ -80,7 +84,7 @@ def main() -> int:
     print()
     print(f"{placed} file(s) {'to place' if args.dry_run else 'placed'}, {skipped} already present.")
     if not args.dry_run and placed:
-        print("Verify the whole tree with: sha256sum -c MANIFEST.sha256")
+        print("Verify with: cd data && sha256sum -c ../docs/migration/ml-surrogates-thesis-data.MANIFEST.sha256")
     return 0
 
 
