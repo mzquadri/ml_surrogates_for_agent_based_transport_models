@@ -12,4 +12,11 @@ keywords:
   - graph neural networks
   - transport simulation
   - conformal prediction
-license: "Proprietary"
+# No license key. CFF 1.2.0 constrains it to an SPDX identifier, and this
+# repository has no single one: the upstream code is MIT, (c) 2024 Elena
+# Natterer, while the thesis text, figures, checkpoints and result artifacts
+# added here are not covered by that grant. "Proprietary" was not an SPDX
+# identifier, so the file failed schema validation and GitHub would not render
+# the citation widget; "MIT" would validate by misstating the terms of the
+# added material. The split is stated exactly in LICENSE and in the "Licence
+# and attribution" section of README.md.
