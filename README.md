@@ -284,6 +284,34 @@ evidence of a mechanism. See [`05_spillover.md`](docs/portfolio_data_story/05_sp
     indices were not retained. The two must not be pooled; see
     [CORRIGENDUM C3](docs/CORRIGENDUM.md).
 
+### Inference cost
+
+The opening claim of this README is that the simulator needs hours per scenario and the
+surrogate answers in seconds. That is the reason to build a surrogate at all, and it was
+never measured here. It is now, by
+[`scripts/benchmark_inference.py`](scripts/benchmark_inference.py).
+
+One forward pass of T8 over the full Paris graph, 31,635 nodes and 59,851 edges, median of
+50 timed passes after 10 warm-up passes:
+
+| Device | Hardware | Median | Range |
+| --- | --- | --- | --- |
+| CPU | Intel Core Ultra 9 285H, 16 cores | 610 ms | 517 - 691 ms |
+| GPU | Intel Arc Pro 140T, 50.7 GB, torch 2.11 XPU | **141 ms** | 135 - 151 ms |
+
+The two devices agree to 3.15e-03 on an output spanning roughly 290 vehicles/hour, which is
+1.1e-05 of the range and is float32 ordering, not a different computation. The accelerator
+is 4.3x faster.
+
+This is a property of the machine it ran on, not a result of the thesis. It is kept out of
+[`scripts/verify_headline_results.py`](scripts/verify_headline_results.py), which pins
+numbers that have to reproduce on any machine, and it changes no accuracy figure: the
+thesis numbers come from the recorded runs and the benchmark only times a forward pass.
+
+Reproducing it needs a scenario file from the `thesis-data-v1` release, so it does not run
+in CI. Any scenario will do, because the topology and five of the six feature columns are
+byte-identical across scenarios.
+
 ### What this does not establish
 
 One Paris network, one capacity-reduction intervention family, a 1,000-scenario subset, one
@@ -371,6 +399,7 @@ so the two overlay without reprojection. Heavy reductions use the Intel Arc GPU 
 scripts/
   verify_headline_results.py   Recomputes every published number; non-zero exit on drift
   check_docs.py                Link and SVG gate
+  benchmark_inference.py       Times one forward pass on CPU and on an XPU/CUDA device
   restore_large_files.py       Rebuilds the data tree from the releases
   data_exploration/            Dataset, arrondissement and checkpoint analysis
   evaluation/  figure_generation/
