@@ -1,0 +1,271 @@
+{
+  "analysis": "conformal_coverage_by_arrondissement",
+  "description": "Split-conformal coverage (first 20% of graphs calibrate, remaining 80% evaluate), grouped by the arrondissement each link's midpoint falls in. 0 = outside all twenty polygons.",
+  "trial": "point_net_transf_gat_8th_trial_lower_dropout",
+  "n_cal_nodes": 632700,
+  "n_eval_nodes": 2530800,
+  "nominal_90": {
+    "global_quantile": 9.99326,
+    "global_coverage": 0.9017,
+    "by_arrondissement": [
+      {
+        "arrondissement": 0,
+        "n_nodes": 294160,
+        "coverage": 0.9617,
+        "mean_abs_residual": 2.2702
+      },
+      {
+        "arrondissement": 1,
+        "n_nodes": 37840,
+        "coverage": 0.8885,
+        "mean_abs_residual": 3.8986
+      },
+      {
+        "arrondissement": 2,
+        "n_nodes": 27520,
+        "coverage": 0.8753,
+        "mean_abs_residual": 4.4606
+      },
+      {
+        "arrondissement": 3,
+        "n_nodes": 30480,
+        "coverage": 0.8136,
+        "mean_abs_residual": 5.5244
+      },
+      {
+        "arrondissement": 4,
+        "n_nodes": 42800,
+        "coverage": 0.8068,
+        "mean_abs_residual": 5.6218
+      },
+      {
+        "arrondissement": 5,
+        "n_nodes": 66800,
+        "coverage": 0.8999,
+        "mean_abs_residual": 4.0987
+      },
+      {
+        "arrondissement": 6,
+        "n_nodes": 58960,
+        "coverage": 0.8807,
+        "mean_abs_residual": 4.4555
+      },
+      {
+        "arrondissement": 7,
+        "n_nodes": 94160,
+        "coverage": 0.9089,
+        "mean_abs_residual": 3.8839
+      },
+      {
+        "arrondissement": 8,
+        "n_nodes": 97920,
+        "coverage": 0.8299,
+        "mean_abs_residual": 5.6295
+      },
+      {
+        "arrondissement": 9,
+        "n_nodes": 61760,
+        "coverage": 0.9001,
+        "mean_abs_residual": 3.9097
+      },
+      {
+        "arrondissement": 10,
+        "n_nodes": 76240,
+        "coverage": 0.8989,
+        "mean_abs_residual": 3.8043
+      },
+      {
+        "arrondissement": 11,
+        "n_nodes": 93840,
+        "coverage": 0.9062,
+        "mean_abs_residual": 3.8468
+      },
+      {
+        "arrondissement": 12,
+        "n_nodes": 192640,
+        "coverage": 0.9178,
+        "mean_abs_residual": 3.5312
+      },
+      {
+        "arrondissement": 13,
+        "n_nodes": 180960,
+        "coverage": 0.9189,
+        "mean_abs_residual": 3.6692
+      },
+      {
+        "arrondissement": 14,
+        "n_nodes": 133280,
+        "coverage": 0.8617,
+        "mean_abs_residual": 5.0797
+      },
+      {
+        "arrondissement": 15,
+        "n_nodes": 208320,
+        "coverage": 0.903,
+        "mean_abs_residual": 3.965
+      },
+      {
+        "arrondissement": 16,
+        "n_nodes": 241760,
+        "coverage": 0.9289,
+        "mean_abs_residual": 3.4154
+      },
+      {
+        "arrondissement": 17,
+        "n_nodes": 174320,
+        "coverage": 0.8178,
+        "mean_abs_residual": 6.0779
+      },
+      {
+        "arrondissement": 18,
+        "n_nodes": 157040,
+        "coverage": 0.8973,
+        "mean_abs_residual": 4.0111
+      },
+      {
+        "arrondissement": 19,
+        "n_nodes": 136080,
+        "coverage": 0.9224,
+        "mean_abs_residual": 3.4919
+      },
+      {
+        "arrondissement": 20,
+        "n_nodes": 123920,
+        "coverage": 0.9241,
+        "mean_abs_residual": 3.4711
+      }
+    ]
+  },
+  "nominal_95": {
+    "global_quantile": 14.76998,
+    "global_coverage": 0.9509,
+    "by_arrondissement": [
+      {
+        "arrondissement": 0,
+        "n_nodes": 294160,
+        "coverage": 0.9783,
+        "mean_abs_residual": 2.2702
+      },
+      {
+        "arrondissement": 1,
+        "n_nodes": 37840,
+        "coverage": 0.944,
+        "mean_abs_residual": 3.8986
+      },
+      {
+        "arrondissement": 2,
+        "n_nodes": 27520,
+        "coverage": 0.9459,
+        "mean_abs_residual": 4.4606
+      },
+      {
+        "arrondissement": 3,
+        "n_nodes": 30480,
+        "coverage": 0.8976,
+        "mean_abs_residual": 5.5244
+      },
+      {
+        "arrondissement": 4,
+        "n_nodes": 42800,
+        "coverage": 0.8777,
+        "mean_abs_residual": 5.6218
+      },
+      {
+        "arrondissement": 5,
+        "n_nodes": 66800,
+        "coverage": 0.9576,
+        "mean_abs_residual": 4.0987
+      },
+      {
+        "arrondissement": 6,
+        "n_nodes": 58960,
+        "coverage": 0.9409,
+        "mean_abs_residual": 4.4555
+      },
+      {
+        "arrondissement": 7,
+        "n_nodes": 94160,
+        "coverage": 0.9564,
+        "mean_abs_residual": 3.8839
+      },
+      {
+        "arrondissement": 8,
+        "n_nodes": 97920,
+        "coverage": 0.9108,
+        "mean_abs_residual": 5.6295
+      },
+      {
+        "arrondissement": 9,
+        "n_nodes": 61760,
+        "coverage": 0.9573,
+        "mean_abs_residual": 3.9097
+      },
+      {
+        "arrondissement": 10,
+        "n_nodes": 76240,
+        "coverage": 0.9554,
+        "mean_abs_residual": 3.8043
+      },
+      {
+        "arrondissement": 11,
+        "n_nodes": 93840,
+        "coverage": 0.9639,
+        "mean_abs_residual": 3.8468
+      },
+      {
+        "arrondissement": 12,
+        "n_nodes": 192640,
+        "coverage": 0.9598,
+        "mean_abs_residual": 3.5312
+      },
+      {
+        "arrondissement": 13,
+        "n_nodes": 180960,
+        "coverage": 0.9633,
+        "mean_abs_residual": 3.6692
+      },
+      {
+        "arrondissement": 14,
+        "n_nodes": 133280,
+        "coverage": 0.9239,
+        "mean_abs_residual": 5.0797
+      },
+      {
+        "arrondissement": 15,
+        "n_nodes": 208320,
+        "coverage": 0.9548,
+        "mean_abs_residual": 3.965
+      },
+      {
+        "arrondissement": 16,
+        "n_nodes": 241760,
+        "coverage": 0.9676,
+        "mean_abs_residual": 3.4154
+      },
+      {
+        "arrondissement": 17,
+        "n_nodes": 174320,
+        "coverage": 0.8913,
+        "mean_abs_residual": 6.0779
+      },
+      {
+        "arrondissement": 18,
+        "n_nodes": 157040,
+        "coverage": 0.9448,
+        "mean_abs_residual": 4.0111
+      },
+      {
+        "arrondissement": 19,
+        "n_nodes": 136080,
+        "coverage": 0.9668,
+        "mean_abs_residual": 3.4919
+      },
+      {
+        "arrondissement": 20,
+        "n_nodes": 123920,
+        "coverage": 0.9719,
+        "mean_abs_residual": 3.4711
+      }
+    ]
+  }
+}

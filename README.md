@@ -316,7 +316,9 @@ byte-identical across scenarios.
 
 One Paris network, one capacity-reduction intervention family, a 1,000-scenario subset, one
 model family. Conformal coverage is marginal over the evaluated split — not a guarantee for
-any individual scenario, link, city, or policy.
+any individual scenario, link, city, or policy. Checked directly: coverage breaks out by
+arrondissement at 80.7%–92.4% against a 90% nominal level, not a flat 90% everywhere — see
+[`docs/COVERAGE_BY_ARRONDISSEMENT.md`](docs/COVERAGE_BY_ARRONDISSEMENT.md).
 
 ---
 
