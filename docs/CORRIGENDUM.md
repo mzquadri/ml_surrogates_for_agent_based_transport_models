@@ -400,6 +400,36 @@ is not part of any release.
 **Reproduction.** `python scripts/data_exploration/explore_tensors.py`, and
 [`data_exploration/auxiliary_tensors.md`](data_exploration/auxiliary_tensors.md).
 
+## C13 - fig12 marks an optimum its own curve does not have
+
+`figures/new/fig12_sigma_scaling_ece.png`, titled *ECE optimisation for T8 MC
+Dropout regression sigma-scaling*, draws ECE against the scaling factor T and marks a
+vertical dashed line labelled **"T* = 2.887 (optimal)"**.
+
+**The curve in that same figure does not attain its minimum there.** Read off the
+plotted line, ECE bottoms out at roughly **T = 2.55 to 2.6**, at about 0.040. At the
+marked T = 2.887 the curve has already risen to about 0.047. The marker sits to the
+right of the trough it claims to identify, so the figure disagrees with itself
+independently of which calibration protocol is correct.
+
+**Scope.** This is a defect in the figure, not a third calibration result. The value
+2.887 is the `node30_70_thesis_final` protocol already recorded in
+[C3](#c3-calibration-protocols), whose split indices were never saved and which
+therefore cannot be replayed. The audited and replayable protocol is `graph20_80_v1`,
+T = 2.702, ECE 0.26874 to 0.04783, a 82% reduction.
+
+**Consequence.** The figure appears in the submitted PDF. That artifact is frozen and
+is deliberately **not** being changed - the point of this document is to record what
+the submission says and where it is wrong, not to revise it after the fact. The
+consequence is forward-looking only: **do not reuse this figure, or the two diagrams
+`docs/diagrams/calibration.svg` and `docs/diagrams/stratified_uq.svg`, in any new
+material.** The first prints the superseded 90.5% and T* = 2.887; the second prints
+the 88.7% share that [C1](#c1-target-zero-mass) corrects.
+
+**Reproduction.** Open the figure and compare the dashed line against the minimum of
+the blue curve; no computation is required. Found 2026-10-16 while selecting figures
+for external material.
+
 ## Provenance
 
 - Submitted artifact baseline, by content: `thesis/latex_tum_official/main.pdf`,
