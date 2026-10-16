@@ -1,9 +1,94 @@
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/assets/header-dark.png">
+  <img alt="M.Sc. thesis, TUM 2026 — Uncertainty for a traffic surrogate: a graph network predicts how Paris traffic shifts when a lane closes, in milliseconds instead of hours, with a line chart showing calibration error falling from 0.269 on raw sigma to 0.048 after one scalar, 82% less calibration error" src="docs/assets/header-light.png">
+</picture>
+
 # Uncertainty Quantification for Machine Learning Models in Transportation Policy Analysis
 
-**M.Sc. thesis** · Technical University of Munich · School of Computation, Information and Technology
+A graph neural network trained on MATSim output predicts how Paris traffic shifts under a
+road-capacity policy in milliseconds, where the simulator needs hours — but it returns a
+bare number, with nothing to say which of the 31,635 road links it is guessing at. This
+repository adds a post-hoc uncertainty layer on top of that already-trained surrogate — MC
+Dropout, temperature scaling and conformal prediction, none of which touch the weights —
+and then measures how far the resulting σ can actually be trusted. It is for transport
+modellers and ML practitioners who have a working surrogate and need to know when not to
+believe it.
 
-Uncertainty quantification for GNN surrogates of agent-based transport models — MC Dropout,
-conformal prediction, and uncertainty-aware heads on a PointNetTransfGAT surrogate of MATSim.
+![What the thesis is about: MATSim simulation to graph representation to GNN surrogate to prediction, and the post-hoc uncertainty layer added on top](docs/diagrams/01_research_problem.svg)
+
+## The result
+
+Every number here is recomputed from its source artifact by
+[`scripts/verify_headline_results.py`](scripts/verify_headline_results.py), which exits
+non-zero on drift.
+
+| What was measured | Value |
+| --- | --- |
+| Calibration error (ECE), raw σ → one fitted scalar | **0.269 → 0.048**, a **−82%** change (T = 2.702) |
+| Error detection, AUROC at the top-10% / top-20% errors | **0.7585** / 0.7401 [^auroc] |
+| Does σ rank errors? Spearman ρ against absolute error | **0.482** |
+| Selective prediction, MAE change at 50% of links retained | **−41.2%** |
+| Split conformal coverage, 90% / 95% nominal | 90.17% / 95.09% [^prot] |
+| The surrogate it sits on (Trial 8), R² / MAE / RMSE | 0.5957 / 3.96 / 7.12 veh/h |
+
+Two findings, and they point in different directions. **σ ranks errors well enough to act
+on**: ρ = 0.482, error rises monotonically across σ deciles, and handing off the least
+reliable half of the links cuts MAE by 41%. **Raw σ is not a usable scale**: it covers only
+48.6% of errors at the nominal 90% level, so it has to be calibrated before it can be read
+as an interval at all. One scalar does most of that work.
+
+The target the model predicts is the *change* in traffic flow,
+`vol_car - vol_base_case` — the flow under the policy minus the flow in the base case. That
+is why a prediction goes negative: a capacity reduction pushes cars off the link it touches.
+
+**The PointNetTransfGAT surrogate, the MATSim preprocessing and the base training pipeline
+are upstream work by Elena Natterer et al.; the uncertainty layer on top of them is mine.**
+Full split in [What is mine and what is inherited](#what-is-mine-and-what-is-inherited).
+
+## Run it
+
+The repository pins **Python 3.10** — `environment-minimal.yml` declares `python=3.10` and
+the CI workflow installs the same. There is no `pyproject.toml`; nothing here is
+pip-installable, and conda is the supported path.
+
+```bash
+git clone https://github.com/mzquadri/ml_surrogates_for_agent_based_transport_models.git
+cd ml_surrogates_for_agent_based_transport_models
+
+conda env create -f environment-minimal.yml      # python=3.10, analysis deps only
+conda activate traffic-gnn
+
+python scripts/verify_headline_results.py        # recompute every headline number
+```
+
+That runs against tracked artifacts and needs no downloads. Two of the thirteen checks —
+the AUROC pair — report `SKIP` until the 209 MB ablation CSV is fetched:
+
+```bash
+gh release download thesis-data-v1 \
+  --repo mzquadri/ml_surrogates_for_agent_based_transport_models \
+  --pattern '*trial8_uq_ablation_results.csv' --dir /tmp/large
+python scripts/restore_large_files.py /tmp/large
+```
+
+The rest of what CI runs:
+
+```bash
+python scripts/check_repository.py      # 16 required artifacts exist and compile
+python scripts/check_docs.py            # documentation links and SVG validity
+python scripts/check_web_assets.py      # web assets parse and match their schema
+python -m pytest -q                     # 13 of 15 tests; 2 need Streamlit
+```
+
+For the full training environment, including PyTorch Geometric and CUDA, use
+`traffic-gnn.yml` instead. Training itself runs on a SLURM cluster via `run_models.sbatch`
+and is not reproducible from a clone — see [Reproducing the analyses](#reproducing-the-analyses).
+
+---
+
+## The thesis
+
+**M.Sc. thesis** · Technical University of Munich · School of Computation, Information and Technology
 
 |               |                                                   |
 | ------------- | ------------------------------------------------- |
@@ -13,7 +98,7 @@ conformal prediction, and uncertainty-aware heads on a PointNetTransfGAT surroga
 | **Advisors**  | Dominik Fuchsgruber, M.Sc. · Elena Natterer, M.Sc. |
 | **Submitted** | 15 May 2026                                        |
 
-**[Read the thesis (PDF)](thesis/submission_2026-05-15/)** · **[Verified results](#results)** · **[Reproduce them](#reproducing-the-results)** · **[Data story](docs/portfolio_data_story/)** · **[Corrigendum](docs/CORRIGENDUM.md)**
+**[Read the thesis (PDF)](thesis/submission_2026-05-15/)** · **[Full results](#results-in-detail)** · **[Data story](docs/portfolio_data_story/)** · **[Corrigendum](docs/CORRIGENDUM.md)**
 
 ![The Paris network](docs/figures/portfolio/01_the_network.png)
 
@@ -33,16 +118,12 @@ another point of R².
 **This thesis asks: can a useful, calibrated uncertainty estimate be attached to an
 already-trained GNN surrogate, without retraining it?**
 
-Short answer: yes, for ranking. MC Dropout σ tracks the error well enough to cut MAE by
-**41%** when the least reliable half of the links are handed off, and to flag the
-worst-predicted links at **0.7585 AUROC**. But raw σ is not a usable scale — it covers only
-49% of errors at the nominal 90% level — so it has to be calibrated first.
-
-![Research problem](docs/diagrams/01_research_problem.svg)
-
 ---
 
 ## What is mine and what is inherited
+
+The PointNetTransfGAT surrogate, the MATSim preprocessing and the base training pipeline
+are upstream work by Elena Natterer et al.; the uncertainty layer on top of them is mine.
 
 | Origin | What it covers |
 | --- | --- |
@@ -101,7 +182,7 @@ plus five further tensors — eleven stored fields in total**.
 | `x[:, 4]` `HIGHWAY` | ″ | no | ❌ nominal codes |
 | `x[:, 5]` `LENGTH` | ″ | no | ✅ |
 | `pos` — start / end / midpoint, WGS84 | `[31635, 3, 2]` | no | ✅ |
-| `y` — change in link volume | `[31635, 1]` | **yes** | target |
+| `y` — change in link volume, `vol_car - vol_base_case` | `[31635, 1]` | **yes** | target |
 | `edge_index` | `[2, 59851]` | no | ✅ |
 | `mode_stats_diff` | `[6, 3]` | yes | ❌ unused |
 | `mode_stats_diff_perc` | `[6, 3]` | yes | ❌ unused |
@@ -232,11 +313,7 @@ uncertainty result:
 
 ---
 
-## Results
-
-Every number is recomputed from its source artifact by
-[`scripts/verify_headline_results.py`](scripts/verify_headline_results.py), which exits
-non-zero on drift.
+## Results in detail
 
 ### Trial 8 — 100 held-out scenarios, 3,163,500 links
 
@@ -275,12 +352,13 @@ evidence of a mechanism. See [`05_spillover.md`](docs/portfolio_data_story/05_sp
     retained archive, which yields 0.4437 under the definition that reproduces Trial 8
     exactly. See [CORRIGENDUM C7b](docs/CORRIGENDUM.md).
 
-[^auroc]: **Corrected after submission.** The submitted thesis reports 0.7548 and 0.7324,
-    citing a file absent from this repository. Recomputation from the cited artifact gives
-    0.7585 and 0.7401. The figure above reports 0.7561 / 0.7378 for the same metric because
-    it reads the tracked NPZ archive — a different stochastic MC Dropout replay of the same
-    model. Both are correct for the artifact they name; see
-    [CORRIGENDUM C4 and C7a](docs/CORRIGENDUM.md).
+[^auroc]: **Corrected after submission.** The submitted thesis reports a lower pair for
+    this metric, citing a file absent from this repository. Recomputation from the cited
+    artifact gives 0.7585 and 0.7401. A results figure in this README computes the same
+    metric from the tracked NPZ archive and lands slightly lower again — a different
+    stochastic MC Dropout replay of the same model, not a different result. Each value is
+    correct for the artifact it names; the superseded figures and the full derivation are
+    in [CORRIGENDUM C4 and C7a](docs/CORRIGENDUM.md).
 
 [^prot]: Protocol `graph20_80_v1` — calibrate on the first 20 test graphs, evaluate on the
     remaining 80. The thesis reports 90.02% / 95.01% under a 50/50 scenario split whose
@@ -290,8 +368,8 @@ evidence of a mechanism. See [`05_spillover.md`](docs/portfolio_data_story/05_sp
 ### Inference cost
 
 The opening claim of this README is that the simulator needs hours per scenario and the
-surrogate answers in seconds. That is the reason to build a surrogate at all, and it was
-never measured here. It is now, by
+surrogate answers in milliseconds. That is the reason to build a surrogate at all, and it
+was never measured here. It is now, by
 [`scripts/benchmark_inference.py`](scripts/benchmark_inference.py).
 
 One forward pass of T8 over the full Paris graph, 31,635 nodes and 59,851 edges, median of
@@ -325,29 +403,10 @@ arrondissement at 80.7%–92.4% against a 90% nominal level, not a flat 90% ever
 
 ---
 
-## Reproducing the results
+## Reproducing the analyses
 
-```bash
-git clone https://github.com/mzquadri/ml_surrogates_for_agent_based_transport_models.git
-cd ml_surrogates_for_agent_based_transport_models
-
-conda env create -f environment-minimal.yml
-conda activate traffic-gnn
-
-python scripts/verify_headline_results.py        # recompute every headline number
-```
-
-That runs against tracked artifacts and needs no downloads. Two of the thirteen checks —
-the AUROC pair — report `SKIP` until the 209 MB ablation CSV is fetched:
-
-```bash
-gh release download thesis-data-v1 \
-  --repo mzquadri/ml_surrogates_for_agent_based_transport_models \
-  --pattern '*trial8_uq_ablation_results.csv' --dir /tmp/large
-python scripts/restore_large_files.py /tmp/large
-```
-
-Analyses, figures and data exploration:
+Beyond the verification run in [Run it](#run-it), the analyses, figures and data
+exploration:
 
 ```bash
 python scripts/evaluation/run_part4_t7_crosscheck.py          # no downloads needed
@@ -395,6 +454,11 @@ Maps draw the real street geometry from `pos[:, 0]` to `pos[:, 1]`, and district
 boundaries come from the arrondissement GeoJSON — the same CRS84 longitude and latitude,
 so the two overlay without reprojection. Heavy reductions use the Intel Arc GPU through
 `torch.xpu` where it helps, which is about fifteen times faster than numpy for this shape.
+
+Three figures are recorded as defective in [`docs/CORRIGENDUM.md`](docs/CORRIGENDUM.md)
+C13 — `docs/diagrams/calibration.svg`, `docs/diagrams/stratified_uq.svg` and
+`thesis/latex_tum_official/figures/new/fig12_sigma_scaling_ece.png`. They are kept as part
+of the record and are not embedded anywhere in this README. Do not reuse them.
 
 ---
 
