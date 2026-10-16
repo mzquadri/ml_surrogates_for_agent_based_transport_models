@@ -8,7 +8,7 @@ Every claim below is traceable to an artifact in this repository and is asserted
 
 ## Project title
 
-**Uncertainty Quantification for GNN Surrogates of Agent-Based Transport Models**
+**Uncertainty Quantification for Machine Learning Models in Transportation Policy Analysis**
 
 Short form for cards and navigation: *Uncertainty Quantification for Traffic GNN Surrogates*
 
@@ -131,8 +131,8 @@ In narrative order:
 
 ## Thesis reference
 
-Mohd Zamin Quadri (2026). *Uncertainty Quantification for GNN Surrogates of Agent-Based Transport
-Models.* M.Sc. thesis, M.Sc. Mathematics in Science and Engineering, Technical University of Munich,
+Mohd Zamin Quadri (2026). *Uncertainty Quantification for Machine Learning Models in
+Transportation Policy Analysis.* M.Sc. thesis, M.Sc. Mathematics in Science and Engineering, Technical University of Munich,
 School of Computation, Information and Technology. Supervisor: Prof. Dr. Stephan Günnemann.
 Advisors: Dominik Fuchsgruber, M.Sc. and Elena Natterer, M.Sc. Submitted 15 May 2026.
 

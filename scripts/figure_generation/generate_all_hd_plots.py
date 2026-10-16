@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Generate ALL HD publication-quality plots for thesis cross-checking.
-Thesis: Uncertainty Quantification for GNN Surrogates of Agent-Based Transport Models
+Thesis: Uncertainty Quantification for Machine Learning Models in Transportation Policy Analysis
 Author: Mohd Zamin Quadri, TUM 2025
 
 All data loaded from verified JSON artifacts. No hardcoded values.
@@ -1501,7 +1501,7 @@ ax6.text(
 )
 
 fig.suptitle(
-    "Thesis Results Dashboard: UQ for GNN Surrogates of Agent-Based Transport Models",
+    "Thesis Results Dashboard: UQ for a GNN Traffic Surrogate (Paris, MATSim)",
     fontsize=15,
     fontweight="bold",
 )

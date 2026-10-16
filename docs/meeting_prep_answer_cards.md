@@ -1,5 +1,5 @@
 # Meeting Prep: Answer Cards for March 30 Thesis Defense
-## Mohd Zamin Quadri — UQ for GNN Surrogates of Agent-Based Transport Models
+## Mohd Zamin Quadri — UQ for Machine Learning Models in Transportation Policy Analysis
 
 ---
 

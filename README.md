@@ -1,6 +1,9 @@
-# Uncertainty Quantification for GNN Surrogates of Agent-Based Transport Models
+# Uncertainty Quantification for Machine Learning Models in Transportation Policy Analysis
 
 **M.Sc. thesis** · Technical University of Munich · School of Computation, Information and Technology
+
+Uncertainty quantification for GNN surrogates of agent-based transport models — MC Dropout,
+conformal prediction, and uncertainty-aware heads on a PointNetTransfGAT surrogate of MATSim.
 
 |               |                                                   |
 | ------------- | ------------------------------------------------- |

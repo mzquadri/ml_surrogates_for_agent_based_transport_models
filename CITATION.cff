@@ -1,6 +1,9 @@
 cff-version: 1.2.0
 message: "If you use this work, please cite it as below."
-title: "Uncertainty Quantification for GNN Surrogates of Agent-Based Transport Models"
+# Exact title of the submitted thesis (thesis/submission_2026-05-15/). Earlier revisions of
+# this file carried a descriptive variant ("...for GNN Surrogates of Agent-Based Transport
+# Models"), which would have produced a citation to a title that does not exist on record.
+title: "Uncertainty Quantification for Machine Learning Models in Transportation Policy Analysis"
 authors:
   - family-names: Quadri
     given-names: Mohd Zamin
