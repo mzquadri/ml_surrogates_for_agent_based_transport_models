@@ -1,16 +1,16 @@
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/assets/header-dark.png">
-  <img alt="M.Sc. thesis, TUM 2026 — Uncertainty for a traffic surrogate: a graph network predicts how Paris traffic shifts when a lane closes, in milliseconds instead of hours, with a line chart showing calibration error falling from 0.269 on raw sigma to 0.048 after one scalar, 82% less calibration error" src="docs/assets/header-light.png">
+  <img alt="M.Sc. thesis, TUM 2026, Uncertainty for a traffic surrogate: a graph network predicts how Paris traffic shifts when a lane closes, in milliseconds instead of hours, with a line chart showing calibration error falling from 0.269 on raw sigma to 0.048 after one scalar, 82% less calibration error" src="docs/assets/header-light.png">
 </picture>
 
 # Uncertainty Quantification for Machine Learning Models in Transportation Policy Analysis
 
 A graph neural network trained on MATSim output predicts how Paris traffic shifts under a
-road-capacity policy in milliseconds, where the simulator needs hours — but it returns a
+road-capacity policy in milliseconds, where the simulator needs hours, but it returns a
 bare number, with nothing to say which of the 31,635 road links it is guessing at. This
-repository adds a post-hoc uncertainty layer on top of that already-trained surrogate — MC
-Dropout, temperature scaling and conformal prediction, none of which touch the weights —
-and then measures how far the resulting σ can actually be trusted. It is for transport
+repository adds a post-hoc uncertainty layer on top of that already-trained surrogate, MC
+Dropout, temperature scaling and conformal prediction, none of which touch the weights,
+and then measures how far the resulting sigma can actually be trusted. It is for transport
 modellers and ML practitioners who have a working surrogate and need to know when not to
 believe it.
 
@@ -24,21 +24,21 @@ non-zero on drift.
 
 | What was measured | Value |
 | --- | --- |
-| Calibration error (ECE), raw σ → one fitted scalar | **0.269 → 0.048**, a **−82%** change (T = 2.702) |
+| Calibration error (ECE), raw sigma to one fitted scalar | **0.269 to 0.048**, a **-82%** change (T = 2.702) |
 | Error detection, AUROC at the top-10% / top-20% errors | **0.7585** / 0.7401 [^auroc] |
-| Does σ rank errors? Spearman ρ against absolute error | **0.482** |
-| Selective prediction, MAE change at 50% of links retained | **−41.2%** |
+| Does sigma rank errors? Spearman rho against absolute error | **0.482** |
+| Selective prediction, MAE change at 50% of links retained | **-41.2%** |
 | Split conformal coverage, 90% / 95% nominal | 90.17% / 95.09% [^prot] |
-| The surrogate it sits on (Trial 8), R² / MAE / RMSE | 0.5957 / 3.96 / 7.12 veh/h |
+| The surrogate it sits on (Trial 8), R2 / MAE / RMSE | 0.5957 / 3.96 / 7.12 veh/h |
 
-Two findings, and they point in different directions. **σ ranks errors well enough to act
-on**: ρ = 0.482, error rises monotonically across σ deciles, and handing off the least
-reliable half of the links cuts MAE by 41%. **Raw σ is not a usable scale**: it covers only
+Two findings, and they point in different directions. **sigma ranks errors well enough to act
+on**: rho = 0.482, error rises monotonically across sigma deciles, and handing off the least
+reliable half of the links cuts MAE by 41%. **Raw sigma is not a usable scale**: it covers only
 48.6% of errors at the nominal 90% level, so it has to be calibrated before it can be read
 as an interval at all. One scalar does most of that work.
 
 The target the model predicts is the *change* in traffic flow,
-`vol_car - vol_base_case` — the flow under the policy minus the flow in the base case. That
+`vol_car - vol_base_case`, the flow under the policy minus the flow in the base case. That
 is why a prediction goes negative: a capacity reduction pushes cars off the link it touches.
 
 **The PointNetTransfGAT surrogate, the MATSim preprocessing and the base training pipeline
@@ -47,7 +47,7 @@ Full split in [What is mine and what is inherited](#what-is-mine-and-what-is-inh
 
 ## Run it
 
-The repository pins **Python 3.10** — `environment-minimal.yml` declares `python=3.10` and
+The repository pins **Python 3.10**, `environment-minimal.yml` declares `python=3.10` and
 the CI workflow installs the same. There is no `pyproject.toml`; nothing here is
 pip-installable, and conda is the supported path.
 
@@ -61,8 +61,8 @@ conda activate traffic-gnn
 python scripts/verify_headline_results.py        # recompute every headline number
 ```
 
-That runs against tracked artifacts and needs no downloads. Two of the thirteen checks —
-the AUROC pair — report `SKIP` until the 209 MB ablation CSV is fetched:
+That runs against tracked artifacts and needs no downloads. Two of the thirteen checks,
+the AUROC pair, report `SKIP` until the 209 MB ablation CSV is fetched:
 
 ```bash
 gh release download thesis-data-v1 \
@@ -82,23 +82,23 @@ python -m pytest -q                     # 13 of 15 tests; 2 need Streamlit
 
 For the full training environment, including PyTorch Geometric and CUDA, use
 `traffic-gnn.yml` instead. Training itself runs on a SLURM cluster via `run_models.sbatch`
-and is not reproducible from a clone — see [Reproducing the analyses](#reproducing-the-analyses).
+and is not reproducible from a clone, see [Reproducing the analyses](#reproducing-the-analyses).
 
 ---
 
 ## The thesis
 
-**M.Sc. thesis** · Technical University of Munich · School of Computation, Information and Technology
+**M.Sc. thesis**, Technical University of Munich, School of Computation, Information and Technology
 
 |               |                                                   |
 | ------------- | ------------------------------------------------- |
 | **Author**    | Mohd Zamin Quadri                                  |
 | **Programme** | M.Sc. Mathematics in Science and Engineering       |
 | **Supervisor**| Prof. Dr. Stephan Günnemann                        |
-| **Advisors**  | Dominik Fuchsgruber, M.Sc. · Elena Natterer, M.Sc. |
+| **Advisors**  | Dominik Fuchsgruber, M.Sc., Elena Natterer, M.Sc. |
 | **Submitted** | 15 May 2026                                        |
 
-**[Read the thesis (PDF)](thesis/submission_2026-05-15/)** · **[Full results](#results-in-detail)** · **[Data story](docs/portfolio_data_story/)** · **[Corrigendum](docs/CORRIGENDUM.md)**
+**[Read the thesis (PDF)](thesis/submission_2026-05-15/)**, **[Full results](#results-in-detail)**, **[Data story](docs/portfolio_data_story/)**, **[Corrigendum](docs/CORRIGENDUM.md)**
 
 ![The Paris network](docs/figures/portfolio/01_the_network.png)
 
@@ -106,14 +106,14 @@ and is not reproducible from a clone — see [Reproducing the analyses](#reprodu
 
 ## The problem
 
-Agent-based transport simulators such as MATSim answer policy questions well but slowly —
+Agent-based transport simulators such as MATSim answer policy questions well but slowly,
 hours per scenario. A graph neural network trained on their output answers the same
 question in seconds, which is what makes large policy sweeps feasible at all.
 
 The catch is that the surrogate returns a bare number. Nothing in it says which of the
 31,635 road links it is confident about and which it is guessing at. For a model whose
 output is meant to inform a decision about closing a road, that gap matters more than
-another point of R².
+another point of R2.
 
 **This thesis asks: can a useful, calibrated uncertainty estimate be attached to an
 already-trained GNN surrogate, without retraining it?**
@@ -128,12 +128,12 @@ are upstream work by Elena Natterer et al.; the uncertainty layer on top of them
 | Origin | What it covers |
 | --- | --- |
 | **Inherited** (upstream) | The GNN architectures (`scripts/gnn/`), the MATSim-to-graph preprocessing (`scripts/data_preprocessing/`), the base training pipeline (`scripts/training/`), `help_functions.py` / `plot_functions.py`, and `traffic-gnn.yml`. |
-| **Mine** (this thesis) | The entire uncertainty layer — MC Dropout evaluation, temperature scaling, split and adaptive conformal prediction, CQR, deep ensembles, heteroscedastic regression, selective prediction, error detection, the calibration audits, every result artifact under `results/`, the thesis document, and the verification tooling. |
+| **Mine** (this thesis) | The entire uncertainty layer, MC Dropout evaluation, temperature scaling, split and adaptive conformal prediction, CQR, deep ensembles, heteroscedastic regression, selective prediction, error detection, the calibration audits, every result artifact under `results/`, the thesis document, and the verification tooling. |
 
 Upstream is **[`enatterer/ml_surrogates_for_agent_based_transport_models`](https://github.com/enatterer/ml_surrogates_for_agent_based_transport_models)**
 by **Elena Natterer**, with contributions from **Saini Rohan Rao** and **Thua Duc Nguyen**.
 Their full commit history is preserved unmodified on the [`zamin_uq`](../../tree/zamin_uq)
-branch — 266 commits, none of them mine. The `main` branch carries this thesis's work.
+branch, 266 commits, none of them mine. The `main` branch carries this thesis's work.
 
 The trained surrogate itself is taken as given from that work. This thesis does not claim
 the architecture, the preprocessing, or the base training procedure.
@@ -147,19 +147,19 @@ the architecture, the preprocessing, or the base training procedure.
 
 1,000 MATSim scenarios of the Paris Île-de-France network at 1% population sampling. Each
 scenario is the **same** road network under a different capacity-reduction policy, and the
-preprocessing names each one after the districts its policy touches —
+preprocessing names each one after the districts its policy touches,
 `create_policy_key()` returns *"Policy introduced in Arrondissement(s) 5, 12"*. **The
 arrondissement is the unit the experiment was designed around.**
 
 ![Paris by arrondissement](docs/figures/portfolio/07_arrondissements.png)
 
 88.4% of links fall inside the twenty arrondissements; the rest extend into the wider
-Île-de-France. The policy only ever touches three OSM road classes — primary, secondary and
+Île-de-France. The policy only ever touches three OSM road classes, primary, secondary and
 tertiary. Motorways are **never** intervened in any of the 1,000 scenarios.
 
 ![Arrondissement choropleths](docs/figures/geography/02_arrondissement_choropleths.png)
 
-Intervention rates span 25.9% (18th) to 48.1% (16th) and severity 190 to 472 veh/h (8th) —
+Intervention rates span 25.9% (18th) to 48.1% (16th) and severity 190 to 472 veh/h (8th),
 but **local severity does not determine local response**. The 16th is intervened most and
 responds least; the 17th absorbs **12.0% of the network's total response across 6.9% of its
 links**, the 14th 10.3% across 5.3%.
@@ -169,7 +169,7 @@ links**, the 14th 10.3% across 5.3%.
 ## The dataset: 11 stored fields
 
 Each scenario is one PyTorch Geometric `Data` object holding **six feature columns in `x`
-plus five further tensors — eleven stored fields in total**.
+plus five further tensors, eleven stored fields in total**.
 
 ![Feature representation](docs/diagrams/03_feature_representation.svg)
 
@@ -181,8 +181,8 @@ plus five further tensors — eleven stored fields in total**.
 | `x[:, 3]` `FREESPEED` | ″ | no | ✅ |
 | `x[:, 4]` `HIGHWAY` | ″ | no | ❌ nominal codes |
 | `x[:, 5]` `LENGTH` | ″ | no | ✅ |
-| `pos` — start / end / midpoint, WGS84 | `[31635, 3, 2]` | no | ✅ |
-| `y` — change in link volume, `vol_car - vol_base_case` | `[31635, 1]` | **yes** | target |
+| `pos`, start / end / midpoint, WGS84 | `[31635, 3, 2]` | no | ✅ |
+| `y`, change in link volume, `vol_car - vol_base_case` | `[31635, 1]` | **yes** | target |
 | `edge_index` | `[2, 59851]` | no | ✅ |
 | `mode_stats_diff` | `[6, 3]` | yes | ❌ unused |
 | `mode_stats_diff_perc` | `[6, 3]` | yes | ❌ unused |
@@ -190,8 +190,8 @@ plus five further tensors — eleven stored fields in total**.
 **One column carries the whole experiment.** Five of six features, the positions and the
 topology are byte-identical in every scenario; only `CAPACITY_REDUCTION` moves.
 
-The `EdgeFeatures` enum also declares `ALLOWED_MODE_CAR` … `ALLOWED_MODE_SUBWAY` at indices
-6–11, but `use_allowed_modes = False` in the preprocessing, so those six columns were
+The `EdgeFeatures` enum also declares `ALLOWED_MODE_CAR` ... `ALLOWED_MODE_SUBWAY` at indices
+6 to 11, but `use_allowed_modes = False` in the preprocessing, so those six columns were
 **designed and never materialised**. `x` has six columns, not twelve.
 
 ![Field reference](docs/figures/portfolio/10_field_reference.png)
@@ -199,15 +199,15 @@ The `EdgeFeatures` enum also declares `ALLOWED_MODE_CAR` … `ALLOWED_MODE_SUBWA
 ![The five model features](docs/figures/portfolio/09_five_model_features.png)
 
 The same panel layout the thesis used, rebuilt over the whole corpus rather than a
-200-graph subset. Every one of the eleven stored fields has its own card —
-distribution, spatial map and relationship with the response — in
+200-graph subset. Every one of the eleven stored fields has its own card,
+distribution, spatial map and relationship with the response, in
 [`docs/figures/features/`](docs/figures/features/README.md).
 
 ![The busiest roads are the steady ones](docs/figures/portfolio/03_inverted_u.png)
 
 A separate check on the stored schema found that `num_nodes` is recorded as 31,559 while
 `x`, `pos` and `y` all carry 31,635 rows. The 76 extra rows are public-transport links with
-no car access, no edges, and a target of exactly zero in every scenario — see
+no car access, no edges, and a target of exactly zero in every scenario, see
 [CORRIGENDUM C11](docs/CORRIGENDUM.md).
 
 Per-field detail: [`docs/DATASET.md`](docs/DATASET.md),
@@ -241,17 +241,17 @@ Traced to the code and confirmed against the trained checkpoint:
 
 ## Model
 
-`PointNetTransfGAT` — two PointNet convolutions folding in link geometry, two
+`PointNetTransfGAT`, two PointNet convolutions folding in link geometry, two
 graph-transformer layers, two attention layers reducing to one value per link.
 **1,416,835 parameters**, read from the Trial 8 checkpoint rather than code defaults.
 
 ![Model architecture](docs/figures/portfolio/08_model_architecture.png)
 
 Every shape and count above is a tensor in the Trial 8 checkpoint. There is a card
-for each of the eleven stored fields — the six columns of `x` and the five other
-tensors — in [`docs/figures/features/`](docs/figures/features/README.md).
+for each of the eleven stored fields, the six columns of `x` and the five other
+tensors, in [`docs/figures/features/`](docs/figures/features/README.md).
 
-The two dropout layers are the only stochastic elements — which is exactly what makes
+The two dropout layers are the only stochastic elements, which is exactly what makes
 post-hoc MC Dropout possible without touching the weights.
 
 ---
@@ -262,16 +262,16 @@ Sixteen checkpoints across eleven trials plus a five-seed ensemble.
 
 | Stage | Change | Outcome |
 | --- | --- | --- |
-| **T1–T6** | output head, weighted loss, learning rate | T1 R² 0.786 (Linear head, no dropout); weighted loss failed twice (0.225, 0.243); T5 recovered to 0.555 |
-| **T7–T8** | 80/10/10 split, then dropout 0.3 → **0.2** | **T8: R² 0.5957, MAE 3.96** — the UQ baseline |
+| **T1-T6** | output head, weighted loss, learning rate | T1 R2 0.786 (Linear head, no dropout); weighted loss failed twice (0.225, 0.243); T5 recovered to 0.555 |
+| **T7-T8** | 80/10/10 split, then dropout 0.3 to **0.2** | **T8: R2 0.5957, MAE 3.96**, the UQ baseline |
 | **T9** | freeze T8, add heteroscedastic head | val NLL 3.249; no test metrics recorded |
-| **T10** | full CQR retrain, 87 hours | **gate FAIL** — midpoint R² 0.406, PICP95 91.8% |
-| **T11** | freeze T8, quantile head only, 40 hours | **gate PASS** — midpoint R² 0.584, PICP95 94.9% |
-| **Ensemble** | 5 seeds, dropout off at inference | R² **0.684** — best accuracy — but ρ 0.400 |
+| **T10** | full CQR retrain, 87 hours | **gate FAIL**, midpoint R2 0.406, PICP95 91.8% |
+| **T11** | freeze T8, quantile head only, 40 hours | **gate PASS**, midpoint R2 0.584, PICP95 94.9% |
+| **Ensemble** | 5 seeds, dropout off at inference | R2 **0.684**, best accuracy, but rho 0.400 |
 
-> **⚠ Trials were not all scored on the same test split.** T1–T6 used **50 test graphs**
-> (1,581,750 nodes); T7–T11 and the ensembles used **100** (3,163,500). R² is not comparable
-> across that boundary — see [CORRIGENDUM C9](docs/CORRIGENDUM.md). All uncertainty work
+> **⚠ Trials were not all scored on the same test split.** T1-T6 used **50 test graphs**
+> (1,581,750 nodes); T7-T11 and the ensembles used **100** (3,163,500). R2 is not comparable
+> across that boundary, see [CORRIGENDUM C9](docs/CORRIGENDUM.md). All uncertainty work
 > uses Trial 8 alone, so no UQ result rests on a cross-split comparison.
 
 **Freezing beat retraining.** T10 retrained everything for 87 hours and failed its own
@@ -280,7 +280,7 @@ one quantile head for 40 hours, passed every gate and kept it. Same method, oppo
 outcome, decided by what was allowed to move.
 
 **The ensemble bought accuracy and lost uncertainty quality.** Most accurate model here at
-R² 0.684, yet its σ ranks errors *worse* than MC Dropout — ρ 0.400 against 0.482, a 17.1%
+R2 0.684, yet its sigma ranks errors *worse* than MC Dropout, rho 0.400 against 0.482, a 17.1%
 drop recorded in its own comparison block. Better predictions did not mean better
 uncertainty.
 
@@ -294,19 +294,19 @@ Everything here is **post-hoc**: the checkpoint is loaded, frozen, never updated
 
 ![Uncertainty pipeline](docs/diagrams/06_uncertainty_pipeline.svg)
 
-Two questions with different answers. **Does σ rank errors?** Yes — ρ = 0.482, and error
-rises monotonically across σ deciles. **Is σ a calibrated scale?** No — raw σ covers only
+Two questions with different answers. **Does sigma rank errors?** Yes, rho = 0.482, and error
+rises monotonically across sigma deciles. **Is sigma a calibrated scale?** No, raw sigma covers only
 48.6% of errors at nominal 90%.
 
 ![Uncertainty vs error](docs/figures/results/02_uncertainty_vs_error.png)
 
-So σ is corrected two independent ways: **temperature scaling** (one scalar, keeps an
-interpretable per-link σ) and **split conformal prediction** (exact marginal coverage by
+So sigma is corrected two independent ways: **temperature scaling** (one scalar, keeps an
+interpretable per-link sigma) and **split conformal prediction** (exact marginal coverage by
 construction, at the cost of one shared width).
 
 ![Calibration](docs/figures/results/03_calibration.png)
 
-Four questions, four evaluations — conflating them is the usual way to overstate an
+Four questions, four evaluations, conflating them is the usual way to overstate an
 uncertainty result:
 
 ![Evaluation framework](docs/diagrams/07_evaluation_framework.svg)
@@ -315,21 +315,21 @@ uncertainty result:
 
 ## Results in detail
 
-### Trial 8 — 100 held-out scenarios, 3,163,500 links
+### Trial 8, 100 held-out scenarios, 3,163,500 links
 
 | Metric | Value |
 | --- | --- |
-| R² | **0.5957** |
+| R2 | **0.5957** |
 | MAE / RMSE | **3.96 / 7.12** veh/h |
 
 ### Uncertainty quality
 
 | Analysis | Trial 8 | Trial 7 |
 | --- | --- | --- |
-| MC Dropout Spearman ρ (σ vs abs. error) | **0.482** | 0.4437 [^t7] |
-| ECE, before → after temperature scaling | 0.269 → 0.048 (T = 2.702) | — |
-| Selective prediction, MAE reduction at 50% retained | **−41.2%** | −38.3% |
-| Error detection AUROC, top-10% / top-20% | **0.7585 / 0.7401** [^auroc] | 0.7416 / — |
+| MC Dropout Spearman rho (sigma vs abs. error) | **0.482** | 0.4437 [^t7] |
+| ECE, before to after temperature scaling | 0.269 to 0.048 (T = 2.702) |, |
+| Selective prediction, MAE reduction at 50% retained | **-41.2%** | -38.3% |
+| Error detection AUROC, top-10% / top-20% | **0.7585 / 0.7401** [^auroc] | 0.7416 /, |
 | Split conformal coverage, 90% / 95% | 90.17% / 95.09% [^prot] | 90.18% / 95.11% |
 
 ![Selective prediction and conformal coverage](docs/figures/results/04_selective_and_conformal.png)
@@ -338,8 +338,8 @@ uncertainty result:
 
 **About 65% of the response lands on links the policy never touched.** Mean |response| is
 13.06 veh/h on intervened links against 2.91 elsewhere, but the untouched links are so
-numerous they carry two-thirds of the total effect. The graph-distance profile drops 4.4×
-at the first hop and is then **flat out to eight hops** — an observed network-wide
+numerous they carry two-thirds of the total effect. The graph-distance profile drops 4.4x
+at the first hop and is then **flat out to eight hops**, an observed network-wide
 redistribution rather than a gradient that fades with distance.
 
 It survives its reachability control (one hop reaches only 32% of the network, three reach
@@ -355,12 +355,12 @@ evidence of a mechanism. See [`05_spillover.md`](docs/portfolio_data_story/05_sp
 [^auroc]: **Corrected after submission.** The submitted thesis reports a lower pair for
     this metric, citing a file absent from this repository. Recomputation from the cited
     artifact gives 0.7585 and 0.7401. A results figure in this README computes the same
-    metric from the tracked NPZ archive and lands slightly lower again — a different
+    metric from the tracked NPZ archive and lands slightly lower again, a different
     stochastic MC Dropout replay of the same model, not a different result. Each value is
     correct for the artifact it names; the superseded figures and the full derivation are
     in [CORRIGENDUM C4 and C7a](docs/CORRIGENDUM.md).
 
-[^prot]: Protocol `graph20_80_v1` — calibrate on the first 20 test graphs, evaluate on the
+[^prot]: Protocol `graph20_80_v1`, calibrate on the first 20 test graphs, evaluate on the
     remaining 80. The thesis reports 90.02% / 95.01% under a 50/50 scenario split whose
     indices were not retained. The two must not be pooled; see
     [CORRIGENDUM C3](docs/CORRIGENDUM.md).
@@ -396,9 +396,9 @@ byte-identical across scenarios.
 ### What this does not establish
 
 One Paris network, one capacity-reduction intervention family, a 1,000-scenario subset, one
-model family. Conformal coverage is marginal over the evaluated split — not a guarantee for
+model family. Conformal coverage is marginal over the evaluated split, not a guarantee for
 any individual scenario, link, city, or policy. Checked directly: coverage breaks out by
-arrondissement at 80.7%–92.4% against a 90% nominal level, not a flat 90% everywhere — see
+arrondissement at 80.7%-92.4% against a 90% nominal level, not a flat 90% everywhere, see
 [`docs/COVERAGE_BY_ARRONDISSEMENT.md`](docs/COVERAGE_BY_ARRONDISSEMENT.md).
 
 ---
@@ -416,7 +416,7 @@ python scripts/data_exploration/explore_arrondissements.py --corpus <dir> --cach
 ```
 
 These replay the analyses from cached prediction arrays. They do not retrain the models and
-do not rerun MATSim — the raw simulation outputs were not retained.
+do not rerun MATSim, the raw simulation outputs were not retained.
 [`docs/CORRIGENDUM.md`](docs/CORRIGENDUM.md) C5 states the replay boundaries;
 [`DATA.md`](DATA.md) covers artifact availability.
 
@@ -430,7 +430,7 @@ byte-identically. Nothing is drawn by hand.
 | | What it shows | Where |
 |---|---|---|
 | **The network** | 31,635 real street segments, shaded by traffic | [gallery](docs/figures/portfolio/README.md) |
-| **Five model features** | the (a)–(e) panel figure, full corpus | [gallery](docs/figures/portfolio/README.md) |
+| **Five model features** | the (a)-(e) panel figure, full corpus | [gallery](docs/figures/portfolio/README.md) |
 | **Field reference** | all eleven fields: shape, dynamic, model input | [gallery](docs/figures/portfolio/README.md) |
 | **Eleven field cards** | one card per stored field | [features](docs/figures/features/README.md) |
 | **Policy vs response** | where the policy lands against where traffic moves | [gallery](docs/figures/portfolio/README.md) |
@@ -451,12 +451,12 @@ python scripts/figure_generation/generate_field_reference.py
 ```
 
 Maps draw the real street geometry from `pos[:, 0]` to `pos[:, 1]`, and district
-boundaries come from the arrondissement GeoJSON — the same CRS84 longitude and latitude,
+boundaries come from the arrondissement GeoJSON, the same CRS84 longitude and latitude,
 so the two overlay without reprojection. Heavy reductions use the Intel Arc GPU through
 `torch.xpu` where it helps, which is about fifteen times faster than numpy for this shape.
 
 Three figures are recorded as defective in [`docs/CORRIGENDUM.md`](docs/CORRIGENDUM.md)
-C13 — `docs/diagrams/calibration.svg`, `docs/diagrams/stratified_uq.svg` and
+C13, `docs/diagrams/calibration.svg`, `docs/diagrams/stratified_uq.svg` and
 `thesis/latex_tum_official/figures/new/fig12_sigma_scaling_ece.png`. They are kept as part
 of the record and are not embedded anywhere in this README. Do not reuse them.
 
@@ -473,7 +473,7 @@ scripts/
   data_exploration/            Dataset, arrondissement and checkpoint analysis
   evaluation/  figure_generation/
   gnn/  training/  data_preprocessing/     Upstream model, training and preprocessing
-  archive/                     Historical one-offs — provenance only, not runnable
+  archive/                     Historical one-offs, provenance only, not runnable
 docs/
   DATASET.md  CORRIGENDUM.md  ARTIFACT_PROVENANCE.md
   portfolio_data_story/        Deep corpus analysis + derived web assets
@@ -486,7 +486,7 @@ thesis/     submission_2026-05-15/ (examined) and latex_tum_official/ (working)
 tests/
 ```
 
-All large artifacts are published as **[Releases on this repository](../../releases)** —
+All large artifacts are published as **[Releases on this repository](../../releases)**,
 the training corpus, per-trial evaluation outputs, oversized prediction archives, and the
 migrated per-trial data. Everything the thesis needs is here or on those releases; there is
 no companion repository. See [`DATA.md`](DATA.md).
@@ -501,8 +501,8 @@ Upstream code is under the **MIT Licence, © 2024 Elena Natterer**, reproduced i
 `scripts/evaluation/plot_functions.py`, the upstream notebooks, and `traffic-gnn.yml`, and
 anything derived from them.
 
-Material added by this fork — the thesis text and figures, the trained checkpoints, and the
-result artifacts — is **not** covered by that grant. Reuse requires prior permission from
+Material added by this fork, the thesis text and figures, the trained checkpoints, and the
+result artifacts, is **not** covered by that grant. Reuse requires prior permission from
 the author and, where applicable, the original data and model owners.
 
 Citation metadata: [`CITATION.cff`](CITATION.cff).
