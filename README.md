@@ -29,6 +29,7 @@ non-zero on drift.
 | Does sigma rank errors? Spearman rho against absolute error | **0.482** |
 | Selective prediction, MAE change at 50% of links retained | **-41.2%** |
 | Split conformal coverage, 90% / 95% nominal | 90.17% / 95.09% [^prot] |
+| Conditional coverage across sigma deciles, standard to adaptive conformal | **59.0%-98.1% to 83.7%-96.4%** [^cond] |
 | The surrogate it sits on (Trial 8), R2 / MAE / RMSE | 0.5957 / 3.96 / 7.12 veh/h |
 
 Two findings, and they point in different directions. **sigma ranks errors well enough to act
@@ -36,6 +37,14 @@ on**: rho = 0.482, error rises monotonically across sigma deciles, and handing o
 reliable half of the links cuts MAE by 41%. **Raw sigma is not a usable scale**: it covers only
 48.6% of errors at the nominal 90% level, so it has to be calibrated before it can be read
 as an interval at all. One scalar does most of that work.
+
+A third finding sits underneath both, and it is the one a marginal number hides. **Coverage
+that is right on average is not right anywhere in particular.** A single constant conformal
+width lands at 88.4% overall while running from 59.0% on the links the model is least sure
+about to 98.1% on the ones it is most sure about: too narrow exactly where it matters, and
+wastefully wide where it does not. Scaling the width by sigma pulls that band to 83.7%-96.4%
+and moves the global figure from 88.4% to 89.9%, nearer the 90% it targets. Reporting only
+the marginal number would have shown none of this.
 
 The target the model predicts is the *change* in traffic flow,
 `vol_car - vol_base_case`, the flow under the policy minus the flow in the base case. That
@@ -334,6 +343,32 @@ uncertainty result:
 
 ![Selective prediction and conformal coverage](docs/figures/results/04_selective_and_conformal.png)
 
+### Conditional coverage, and why the marginal number is not enough
+
+Marginal coverage is an average over the evaluated split. It can be exactly right while the
+guarantee fails on every subgroup a reader would actually ask about. It does here.
+
+Nominal 90%, 10 sigma deciles, 1,581,750 nodes
+(`results/phase3/adaptive_conformal_decile.json`):
+
+| Width | Global | Lowest decile | Highest decile | Span |
+| --- | --- | --- | --- | --- |
+| Standard conformal, one constant width | 88.39% | 59.04% | 98.08% | **39.0 points** |
+| Adaptive conformal, width scaled by sigma | 89.89% | 83.69% | 96.44% | **12.8 points** |
+
+The constant width is set by the whole calibration set, so it is too narrow on the links
+whose sigma is large, which are the links the model is already least sure about, and too
+wide on the links whose sigma is small. The failure is concentrated exactly where a user
+would be relying on the interval most. Scaling the width by sigma closes 26 points of that
+spread and does not pay for it globally: overall coverage moves from 88.39% to 89.89%,
+nearer the 90% it is aiming at, not further from it.
+
+This is a different split from the marginal coverage row in
+[The result](#the-result) and the two must not be pooled; see
+[CORRIGENDUM C3](docs/CORRIGENDUM.md) on protocols. The same analysis over the
+2,530,800-node evaluation set in `results/conformal_conditional_coverage_t8.json` reproduces
+the effect: 62.92%-98.57% narrowing to 84.25%-96.24%.
+
 ### Where the traffic actually goes
 
 **About 65% of the response lands on links the policy never touched.** Mean |response| is
@@ -364,6 +399,16 @@ evidence of a mechanism. See [`05_spillover.md`](docs/portfolio_data_story/05_sp
     remaining 80. The thesis reports 90.02% / 95.01% under a 50/50 scenario split whose
     indices were not retained. The two must not be pooled; see
     [CORRIGENDUM C3](docs/CORRIGENDUM.md).
+
+[^cond]: From `results/phase3/adaptive_conformal_decile.json`, recomputed for this table:
+    1,581,750 nodes, the last 50 graphs, 10 sigma deciles, nominal 90%. Standard conformal
+    (one constant width) spans 59.04% to 98.08% across the deciles at 88.39% globally;
+    adaptive conformal (width scaled by sigma, `q_adapt` = 7.709) spans 83.69% to 96.44% at
+    89.89% globally. **This is a different split from the marginal coverage row above**,
+    which uses `graph20_80_v1` over 80 graphs, so the two rows are not two readings of one
+    number and must not be pooled. The same analysis over the 2,530,800-node evaluation set
+    in `results/conformal_conditional_coverage_t8.json` gives 62.92%-98.57% narrowing to
+    84.25%-96.24%, the same effect at the same size.
 
 ### Inference cost
 
