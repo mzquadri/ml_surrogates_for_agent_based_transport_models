@@ -5,6 +5,16 @@
 
 # Uncertainty Quantification for Machine Learning Models in Transportation Policy Analysis
 
+<!-- project-story:start -->
+<p align="center"><img src="docs/assets/architecture-animated.svg" alt="Animated architecture diagram of this project" width="100%"></p>
+
+| Problem | Why it mattered | Result |
+|---|---|---|
+| A fast traffic model can be wrong with no warning. | Analysts need to know which predictions to trust. | **41.2%** lower error after setting aside the least confident half |
+
+[See it animated on mzquadri.de](https://mzquadri.de/work/transport-uq)
+<!-- project-story:end -->
+
 A graph neural network trained on MATSim output predicts how Paris traffic shifts under a
 road-capacity policy in milliseconds, where the simulator needs hours, but it returns a
 bare number, with nothing to say which of the 31,635 road links it is guessing at. This
