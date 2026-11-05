@@ -40,7 +40,7 @@ verification tooling that recomputes each published number from its source artif
 **Not mine, and must be labelled as such on any page:** the GNN architecture, the MATSim-to-graph
 preprocessing, and the base training pipeline. Those come from
 `enatterer/ml_surrogates_for_agent_based_transport_models` (MIT, © 2024 Elena Natterer), with
-contributions from Saini Rohan Rao and Thua Duc Nguyen. The trained surrogate is taken as given.
+contributions from Saini Rohan Rao and Thua Duc Nguyen. The data and the training scripts came from that work; the trials were trained in this thesis.
 
 ## Technologies
 

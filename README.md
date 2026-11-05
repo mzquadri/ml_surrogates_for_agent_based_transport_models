@@ -61,7 +61,8 @@ The target the model predicts is the *change* in traffic flow,
 is why a prediction goes negative: a capacity reduction pushes cars off the link it touches.
 
 **The PointNetTransfGAT surrogate, the MATSim preprocessing and the base training pipeline
-are upstream work by Elena Natterer et al.; the uncertainty layer on top of them is mine.**
+are upstream work by Elena Natterer et al.; the eleven training trials and the uncertainty
+layer on top of them are mine.**
 Full split in [What is mine and what is inherited](#what-is-mine-and-what-is-inherited).
 
 ## Run it
@@ -142,19 +143,21 @@ already-trained GNN surrogate, without retraining it?**
 ## What is mine and what is inherited
 
 The PointNetTransfGAT surrogate, the MATSim preprocessing and the base training pipeline
-are upstream work by Elena Natterer et al.; the uncertainty layer on top of them is mine.
+are upstream work by Elena Natterer et al.; the eleven training trials and the uncertainty
+layer on top of them are mine.
 
 | Origin | What it covers |
 | --- | --- |
 | **Inherited** (upstream) | The GNN architectures (`scripts/gnn/`), the MATSim-to-graph preprocessing (`scripts/data_preprocessing/`), the base training pipeline (`scripts/training/`), `help_functions.py` / `plot_functions.py`, and `traffic-gnn.yml`. |
-| **Mine** (this thesis) | The entire uncertainty layer, MC Dropout evaluation, temperature scaling, split and adaptive conformal prediction, CQR, deep ensembles, heteroscedastic regression, selective prediction, error detection, the calibration audits, every result artifact under `results/`, the thesis document, and the verification tooling. |
+| **Mine** (this thesis) | Training every trial (T1-T11) and the ensemble on PointNetTransfGAT, the entire uncertainty layer, MC Dropout evaluation, temperature scaling, split and adaptive conformal prediction, CQR, deep ensembles, heteroscedastic regression, selective prediction, error detection, the calibration audits, every result artifact under `results/`, the thesis document, and the verification tooling. |
 
 Upstream is **[`enatterer/ml_surrogates_for_agent_based_transport_models`](https://github.com/enatterer/ml_surrogates_for_agent_based_transport_models)**
 by **Elena Natterer**, with contributions from **Saini Rohan Rao** and **Thua Duc Nguyen**.
 Their full commit history is preserved unmodified on the [`zamin_uq`](../../tree/zamin_uq)
 branch, 266 commits, none of them mine. The `main` branch carries this thesis's work.
 
-The trained surrogate itself is taken as given from that work. This thesis does not claim
+The data and the training scripts came from that work. I trained every trial with them,
+then added the uncertainty layer. This thesis does not claim
 the architecture, the preprocessing, or the base training procedure.
 
 > Natterer et al. (2025). *Machine Learning Surrogates for Agent-Based Models in
